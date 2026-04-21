@@ -1,200 +1,90 @@
 # AutoMem Evals
 
-Evaluation framework for testing and comparing AutoMem rule sets across different AI agents.
+`automem-evals` is the exploratory evaluation lab for AutoMem.
 
-## Purpose
+Use this repo for high-churn benchmark work such as ruleset experiments, seeded corpora, scenario authoring, cross-agent comparisons, and timestamped result artifacts. Use the main `automem` repo for official benchmark harnesses, published baselines, and any benchmark numbers referenced in docs, CI, or release notes.
 
-The [mcp-automem](https://github.com/verygoodplugins/mcp-automem) server provides persistent memory to AI agents. But how do we know if a given set of instructions (rules) helps the AI use memory effectively?
+## Repo Boundary
 
-This repo provides:
-1. **Benchmark scenarios** - Reproducible test cases with expected outcomes
-2. **Metrics** - Quantitative measures of memory quality
-3. **Comparison tools** - A/B testing different rule sets
-4. **Analysis** - Reports and visualizations
+This repo owns:
+- scenario definitions under `scenarios/`
+- ruleset definitions under `rulesets/`
+- seed corpora and manifests under `data/seed_memories/`
+- experiment runners under `runners/` and helper scripts under `scripts/`
+- exploratory summaries and per-run comparison artifacts under `data/results/`
 
-## Evaluation Dimensions
+This repo does **not** own:
+- official LoCoMo / LongMemEval benchmark claims
+- release-gating benchmark flows
+- canonical published baselines for AutoMem
 
-### 1. Recall Precision
-*Does the AI retrieve the right memories?*
+Those stay in `automem`. See `docs/REPO_BOUNDARY.md` here and `automem/docs/EVALS_CONTRACT.md` in the service repo for the working contract between repos.
 
-```
-Scenario: Given 50 stored memories about a project, ask "What architecture decisions did we make?"
-Expected: Retrieve memories tagged [decision, architecture] with >0.8 importance
-Metric: Precision@K, Recall@K, NDCG
-```
+## What Exists Today
 
-### 2. Storage Quality (Signal-to-Noise)
-*Does the AI store meaningful information?*
+The current implementation is a focused recall-quality harness against a locally running AutoMem stack.
 
-```
-Scenario: Complete a 30-minute coding session fixing 3 bugs
-Expected: ~3-5 memories (one per significant fix), not 50 trivial edits
-Metric: 
-  - Storage rate (memories/hour)
-  - Importance distribution (should be bimodal, not uniform)
-  - Human-rated usefulness (sample review)
-```
+- Compare multiple recall parameter rulesets against the same scenario set
+- Seed synthetic corpora into AutoMem with stable scenario-to-memory mappings
+- Generate timestamped markdown reports for quick A/B analysis
+- Prototype retrieval behavior such as client-side graph expansion without changing `automem`
 
-### 3. Association Quality
-*Are relationships between memories meaningful?*
+It is intentionally narrower than a full benchmark platform. Today it is primarily about answering:
 
-```
-Scenario: Store a bug fix, then ask about related decisions
-Expected: Bug fix memory should RELATES_TO or DERIVED_FROM the original feature
-Metric:
-  - Association coverage (% of memories with relationships)
-  - Relationship accuracy (human-rated)
-  - Graph connectivity (isolated nodes = bad)
-```
+> Does this recall strategy surface the right memories from a seeded corpus?
 
-### 4. Context Awareness
-*Does the AI use context hints effectively?*
+## Current Layout
 
-```
-Scenario: Working in Python file, ask about "error handling patterns"
-Expected: Prioritize Python-specific memories over JavaScript ones
-Metric: Language/context match rate
-```
-
-### 5. Multi-hop Reasoning
-*Can the AI follow relationship chains?*
-
-```
-Scenario: Store "Alice's manager is Bob" and "Bob works in Engineering"
-Query: "What department does Alice's manager work in?"
-Expected: Engineering (requires 2-hop traversal)
-Metric: Multi-hop accuracy by hop count
-```
-
-## Proposed Structure
-
-```
+```text
 automem-evals/
-├── scenarios/                    # Test scenario definitions
-│   ├── recall/
-│   │   ├── basic_query.yaml
-│   │   ├── multi_query.yaml
-│   │   ├── time_filtered.yaml
-│   │   └── entity_expansion.yaml
-│   ├── storage/
-│   │   ├── coding_session.yaml
-│   │   ├── decision_making.yaml
-│   │   └── bug_fixing.yaml
-│   └── association/
-│       ├── feature_to_bug.yaml
-│       └── decision_chain.yaml
-│
-├── rulesets/                     # Rule sets to compare
-│   ├── baseline/                 # Minimal rules
-│   │   └── rules.md
-│   ├── cursor_v1/                # Current Cursor template
-│   │   └── rules.md
-│   ├── claude_code_v1/           # Current Claude Code template
-│   │   └── rules.md
-│   └── experimental/             # New variations to test
-│       ├── aggressive_storage/
-│       └── conservative_storage/
-│
-├── runners/                      # Test execution
-│   ├── scenario_runner.py        # Execute scenarios against rules
-│   ├── transcript_analyzer.py    # Parse session transcripts
-│   └── metrics.py                # Calculate evaluation metrics
-│
-├── data/                         # Test data and results
-│   ├── seed_memories/            # Pre-populated memory sets
-│   ├── transcripts/              # Session transcripts for analysis
-│   └── results/                  # Evaluation results
-│
-├── analysis/                     # Reporting
-│   ├── compare_rulesets.py       # Generate comparison reports
-│   └── visualize.py              # Charts and graphs
-│
-└── docs/
-    ├── SCENARIOS.md              # How to write scenarios
-    ├── METRICS.md                # Metric definitions
-    └── CONTRIBUTING.md           # How to add rule sets
+├── rulesets/            # JSON rulesets for phase 1/2/3 recall behavior
+├── scenarios/           # JSON scenarios with expected hit tags
+├── runners/             # Comparison runners and experimental clients
+├── scripts/             # Corpus generation, seeding, snapshotting helpers
+├── data/
+│   ├── seed_memories/   # Raw corpora, embedded snapshots, manifests
+│   └── results/         # Summaries and timestamped comparison reports
+└── docs/                # Session notes and repo-boundary documentation
 ```
 
-## Scenario Format (Draft)
+## Quick Start
 
-```yaml
-# scenarios/recall/basic_query.yaml
-name: basic_semantic_recall
-description: Test basic semantic search retrieval
-
-setup:
-  seed_memories:
-    - content: "Decided to use PostgreSQL for user data. ACID compliance needed."
-      tags: [project-x, decision, database]
-      importance: 0.9
-    - content: "Using Redis for session caching. Sub-millisecond latency."
-      tags: [project-x, decision, caching]
-      importance: 0.85
-    - content: "Fixed login bug - null check was missing."
-      tags: [project-x, bug-fix, auth]
-      importance: 0.7
-
-test_cases:
-  - query: "What database did we choose?"
-    expected_ids: [mem-1]  # PostgreSQL decision
-    min_score: 0.8
-    
-  - query: "Tell me about caching"
-    expected_ids: [mem-2]  # Redis decision
-    min_score: 0.75
-
-metrics:
-  - precision_at_1
-  - recall_at_3
-  - mean_reciprocal_rank
-```
-
-## Metrics Reference
-
-| Metric | Description | Good Value |
-|--------|-------------|------------|
-| **Precision@K** | % of top-K results that are relevant | >0.8 |
-| **Recall@K** | % of relevant items in top-K | >0.7 |
-| **MRR** | Mean Reciprocal Rank of first relevant | >0.8 |
-| **NDCG** | Normalized Discounted Cumulative Gain | >0.75 |
-| **Storage Rate** | Memories stored per hour | 2-10 |
-| **Importance Spread** | Std dev of importance scores | >0.15 |
-| **Association Coverage** | % memories with relationships | >30% |
-| **Multi-hop Accuracy** | Correct answers requiring traversal | >0.6 |
-
-## Running Evaluations
+Everything here treats `automem` as a black-box server under test.
 
 ```bash
-# Run all scenarios against a rule set
-python runners/scenario_runner.py --ruleset cursor_v1
+# 1. Start AutoMem from the sibling repo
+cd /Users/jgarturo/Projects/OpenAI/automem
+docker compose up -d
 
-# Compare two rule sets
-python analysis/compare_rulesets.py cursor_v1 experimental/aggressive
+# 2. Come back here
+cd /Users/jgarturo/Projects/OpenAI/automem-evals
 
-# Analyze a session transcript
-python runners/transcript_analyzer.py data/transcripts/session_001.json
+# 3. Seed a snapshotted corpus
+python3 scripts/seed_from_snapshot.py
+python3 scripts/seed_associations.py
+
+# 4. Compare rulesets
+python3 runners/compare_rulesets.py --rulesets baseline_v1 bare_tag_1m_v2
 ```
 
-## Ideas for Future Work
+Defaults assume:
+- endpoint: `http://localhost:8001`
+- token: `test-token`
 
-1. **Synthetic session generation** - Use an LLM to generate realistic coding sessions, then evaluate memory behavior
+If the AutoMem volumes were reset, reseed before scoring so the manifest matches the memory IDs currently in the server.
 
-2. **Crowdsourced relevance judgments** - Have humans rate memory relevance for ground truth
+## Working Rules
 
-3. **Longitudinal studies** - Track memory quality over weeks/months of real usage
-
-4. **Cross-agent comparison** - Same scenarios on Claude, GPT-4, Gemini with same rules
-
-5. **Ablation studies** - Remove specific rule components to measure their impact
-
-6. **Prompt optimization** - Use techniques like DSPy to automatically tune rule prompts
+- Treat AutoMem as the system under test, not as a shared workspace.
+- Keep official benchmark claims in `automem`, even if the exploratory work happened here first.
+- If an experiment needs LoCoMo or LongMemEval, call the official harness in `automem` or label the adapter as experimental.
+- Prefer curated `SUMMARY-*.md` writeups for durable findings and keep raw timestamped artifacts lightweight.
 
 ## Related
 
+- [automem](https://github.com/verygoodplugins/automem) - backend memory service and canonical benchmark source of truth
 - [mcp-automem](https://github.com/verygoodplugins/mcp-automem) - MCP server for AutoMem
-- [automem](https://github.com/verygoodplugins/automem) - Backend memory service
 
 ## License
 
 MIT
-

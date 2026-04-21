@@ -6,22 +6,51 @@ __pycache__/
 venv/
 .venv/
 *.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Data and results (large files)
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Data — generated / large files
 data/transcripts/*.json
+data/transcripts/*.jsonl
 data/results/*.json
+data/results/*-comparison.md
+
+# Seed memories — generated corpus files (can be rebuilt via scripts)
+data/seed_memories/*.jsonl
+data/seed_memories/*.embedded.jsonl
+data/seed_memories/*.manifest.json
+
+# Keep placeholder dirs
 !data/transcripts/.gitkeep
 !data/results/.gitkeep
+!data/seed_memories/.gitkeep
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDE
 .idea/
 .vscode/
 *.swp
+*.swo
 
-# OS
-.DS_Store
-
-# Environment
-.env
-.env.local
+# Logs / output artifacts
+*.log
+output/
+tmp/
 

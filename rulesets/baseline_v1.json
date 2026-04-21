@@ -1,0 +1,18 @@
+{
+  "name": "baseline_v1",
+  "description": "Pre-today template. Two-phase recall with 30-day window and limit 10. Represents templates/CLAUDE_MD_MEMORY_RULES.md at version 1.0.0.",
+  "phase_1_preferences": {
+    "tags": ["preference"],
+    "limit": 10
+  },
+  "phase_2_task_context": {
+    "queries_suffix": ["user corrections", "<project> patterns"],
+    "tags_from": "project_slug",
+    "time_query": "last 30 days",
+    "limit": 10
+  },
+  "phase_3_debugging": {
+    "tags": ["bugfix", "solution"],
+    "limit": 10
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "bare_tag_1m_v2",
+  "description": "Today's scheme. Two-phase recall with 90-day window, limit 20/30, auto_decompose=true. Represents templates/CLAUDE_MD_MEMORY_RULES.md at version 2.0.0.",
+  "phase_1_preferences": {
+    "tags": ["preference"],
+    "limit": 20
+  },
+  "phase_2_task_context": {
+    "queries_suffix": ["user corrections", "recent decisions"],
+    "tags_from": "project_slug",
+    "auto_decompose": true,
+    "time_query": "last 90 days",
+    "limit": 30
+  },
+  "phase_3_debugging": {
+    "tags": ["bugfix", "solution"],
+    "limit": 20
+  }
+}

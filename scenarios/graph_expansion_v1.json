@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "description": "Expansion-specific scenarios. Each expects ALSO a cross-boundary memory that is connected to a direct-hit memory via an association but lacks the scoped project tag. expand_relations should surface these; without expansion they stay hidden by the hard tag gate.",
+  "scenarios": [
+    {
+      "id": "EXP-TP-RATE",
+      "phase": 2,
+      "description": "In tensor-pipeline, what do we know about rate limiting? The project-scoped bugfix is tagged; the generic token-bucket pattern is not. Expansion via EXEMPLIFIES should surface it.",
+      "query": "rate limiter implementation Redis SCAN token-bucket",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-RATE", "CROSS-RATE"]
+    },
+    {
+      "id": "EXP-TP-AUTH-WITH-GENERIC",
+      "phase": 2,
+      "description": "Auth implementation query in tensor-pipeline. Project memories are tagged; the generic short-lived-token best practice is not. Expansion via DERIVED_FROM should surface it.",
+      "query": "OAuth access token lifetime refresh strategy",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-AUTH", "DEBUG-AUTH", "CROSS-AUTH"]
+    },
+    {
+      "id": "EXP-TP-OBSERVABILITY",
+      "phase": 2,
+      "description": "Observability query in tensor-pipeline. TP milestone is tagged; the cross-project correlation-IDs logging pattern is not. Expansion via REINFORCES should surface it.",
+      "query": "tracing logging correlation observability patterns",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-MEM", "CROSS-LOG"]
+    }
+  ]
+}

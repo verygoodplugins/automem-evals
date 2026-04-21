@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "description": "Session-start recall scenarios. Each scenario targets one phase of the CLAUDE.md recall protocol. `expected_hit_tags` references scenario IDs that memories in the seed corpus are tagged with (see data/seed_memories/corpus_v1.manifest.json).",
+  "scenarios": [
+    {
+      "id": "SS-ALL-PREFS",
+      "phase": 1,
+      "description": "Phase 1 — pull all preferences. Corpus has 20 prefs. Baseline limit=10 misses half; bare-tag-1m limit=20 gets them all.",
+      "query": null,
+      "project_slug": null,
+      "expected_hit_tags": [
+        "PREF-COMMITS", "PREF-STYLE", "PREF-TESTING", "PREF-MEMORY",
+        "PREF-COLLAB", "PREF-DEPLOY", "PREF-STYLE-OLD", "PREF-TOOLING-OLD"
+      ]
+    },
+
+    {
+      "id": "SS-TP-AUTH",
+      "phase": 2,
+      "description": "Phase 2 — 'we're about to touch OAuth in tensor-pipeline'. Should surface auth decisions and auth-related bugfixes.",
+      "query": "OAuth authentication implementation for tensor-pipeline",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-AUTH"]
+    },
+
+    {
+      "id": "SS-TP-ARCH",
+      "phase": 2,
+      "description": "Phase 2 — broad architectural query about tensor-pipeline.",
+      "query": "tensor-pipeline architecture decisions and patterns",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-ARCH", "PATTERN-CTX", "PATTERN-MIGRATE"]
+    },
+
+    {
+      "id": "SS-TP-RETRY-OLD",
+      "phase": 2,
+      "description": "Phase 2 — retry policy decision is 45 days old. Baseline's 30-day window should miss it; 90-day window should catch it.",
+      "query": "retry policy decisions in tensor-pipeline",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-RETRY"]
+    },
+
+    {
+      "id": "SS-DA-RSC",
+      "phase": 2,
+      "description": "Phase 2 — what's going on with React Server Components in dashboard-app?",
+      "query": "React Server Components migration in dashboard-app",
+      "project_slug": "dashboard-app",
+      "expected_hit_tags": ["DA-RSC"]
+    },
+
+    {
+      "id": "SS-DA-PATTERNS",
+      "phase": 2,
+      "description": "Phase 2 — reusable coding patterns in dashboard-app.",
+      "query": "dashboard-app component patterns and conventions",
+      "project_slug": "dashboard-app",
+      "expected_hit_tags": ["DA-PATTERN"]
+    },
+
+    {
+      "id": "SS-OS-SUNSET",
+      "phase": 2,
+      "description": "Phase 2 — old-service sunset plan. Most of OS is 30-90 days old; heavy test of the time-window difference.",
+      "query": "old-service deprecation and sunset timeline",
+      "project_slug": "old-service",
+      "expected_hit_tags": ["OS-SUNSET"]
+    },
+
+    {
+      "id": "SS-DEBUG-RATE",
+      "phase": 3,
+      "description": "Phase 3 — investigating a rate-limiter timeout issue.",
+      "query": "rate limiter timeout bug Redis SCAN",
+      "project_slug": null,
+      "expected_hit_tags": ["DEBUG-RATE", "TP-RATE"]
+    },
+
+    {
+      "id": "SS-DEBUG-AUTH",
+      "phase": 3,
+      "description": "Phase 3 — OAuth token rotation bug.",
+      "query": "OAuth token rotation not invalidated on logout",
+      "project_slug": null,
+      "expected_hit_tags": ["DEBUG-AUTH"]
+    },
+
+    {
+      "id": "SS-DEBUG-HYDRATE",
+      "phase": 3,
+      "description": "Phase 3 — React hydration mismatch on dates.",
+      "query": "React SSR hydration mismatch date rendering",
+      "project_slug": null,
+      "expected_hit_tags": ["DEBUG-HYDRATE"]
+    }
+  ]
+}

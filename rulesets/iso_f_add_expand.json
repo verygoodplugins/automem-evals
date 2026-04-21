@@ -1,0 +1,29 @@
+{
+  "name": "iso_f_add_expand",
+  "description": "Knob-isolation variant. Phase 2 overrides: {'expand_relations': True, 'expansion_limit': 60, 'relation_limit': 8}",
+  "phase_1_preferences": {
+    "tags": [
+      "preference"
+    ],
+    "limit": 20
+  },
+  "phase_2_task_context": {
+    "queries_suffix": [
+      "user corrections",
+      "<project> patterns"
+    ],
+    "tags_from": "project_slug",
+    "time_query": "last 30 days",
+    "limit": 10,
+    "expand_relations": true,
+    "expansion_limit": 60,
+    "relation_limit": 8
+  },
+  "phase_3_debugging": {
+    "tags": [
+      "bugfix",
+      "solution"
+    ],
+    "limit": 20
+  }
+}

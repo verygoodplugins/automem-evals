@@ -1,0 +1,144 @@
+{
+  "version": 2,
+  "description": "Session-start scenarios against the 370-memory v2 corpus (6 projects, 50 preferences, Voyage voyage-4 embeddings). Exercises larger scale + slug-collision case + new projects.",
+  "scenarios": [
+    {
+      "id": "SS-ALL-PREFS-V2",
+      "phase": 1,
+      "description": "Phase 1 — 50 prefs in corpus. Baseline limit=10 misses 80%; bare-tag-1m limit=20 catches 40%. Real quality floor.",
+      "query": null,
+      "project_slug": null,
+      "expected_hit_tags": [
+        "PREF-GIT_WORKFLOW", "PREF-CODE_STYLE", "PREF-TESTING", "PREF-AUTOMEM",
+        "PREF-COLLABORATION", "PREF-DEPLOYMENT", "PREF-TOOLING", "PREF-SECURITY",
+        "PREF-REVIEW", "PREF-ONCALL", "PREF-RELEASE", "PREF-CULTURE", "PREF-PROCESS"
+      ]
+    },
+
+    {
+      "id": "SS-TP-AUTH-V2",
+      "phase": 2,
+      "description": "Tensor-pipeline auth query. Multiple auth-related memories should surface.",
+      "query": "OAuth authentication implementation and token rotation for tensor-pipeline",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["TP-AUTH", "DEBUG-AUTH"]
+    },
+
+    {
+      "id": "SS-PS-PCI-V2",
+      "phase": 2,
+      "description": "Payment-service compliance query — decisions + milestones + patterns.",
+      "query": "PCI compliance tokenization payment card handling",
+      "project_slug": "payment-service",
+      "expected_hit_tags": ["PS-PCI"]
+    },
+
+    {
+      "id": "SS-PS-IDEMPOTENT-V2",
+      "phase": 2,
+      "description": "Payment-service idempotency — decision + bug + milestone all tagged.",
+      "query": "idempotency duplicate request protection payment-service",
+      "project_slug": "payment-service",
+      "expected_hit_tags": ["PS-IDEMPOTENT"]
+    },
+
+    {
+      "id": "SS-DA-RSC-V2",
+      "phase": 2,
+      "description": "Dashboard-app React Server Components — current active migration thread.",
+      "query": "React Server Components migration dashboard-app",
+      "project_slug": "dashboard-app",
+      "expected_hit_tags": ["DA-RSC"]
+    },
+
+    {
+      "id": "SS-DA-ASYNC-PATTERNS-V2",
+      "phase": 2,
+      "description": "Dashboard-app async-state patterns — hydration + discriminated unions.",
+      "query": "async state loading success error patterns React",
+      "project_slug": "dashboard-app",
+      "expected_hit_tags": ["DA-ASYNC", "DA-PATTERN", "DA-HYDRATION"]
+    },
+
+    {
+      "id": "SS-SE-HYBRID-V2",
+      "phase": 2,
+      "description": "Search-engine hybrid search — decision + pattern + milestone.",
+      "query": "hybrid semantic keyword search ranking",
+      "project_slug": "search-engine",
+      "expected_hit_tags": ["SE-HYBRID", "PATTERN-RERANK"]
+    },
+
+    {
+      "id": "SS-SE-LANG-V2",
+      "phase": 2,
+      "description": "Search-engine multilingual — decisions + bugs + milestones.",
+      "query": "multilingual tokenizer unicode normalization",
+      "project_slug": "search-engine",
+      "expected_hit_tags": ["SE-LANG", "DEBUG-UNICODE"]
+    },
+
+    {
+      "id": "SS-OS-SUNSET-V2",
+      "phase": 2,
+      "description": "Old-service sunset — most memories are 60-180 days old, heavy test of 30d vs 90d window.",
+      "query": "old-service deprecation sunset migration timeline",
+      "project_slug": "old-service",
+      "expected_hit_tags": ["OS-SUNSET"]
+    },
+
+    {
+      "id": "SS-VID-DRM-V2",
+      "phase": 2,
+      "description": "Video project — DRM integration. Note: 'video' slug is a known collision case.",
+      "query": "DRM token license Widevine FairPlay",
+      "project_slug": "video",
+      "expected_hit_tags": ["VID-DRM", "DEBUG-RACE"]
+    },
+
+    {
+      "id": "SS-VID-SLUG-COLLISION",
+      "phase": 2,
+      "description": "Slug-collision demo: tags=['video'] matches BOTH video-project memories AND video content-marketing noise. Queries for video-service content should still surface project memories, but precision will drop.",
+      "query": "video player and transcoding infrastructure",
+      "project_slug": "video",
+      "expected_hit_tags": ["VID-PLAYER", "VID-ARCH"]
+    },
+
+    {
+      "id": "SS-DEBUG-RATE-V2",
+      "phase": 3,
+      "description": "Cross-project debug query — rate limiter issues. Should surface both tensor-pipeline rate bug and payment-service rate bug.",
+      "query": "rate limiter timeout debugging bursts",
+      "project_slug": null,
+      "expected_hit_tags": ["DEBUG-RATE", "TP-RATE", "PS-RATE"]
+    },
+
+    {
+      "id": "SS-DEBUG-AUTH-V2",
+      "phase": 3,
+      "description": "Auth debugging — surfaces multiple projects' auth bugs.",
+      "query": "OAuth token rotation authentication bug",
+      "project_slug": null,
+      "expected_hit_tags": ["DEBUG-AUTH"]
+    },
+
+    {
+      "id": "SS-DEBUG-DOUBLE-CHARGE",
+      "phase": 3,
+      "description": "Payment double-charge / webhook dedup.",
+      "query": "webhook duplicate event idempotency retry",
+      "project_slug": null,
+      "expected_hit_tags": ["DEBUG-DOUBLE", "PS-WEBHOOK", "CROSS-IDEMPOTENT"]
+    },
+
+    {
+      "id": "SS-NEGATIVE-CONTROL",
+      "phase": 2,
+      "description": "Negative control — query about something genuinely absent from the corpus. Expect 0 hits. Lower is better for both schemes; measures over-retrieval.",
+      "query": "Kubernetes helm chart blue-green deployment with Istio service mesh",
+      "project_slug": "tensor-pipeline",
+      "expected_hit_tags": ["NONEXISTENT-TAG-DELIBERATELY"]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "iso_h_v2_no_gate",
+  "description": "Knob-isolation variant. Phase 2 overrides: {'limit': 30, 'time_query': 'last 90 days', 'auto_decompose': True, 'tags_from': None}",
+  "phase_1_preferences": {
+    "tags": [
+      "preference"
+    ],
+    "limit": 20
+  },
+  "phase_2_task_context": {
+    "queries_suffix": [
+      "user corrections",
+      "<project> patterns"
+    ],
+    "time_query": "last 90 days",
+    "limit": 30,
+    "auto_decompose": true
+  },
+  "phase_3_debugging": {
+    "tags": [
+      "bugfix",
+      "solution"
+    ],
+    "limit": 20
+  }
+}
