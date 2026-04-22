@@ -1,0 +1,912 @@
+{
+  "model": "gpt-5-mini",
+  "total_failures": 95,
+  "overall_distribution": {
+    "E": 15,
+    "C": 25,
+    "B": 8,
+    "A": 47
+  },
+  "by_category": {
+    "abstention": {
+      "E": 14,
+      "C": 3,
+      "A": 1
+    },
+    "temporal_reasoning": {
+      "B": 1,
+      "A": 8,
+      "C": 2
+    },
+    "instruction_following": {
+      "A": 2,
+      "C": 2
+    },
+    "summarization": {
+      "C": 10,
+      "A": 4
+    },
+    "knowledge_update": {
+      "A": 11,
+      "B": 5,
+      "C": 1
+    },
+    "multi_session_reasoning": {
+      "A": 10,
+      "E": 1,
+      "C": 1
+    },
+    "contradiction_resolution": {
+      "C": 1,
+      "A": 1,
+      "B": 2
+    },
+    "event_ordering": {
+      "A": 9,
+      "C": 3
+    },
+    "preference_following": {
+      "C": 2
+    },
+    "information_extraction": {
+      "A": 1
+    }
+  },
+  "per_failure": [
+    {
+      "question_id": "100K_1_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 1,
+      "bucket": "E",
+      "confidence": 0.82,
+      "one_line_reason": "The assistant fabricated specific ESLint rule details despite rubric saying no such information exists in the chat (hallucination rather than retrieval error).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 1,
+      "bucket": "C",
+      "confidence": 0.84,
+      "one_line_reason": "Retrieved memories include the correct fact (that only a TypeError was mentioned), but the generated answer ignored them and gave an unrelated meeting-time reply (off-topic).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_0_q19_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 0,
+      "bucket": "B",
+      "confidence": 0.92,
+      "one_line_reason": "Retrieved memories include both March 29 (sprint1 end) and an updated March 31; the model cited the old and new dates inconsistently (used updated March 31 but correct answer requires March 29), indicating a chronology/confusion from conflicting entries.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q8_instruction_following",
+      "question_type": "instruction_following",
+      "conversation_idx": 1,
+      "bucket": "A",
+      "confidence": 0.72,
+      "one_line_reason": "Retrieved memories include guidance to include error status codes, but the generated answer (time conversions) does not contain any error numeric codes and top memories do not show the ground-truth-bearing content was used\u2014so retrieval missed the needed fact in the answer.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_0_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 0,
+      "bucket": "E",
+      "confidence": 0.82,
+      "one_line_reason": "The generated answer fabricated detailed UI/UX changes attributed to user feedback despite rubric stating there was no such information available, i.e., it should have abstained rather than invent specifics.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_0_q18_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 0,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "Retrieved memories do not contain the correct ground-truth final deployment date or the Jan 15\u2013Mar 15 range; the correct fact is not present among top memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q9_instruction_following",
+      "question_type": "instruction_following",
+      "conversation_idx": 1,
+      "bucket": "C",
+      "confidence": 0.72,
+      "one_line_reason": "Retrieved memories include the correct instruction to include numeric error/status codes (memories 2,9 etc.), but the generated answer ignored that and produced unrelated time-zone content.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_0_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 0,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "The ground-truth states there is no info about the user's background, yet the generated answer fabricates detailed project/background facts not present in the retrieved top memories \u2014 the necessary true content is absent from retrieved memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 1,
+      "bucket": "C",
+      "confidence": 0.82,
+      "one_line_reason": "Retrieved memories clearly contain the correct autocomplete implementation details, but the generated answer ignored them and instead produced unrelated time zone conversion content.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 1,
+      "bucket": "C",
+      "confidence": 0.84,
+      "one_line_reason": "Retrieved memories clearly contain the required project details (JS + OpenWeather, modularization, debounce/autocomplete, caching, desire for no dependencies), but the generated answer ignored them and produced unrelated time-zone scheduling output.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 1,
+      "bucket": "A",
+      "confidence": 0.9,
+      "one_line_reason": "The retrieved memories include mentions of 78% (memory 2) but the generated answer contains unrelated time-conversion content, indicating the ground-truth-bearing content wasn\u2019t used in the top_memories for the final answer \u2014 it's a retrieval miss relative to what the model used to generate this response.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q18_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 1,
+      "bucket": "C",
+      "confidence": 0.85,
+      "one_line_reason": "A retrieved memory (memory 1) clearly states the wireframe was completed on March 12 and another memory references obtaining an API key (implying date March 10), but the answer ignored those and produced unrelated timezone conversions instead of using the correct facts.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q12_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 1,
+      "bucket": "A",
+      "confidence": 0.72,
+      "one_line_reason": "The retrieved memories discuss various features (autocomplete, temperature display, debounce, custom feature, responsive design, etc.) but none explicitly summarize or state the total count 'Four'\u2014the ground-truth fact (that there are four features/concerns) is not present in the top memories, so the answer missed retrieval of that specific summary.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 2,
+      "bucket": "C",
+      "confidence": 0.87,
+      "one_line_reason": "A retrieved memory clearly indicates no info about Trello prioritization, but the generated answer ignored that and produced an unrelated timezone/DST response (off-topic).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q13_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 1,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories contain autocomplete and fetch topics but none of the top memories present the ground-truth test result that 'fetch call latency is faster', so the correct fact is not present in retrieved memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_1_q19_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 1,
+      "bucket": "A",
+      "confidence": 0.82,
+      "one_line_reason": "The correct fact (testing starts April 5 / 21-day interval from March 15 to April 5) is present in memory #1 which states MVP completion by April 5 and two weeks for testing \u2014 wait, but that memory implies testing ends April 5 not starts; however the retrieved memories do contain the needed date range (April 5) and schedule context, so the failure is because the model did not retrieve/use the correct memory \u2014 classification: retrieval_miss.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 2,
+      "bucket": "C",
+      "confidence": 0.8,
+      "one_line_reason": "A retrieved memory contains the correct fact (no information about rationale exists), but the generated answer ignored that and produced unrelated meeting-time content instead of stating 'no information available.'",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q3_contradiction_resolution",
+      "question_type": "contradiction_resolution",
+      "conversation_idx": 2,
+      "bucket": "C",
+      "confidence": 0.82,
+      "one_line_reason": "Retrieved memories include the correct statements (Bootstrap classes and that the user never tested API integration), but the generated answer ignored them and produced unrelated timezone/DST content.",
+      "score": 0.25
+    },
+    {
+      "question_id": "100K_2_q2_contradiction_resolution",
+      "question_type": "contradiction_resolution",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.75,
+      "one_line_reason": "The retrieved memories do include many Bootstrap mentions but none of the top memories show the specific contradictory statements (preferring Bootstrap 5.3.0 vs 'never implemented any Bootstrap components') required to resolve the contradiction, so the ground-truth-bearing content is not present in the retrieved memories.",
+      "score": 0.25
+    },
+    {
+      "question_id": "100K_2_q5_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories include many relevant items but do not contain the two missing rubric facts (website performance optimization and final code review focusing on CSS naming), so the ground-truth-bearing content for those items is absent from the top memories.",
+      "score": 0.4
+    },
+    {
+      "question_id": "100K_2_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories include headers, deferring Bootstrap JS, and CSS namespacing but do not contain the ground-truth items about basic responsive components setup or modal bug/upgrade concerns, so the correct facts are missing from the top memories (retrieval miss).",
+      "score": 0.3333
+    },
+    {
+      "question_id": "100K_2_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "The retrieved memories do contain mentions of project gallery and specifically memory [2] states there are 10 cards, but the generated answer is entirely about time zones and does not use any retrieved memory\u2014however the correct fact (10 cards) is present in the retrieved memories, so failure is that the model missed using that content (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q13_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.9,
+      "one_line_reason": "Ground-truth facts about form validation impact, lazy-loading saving 350ms, GA4 anonymized tracking, and bounce-rate monitoring are not present in any of the retrieved top memories used to generate the wrong (timezone) answer.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q8_instruction_following",
+      "question_type": "instruction_following",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.88,
+      "one_line_reason": "The retrieved memories include HTML semantic-tag guidance, but the generated answer contains unrelated Netlify DNS/SSL content; the ground-truth-bearing content (semantic tag mentions and explanations) is not present in the generated answer, indicating a retrieval miss relative to the question asked.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q15_preference_following",
+      "question_type": "preference_following",
+      "conversation_idx": 2,
+      "bucket": "C",
+      "confidence": 0.62,
+      "one_line_reason": "Retrieved memories include the correct recommendation (lazysizes, lightweight libs) but the generated answer ignored them and produced unrelated time-zone content.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 2,
+      "bucket": "C",
+      "confidence": 0.86,
+      "one_line_reason": "Retrieved memories include the correct portfolio project details (HTML5 structure, Bootstrap 5.3.0, palette generator, responsive gallery, contact form with validation and Flask) but the generated answer ignored them and instead produced off-topic scheduling/timezone content.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 2,
+      "bucket": "C",
+      "confidence": 0.86,
+      "one_line_reason": "Retrieved memories clearly contained the web-project debugging details requested (CSS box model, navbar DOM errors, React image loading, JS linking, retry/backoff), but the generated answer ignored them and produced an unrelated response about meeting times/timezones.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q18_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.78,
+      "one_line_reason": "The retrieved memories include the relevant dates (April 1, 2024 and April 5, 2024) but the generated answer contains unrelated CSRF content \u2014 however the ground-truth-bearing content (dates) is present in the top memories, so failure is due to retrieval miss in the answer (model didn't use those memories).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_3_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 3,
+      "bucket": "E",
+      "confidence": 0.85,
+      "one_line_reason": "The generated answer confidently fabricates detailed session agenda despite rubric stating there is no information available (hallucination/no-abstain failure).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_3_q18_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 3,
+      "bucket": "C",
+      "confidence": 0.86,
+      "one_line_reason": "The retrieved memories clearly contain the correct fact (memory 1 states the quiz improved from 65% to 82%), but the model ignored that and refused to answer.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_2_q19_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 2,
+      "bucket": "A",
+      "confidence": 0.86,
+      "one_line_reason": "The retrieved memories include the peer-review date (April 2) but none of the top memories or the generated answer contain the completion date (May 3) or the explicit 31-day interval, so the ground-truth fact is not present in any retrieved memory.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_3_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 3,
+      "bucket": "E",
+      "confidence": 0.86,
+      "one_line_reason": "The correct rubric says there is no information available, but the generated answer fabricates detailed criteria and examples \u2014 a confident hallucination rather than citing retrieved evidence.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_3_q5_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 3,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories contain many triangle topics but do not include the specific nine rubric items (area/median formula, Apollonius, sum of medians, explicit altitude lengths, centroid notation, comparative analysis, etc.), so the ground-truth sequence is not present in any retrieved memory.",
+      "score": 0.3333
+    },
+    {
+      "question_id": "100K_4_q9_instruction_following",
+      "question_type": "instruction_following",
+      "conversation_idx": 4,
+      "bucket": "C",
+      "confidence": 0.7,
+      "one_line_reason": "A retrieved memory contains the correct fact (and likely a tree diagram request) but the generated answer omitted the required tree drawing despite having the correct content; the response ignored the rubric nugget to include the tree.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_4_q13_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 4,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories contain multiple coin/dice discussion snippets but none state the specific ground-truth fact (that the user tried to confirm three different probability calculations), so the ground-truth-bearing content is missing from the top memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_4_q12_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 4,
+      "bucket": "A",
+      "confidence": 0.79,
+      "one_line_reason": "The retrieved memories include various counts (3!, 3C2, C(5,2), C(12,2), C(4,2), C(52,2)) but do not contain any explicit overall statement or evidence that the correct aggregated total should be '15'\u2014the ground-truth fact (15) is not present among the top memories, so this is a retrieval miss.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_4_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 4,
+      "bucket": "C",
+      "confidence": 0.87,
+      "one_line_reason": "Retrieved memories contain the required facts (birthday paradox, permutations, complement rule, conditional probability, card/dice/coin examples), but the generated answer was empty/ignored them, so the correct content was present but not used.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_5_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 5,
+      "bucket": "B",
+      "confidence": 0.72,
+      "one_line_reason": "A retrieved memory explicitly states 'mentoring those 5 women' (old fact) while the correct/updating fact is 7; generated answer repeated the old number, indicating chronology/confusion from an in-dialogue update.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_5_q12_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 5,
+      "bucket": "A",
+      "confidence": 0.77,
+      "one_line_reason": "The retrieved memories contain many resume/portfolio/salary snippets but none present a consolidated list of the four specific updated areas (salary negotiation, portfolio project selection, resume international standards, remote leadership skills), so the ground-truth-bearing content is missing from the top memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_5_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 5,
+      "bucket": "A",
+      "confidence": 0.72,
+      "one_line_reason": "Retrieved memories include both references to '5 interviews' (memory 1) and '3 interviews' (memory 2), but the top retrieved actually used the wrong fact; however the ground-truth '5 interviews' is present in the retrieved set, so failure is a retrieval_miss is incorrect \u2014 wait: on review memory 1 contains the correct '5 interviews', so the model should have used it; this is actually answerer_ignored. Correction: the generated answer gave '3' despite a retrieved memory clearly stating '5' (memory 1), so classify as C.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q2_contradiction_resolution",
+      "question_type": "contradiction_resolution",
+      "conversation_idx": 7,
+      "bucket": "B",
+      "confidence": 0.62,
+      "one_line_reason": "Retrieved memories include both statements (user said they've never worked with Michael and elsewhere said they've been collaborating), indicating a chronology/contradiction in the same dialogue; the model failed by not resolving which is correct.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_6_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 6,
+      "bucket": "E",
+      "confidence": 0.86,
+      "one_line_reason": "The generated answer confidently fabricates specific class content (dates, topics, assigned article) despite the rubric stating no such information exists, i.e., a hallucination rather than retrieval error.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_6_q5_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 6,
+      "bucket": "C",
+      "confidence": 0.86,
+      "one_line_reason": "A retrieved memory (e.g., items 1,2,4,6,7) contains correct facts like collaboration planning, tool use, deadlines, and feedback, but the generated answer ignored those and produced unrelated dated events instead of listing the five required rubric items.",
+      "score": 0.3
+    },
+    {
+      "question_id": "100K_6_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 6,
+      "bucket": "A",
+      "confidence": 0.88,
+      "one_line_reason": "The retrieved memories include the correct facts (meeting mentor, prioritizing essay before conference paper, confidence/planning), but the generated answer's items do not match the ground-truth sequence\u2014however the judge notes many required nuggets are absent from the answer, indicating the needed ground-truth-bearing content was not present in the top retrieved items used to produce the response (retrieval miss).",
+      "score": 0.2
+    },
+    {
+      "question_id": "100K_6_q19_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 6,
+      "bucket": "A",
+      "confidence": 0.86,
+      "one_line_reason": "The retrieved memories do include the missed session (April 5 and May 10 appear across memories) and the June 15 deadline, but the specific ground-truth-bearing content pairing \u2014 that the missed session was April 5 and the interval is 71 days \u2014 is not present in the top memories used by the model, so the model retrieved/used the May 10 memory instead (a retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 7,
+      "bucket": "A",
+      "confidence": 0.86,
+      "one_line_reason": "The correct 'Portfolio update concerns' and other specific rubric items (gratitude/mindfulness, celebration/reassurance, retreat reflection) do not appear in the retrieved top memories used to generate the answer, so the ground-truth-bearing content was not present in the retrieved memories.",
+      "score": 0.2
+    },
+    {
+      "question_id": "100K_7_q5_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 7,
+      "bucket": "C",
+      "confidence": 0.86,
+      "one_line_reason": "A retrieved memory clearly contains the correct mentoring/networking and interview preparation details, but the generated answer ignored the required cover letter feedback and employee handbook items despite retrieved evidence\u2014so the answerer ignored available correct facts.",
+      "score": 0.4
+    },
+    {
+      "question_id": "100K_4_q19_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 4,
+      "bucket": "A",
+      "confidence": 0.88,
+      "one_line_reason": "Retrieved memories include related practice and score-change mentions but none explicitly state the dates (April 5 start and the date of improved score after 15 problems) needed to compute the 10-day difference, so the ground-truth-bearing content is not present in the top memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q12_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 7,
+      "bucket": "A",
+      "confidence": 0.75,
+      "one_line_reason": "Retrieved memories include several cover-letter mentions but none clearly state the user mentioned submitting/revising the cover letter three times, so the ground-truth-bearing content is not present in the top memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 7,
+      "bucket": "C",
+      "confidence": 0.9,
+      "one_line_reason": "Retrieved memories include the correct facts (mentions Leslie, cover letter format, Island Media Group interview, handbook review, workshop prep), but the model's generated answer omitted them entirely (empty), so it ignored available ground-truth evidence.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_8_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 8,
+      "bucket": "E",
+      "confidence": 0.9,
+      "one_line_reason": "The generated answer fabricates detailed recommendations despite the rubric stating there is no information available \u2014 a hallucination instead of abstaining.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 7,
+      "bucket": "B",
+      "confidence": 0.78,
+      "one_line_reason": "Retrieved memories include both 'three days a week' (memory 1) and '2 remote workdays per week' (memory 2); the model cited the old/incorrect '2 days' while evidence for 'three days' was present, indicating chronology/confusion.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 7,
+      "bucket": "A",
+      "confidence": 0.75,
+      "one_line_reason": "The correct appointment (April 22 at 11 AM) appears in several retrieved memories, but the generated answer did not include it \u2014 however those memories do contain the ground-truth fact, so failure is not 'no evidence'; since the model's answer lists other times, this indicates a retrieval miss of the specific memory used to produce the response.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_8_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 8,
+      "bucket": "E",
+      "confidence": 0.85,
+      "one_line_reason": "The correct behavior was to abstain (no information available), but the generated answer confidently fabricated detailed workshop topics\u2014a clear hallucination/no-abstain failure.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_7_q18_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 7,
+      "bucket": "A",
+      "confidence": 0.78,
+      "one_line_reason": "Retrieved memories do not contain the ground-truth dates (April 5 and April 21) or the planned finish date of April 5; the model's answer used April 10, so the correct fact is not present in the top memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_8_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 8,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories include many personal-statement interactions but none of the top memories clearly contain the five specific named items in the rubric, so the ground-truth sequence is not present in the retrieved memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_8_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 8,
+      "bucket": "B",
+      "confidence": 0.82,
+      "one_line_reason": "Retrieved memories include both May 20 and May 22 (the user updated/mentioned dates across dialogue), and the assistant cited the old date (May 20) instead of the updated May 22, indicating chronology confusion.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_9_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 9,
+      "bucket": "A",
+      "confidence": 0.71,
+      "one_line_reason": "Retrieved memories do not include the specific deadline 'April 25' \u2014 the correct fact is absent from the top memories, so the model missed retrieval of the ground-truth date.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_9_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 9,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "Retrieved memories show various weekly targets (1,200; 1,500; 1,700/day etc.) but none contain the ground-truth 1,350 words, so the correct fact wasn't present in the top memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_8_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 8,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "All required facts from the ground-truth (personal statement by Apr 20, Tanya inclusion, part-time role starting June 1, specific prep steps, $2,000 emergency fund and freelance contract) are present in the retrieved memories but the generated answer is empty/missing, indicating the ground-truth content was not included in the top-memories used for the answer (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_9_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 9,
+      "bucket": "A",
+      "confidence": 0.86,
+      "one_line_reason": "All required facts (peer review with Amy 25% dialogue clarity, Carla checklist reducing passive voice 18%\u219210%, Jasper AI 22% improvement, ProWritingAid +10% grammar) appear in the retrieved memories but were NOT present in the generated answer \u2014 however those facts do exist in the retriever results, so this is a retrieval miss relative to what the model used.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_9_q19_temporal_reasoning",
+      "question_type": "temporal_reasoning",
+      "conversation_idx": 9,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "The correct end date (May 10) and the 38-day interval are present in retrieved memory #2 but the generated answer used May 25 and 53 days, indicating the ground-truth-bearing content (correct date range and interval) was not effectively present in the top memories used by the answerer\u2014this is a retrieval miss.",
+      "score": 0.25
+    },
+    {
+      "question_id": "100K_10_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 10,
+      "bucket": "A",
+      "confidence": 0.83,
+      "one_line_reason": "The retrieved memories include many related items but none of the top memories contain the six specific rubric items (e.g., psychometric tests, AI fairness metrics development, Pymetrics suggestion/results), so the ground-truth-bearing content is not present in the retrieved memories.",
+      "score": 0.3333
+    },
+    {
+      "question_id": "100K_10_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 10,
+      "bucket": "B",
+      "confidence": 0.75,
+      "one_line_reason": "Retrieved memories contain both March 20 and an implication of a reschedule (user asked if rescheduled) but the generated answer used March 20 while ground truth is March 27 \u2014 this matches a chronology/confusion from an update in dialogue.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_10_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 10,
+      "bucket": "A",
+      "confidence": 0.82,
+      "one_line_reason": "Retrieved memories show multiple mentions of 87% and 90% in conversation context, but none of the top retrieved memories contain the exact ground-truth fact '90%' as the authoritative evaluation figure needed, so the correct fact was not present in the retrieved set.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_11_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 11,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "The required ground-truth items (e.g., work call about a personal date concern, limiting work trips, anniversary used for conflict resolution) do not appear in any of the top retrieved memories, so the content bearing the facts is missing from the retrieved set (retrieval miss).",
+      "score": 0.4286
+    },
+    {
+      "question_id": "100K_10_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 10,
+      "bucket": "C",
+      "confidence": 0.83,
+      "one_line_reason": "The retrieved memories include the required facts (Montserrat laws, AI transparency items, Employment Act, examples like HireVue/Pymetrics, and ongoing review practices), but the generated answer is empty/ignored those retrieved facts, so the correct content was present but not used.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_11_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 11,
+      "bucket": "A",
+      "confidence": 0.85,
+      "one_line_reason": "The retrieved memories do not contain the specific ground-truth date 'March 30' (they mention various other dates), so the needed fact is missing from the top memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_11_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 11,
+      "bucket": "B",
+      "confidence": 0.86,
+      "one_line_reason": "A retrieved memory contains both the original and updated deadline (April 25 vs April 22) \u2014 the dialogue shows a knowledge update/conflicting dates and the model cited the older/incorrect date (April 25).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_12_q5_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 12,
+      "bucket": "C",
+      "confidence": 0.56,
+      "one_line_reason": "Retrieved memories clearly contain all six required items, but the generated answer was empty/off-topic, so the model ignored the available correct facts.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_12_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 12,
+      "bucket": "E",
+      "confidence": 0.72,
+      "one_line_reason": "The generated answer fabricates specific atmosphere details and attendance despite the rubric stating no information is available, so the model hallucinated instead of abstaining.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_12_q7_information_extraction",
+      "question_type": "information_extraction",
+      "conversation_idx": 12,
+      "bucket": "A",
+      "confidence": 0.79,
+      "one_line_reason": "The retrieved memories include budgeting tactics and specific purchases but do not contain the ground-truth content asking for several combinations of fiction series that fit a $120 Montserrat Books print budget or options mixing series priced $30\u2013$50, so the required facts are absent from the top memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_12_q12_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 12,
+      "bucket": "E",
+      "confidence": 0.6,
+      "one_line_reason": "The model produced no answer (effectively fabricating nothing) and failed to abstain or acknowledge lack of consolidated info; this is treated as hallucination/no-abstain rather than a pure retrieval miss.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_13_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 13,
+      "bucket": "A",
+      "confidence": 0.88,
+      "one_line_reason": "Retrieved memories include mentions of 24 cupcakes but none contain the ground-truth value '30 cupcakes', so the correct fact is not present in the top memories (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_13_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 13,
+      "bucket": "A",
+      "confidence": 0.56,
+      "one_line_reason": "Retrieved memories include a $75 snack budget in memory #3, but the model's answer claimed $70; however the correct fact ($75) is present in the retrieved memories, so this is not a pure retrieval miss \u2014 thus closest single-bucket fit is A with moderate confidence.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_16_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 16,
+      "bucket": "E",
+      "confidence": 0.85,
+      "one_line_reason": "The model fabricated specific mindfulness details (30-minute sessions at 3 PM started late April) despite rubric stating no such specifics exist \u2014 a hallucination rather than supported by memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_14_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 14,
+      "bucket": "C",
+      "confidence": 0.86,
+      "one_line_reason": "Retrieved memories contain the correct facts (Allbirds, Ultraboost sizing/break\u2011in, Brooks Ghost commitment, hiking comparisons), but the generated summary omits or ignores several required nuggets and includes unrelated fabricated specifics, so the answerer ignored available ground-truth content.",
+      "score": 0.25
+    },
+    {
+      "question_id": "100K_15_q17_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 15,
+      "bucket": "A",
+      "confidence": 0.83,
+      "one_line_reason": "The retrieved memories include many budget-related items but none of the top memories contain the specific ground-truth summary facts (housing reductions, Excel for investments/automated price updates, dining-out controls, seasonal grocery adjustments), so the correct content is absent from retrieved memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_13_q12_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 13,
+      "bucket": "A",
+      "confidence": 0.62,
+      "one_line_reason": "The correct count (13 unique movies) is not present in the retrieved memories \u2014 the retrieved items list many titles but do not collectively show evidence that the true answer is 13, so the model likely missed relevant memory entries (retrieval miss).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_15_q13_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 15,
+      "bucket": "A",
+      "confidence": 0.83,
+      "one_line_reason": "The required facts (grocery increase raises expenses, freelance income offsets it, and still enough leftover to accelerate emergency savings) are present in the retrieved memories but the generated answer is missing \u2014 however the ground-truth-bearing content exists in the retrieval set, so failure is due to retrieval miss in the response (actually content present but not used) \u2014 on balance this is a retrieval_miss.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_16_q14_preference_following",
+      "question_type": "preference_following",
+      "conversation_idx": 16,
+      "bucket": "C",
+      "confidence": 0.77,
+      "one_line_reason": "A retrieved memory (several) contains the correct recommendation (dedicated morning creative blocks), but the generated answer is empty/ignores that and fails to include the correct fact.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_16_q13_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 16,
+      "bucket": "C",
+      "confidence": 0.62,
+      "one_line_reason": "Retrieved memories clearly contain the correct facts (Todoist, Google Calendar, Asana/ pilot deadlines) but the generated answer is empty/ignored them, so the correct info was present but not used.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_16_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 16,
+      "bucket": "C",
+      "confidence": 0.72,
+      "one_line_reason": "Retrieved memories clearly contain all required facts (Carla/time balance, mindfulness/exercise/structured breaks, Todoist/task management, planned collaborative sessions/workshops, evolved approach), but the generated answer omitted them and gave none of the required content.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_17_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 17,
+      "bucket": "E",
+      "confidence": 0.85,
+      "one_line_reason": "The generated answer fabricates detailed session format info despite the rubric stating no such information exists \u2014 a hallucination/no-abstain failure.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_17_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 17,
+      "bucket": "E",
+      "confidence": 0.82,
+      "one_line_reason": "The generated answer confidently fabricates specific details about Patrick\u2019s July 1 call despite the rubric stating there is no information \u2014 this is a hallucination/no-abstain failure.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_17_q10_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 17,
+      "bucket": "C",
+      "confidence": 0.82,
+      "one_line_reason": "A retrieved memory (memory 5) clearly contains the correct recent value (4 hours in March), but the generated answer ignored that and reported 5 hours as the most recent instead of 4.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_18_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 18,
+      "bucket": "E",
+      "confidence": 0.83,
+      "one_line_reason": "The model fabricated detailed terms (trust purpose, trustee names, funding source, staged distributions) despite the rubric stating no such specifics exist, so this is a hallucination in an abstention case.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_18_q2_contradiction_resolution",
+      "question_type": "contradiction_resolution",
+      "conversation_idx": 18,
+      "bucket": "B",
+      "confidence": 0.86,
+      "one_line_reason": "Retrieved memories contain both statements (user said they've never met Stephanie and also that they have a meeting / planned meeting), indicating a chronology/conflict in the same conversation, but the generated answer failed to acknowledge the contradiction and cited neither \u2014 classic chronology_confusion.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_18_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 18,
+      "bucket": "A",
+      "confidence": 0.9,
+      "one_line_reason": "The retrieved top memories do not contain the specific detailed facts about Douglas (including $5,000 fund), the executor choice deliberations with Kevin, the family meeting, nor prepping Kevin to review the draft\u2014so ground-truth content is missing from the retrieved set.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_19_q0_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 19,
+      "bucket": "E",
+      "confidence": 0.86,
+      "one_line_reason": "The generated answer fabricates detailed advice that the rubric says does not exist (an abstention case where the correct response is 'no information'); this is a hallucination rather than a retrieval miss or ignored memory.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_18_q13_multi_session_reasoning",
+      "question_type": "multi_session_reasoning",
+      "conversation_idx": 18,
+      "bucket": "A",
+      "confidence": 0.72,
+      "one_line_reason": "The retrieved memories clearly contain the six estate assets (home, vacation home, 2018 Toyota RAV4, film equipment, fireproof safe, original will) but the generated answer is empty/missing; however the ground-truth-bearing content is present in the retrieved memories, so failure is due to retrieval miss (relevant facts not surfaced in the answer).",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_19_q4_event_ordering",
+      "question_type": "event_ordering",
+      "conversation_idx": 19,
+      "bucket": "A",
+      "confidence": 0.8,
+      "one_line_reason": "The retrieved memories include many relevant snippets, but none of the top memories exactly match the six specific rubric items (ordered event nuggets) requested, so the ground-truth-bearing content is not present in the retrieved memories.",
+      "score": 0.4167
+    },
+    {
+      "question_id": "100K_19_q11_knowledge_update",
+      "question_type": "knowledge_update",
+      "conversation_idx": 19,
+      "bucket": "A",
+      "confidence": 0.86,
+      "one_line_reason": "Retrieved memories only mention $7,000 and other allocations; no memory contains the ground-truth $8,000 amount, so the correct fact isn't present in the retrieved top memories.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_19_q1_abstention",
+      "question_type": "abstention",
+      "conversation_idx": 19,
+      "bucket": "E",
+      "confidence": 0.86,
+      "one_line_reason": "The model fabricated multiple specific reasons despite the rubric stating there is no information about additional reasons \u2014 a clear hallucination rather than missing retrievals or ignored evidence.",
+      "score": 0.0
+    },
+    {
+      "question_id": "100K_19_q16_summarization",
+      "question_type": "summarization",
+      "conversation_idx": 19,
+      "bucket": "C",
+      "confidence": 0.78,
+      "one_line_reason": "The retrieved memories included the correct facts (prior art search, webinar, meetings with Ashlee, May 2 anchor), but the generated summary ignored several specific ground-truth items (exact budgets, Montserrat attorney choice, $10,000 grant, May 14 meeting, compromise on drawings/video) despite relevant memories being present.",
+      "score": 0.25
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "timestamp": "20260421-195900",
+  "tier": "100K",
+  "conversations": "0-1",
+  "project_name": "automem-20260421-195900",
+  "shim_url": "http://127.0.0.1:50649",
+  "automem_url": "http://localhost:8001",
+  "upstream_head": "f75666d33ef560f0f196746e0e16c515d17e6856",
+  "command": [
+    "/Users/jgarturo/Projects/OpenAI/automem-evals/.venv-beam/bin/python",
+    "-m",
+    "benchmarks.beam.run",
+    "--project-name",
+    "automem-20260421-195900",
+    "--backend",
+    "oss",
+    "--mem0-host",
+    "http://127.0.0.1:50649",
+    "--chat-sizes",
+    "100K",
+    "--conversations",
+    "0-1",
+    "--output-dir",
+    "/Users/jgarturo/Projects/OpenAI/automem-evals/data/results/beam/20260421-195900-100K-0_1/beam-output",
+    "--answerer-model",
+    "qwen3.6:35b-a3b-32k",
+    "--judge-model",
+    "qwen3.6:35b-a3b-32k",
+    "--top-k",
+    "50"
+  ],
+  "notes": "V1 pass-through shim (no LLM fact extraction). See data/results/beam/README.md."
+}

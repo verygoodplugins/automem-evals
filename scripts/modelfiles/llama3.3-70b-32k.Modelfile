@@ -1,0 +1,8 @@
+FROM llama3.3:70b
+# Same context-window fix as qwen3.6-35b-a3b-32k. 32768 is conservative;
+# Llama 3.3 supports up to 128K but 32K gives us headroom over BEAM's
+# ~30K peak prompt while keeping KV cache memory sane on M5 Max. Create
+# with:
+#   ollama create llama3.3:70b-32k -f scripts/modelfiles/llama3.3-70b-32k.Modelfile
+PARAMETER num_ctx 32768
+PARAMETER temperature 0

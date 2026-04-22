@@ -1,0 +1,32 @@
+{
+  "timestamp": "20260421-234814",
+  "tier": "100K",
+  "conversations": "0-19",
+  "project_name": "automem-20260421-234814",
+  "sweep_tag": "beam-run-d648dee1",
+  "shim_url": "http://127.0.0.1:60933",
+  "automem_url": "http://localhost:8001",
+  "upstream_head": "f75666d33ef560f0f196746e0e16c515d17e6856",
+  "command": [
+    "/Users/jgarturo/Projects/OpenAI/automem-evals/.venv-beam/bin/python",
+    "/Users/jgarturo/Projects/OpenAI/automem-evals/runners/beam_patched_main.py",
+    "--project-name",
+    "automem-20260421-234814",
+    "--backend",
+    "oss",
+    "--mem0-host",
+    "http://127.0.0.1:60933",
+    "--chat-sizes",
+    "100K",
+    "--conversations",
+    "0-19",
+    "--output-dir",
+    "/Users/jgarturo/Projects/OpenAI/automem-evals/data/results/beam/20260421-234814-100K-0_19/beam-output",
+    "--answerer-model",
+    "gpt-5-mini",
+    "--judge-model",
+    "gpt-5-mini"
+  ],
+  "notes": "V1 pass-through shim (no LLM fact extraction). See data/results/beam/README.md.",
+  "upstream_rc": 0
+}

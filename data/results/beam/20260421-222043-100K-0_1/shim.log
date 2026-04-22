@@ -1,0 +1,2 @@
+2026-04-21 22:20:43,556 INFO beam-shim - shim listening on http://127.0.0.1:51625 (upstream=http://localhost:8001)
+2026-04-22 01:10:20,505 INFO beam-shim - shutting down

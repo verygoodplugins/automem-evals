@@ -1,0 +1,8 @@
+FROM qwen3.6:35b-a3b
+# Ollama defaults num_ctx to 4096, which BEAM's ~30K retrieval+question prompts
+# overrun silently (silent truncation or stalls). 32768 is the upstream
+# autobench config limit for this model and what we've budgeted for BEAM
+# --top-k=50 runs. Create with:
+#   ollama create qwen3.6:35b-a3b-32k -f scripts/modelfiles/qwen3.6-35b-a3b-32k.Modelfile
+PARAMETER num_ctx 32768
+PARAMETER temperature 0

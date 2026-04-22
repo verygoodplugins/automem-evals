@@ -1,0 +1,4 @@
+2026-04-21 23:48:15,052 INFO beam-shim - shim listening on http://127.0.0.1:60933 (upstream=http://localhost:8001, sweep_tag=beam-run-d648dee1)
+2026-04-21 23:49:32,267 WARNING beam-shim - user_id=beam_100K_3_f4be4e81 content=349061 chars exceeds AutoMem cap 49000 — truncating. If you see this at scale, upgrade the shim to store multiple memories per chunk.
+2026-04-21 23:50:24,785 WARNING beam-shim - user_id=beam_100K_4_f4be4e81 content=53490 chars exceeds AutoMem cap 49000 — truncating. If you see this at scale, upgrade the shim to store multiple memories per chunk.
+2026-04-22 03:50:21,505 INFO beam-shim - shutting down
