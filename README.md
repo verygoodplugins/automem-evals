@@ -18,7 +18,7 @@ This repo does **not** own:
 - release-gating benchmark flows
 - canonical published baselines for AutoMem
 
-Those stay in `automem`. See `docs/REPO_BOUNDARY.md` here and `automem/docs/EVALS_CONTRACT.md` in the service repo for the working contract between repos.
+Those stay in `automem`. See [`docs/REPO_BOUNDARY.md`](docs/REPO_BOUNDARY.md) here for the working contract between repos.
 
 ## What Exists Today
 
@@ -51,15 +51,17 @@ automem-evals/
 
 Everything here treats `automem` as a black-box server under test.
 
+This assumes you have the sibling [automem](https://github.com/verygoodplugins/automem) repo cloned next to `automem-evals/`. Adjust paths if your layout differs.
+
 ```bash
 # 1. Start AutoMem from the sibling repo
-cd /Users/jgarturo/Projects/OpenAI/automem
+cd ../automem
 docker compose up -d
 
 # 2. Come back here
-cd /Users/jgarturo/Projects/OpenAI/automem-evals
+cd ../automem-evals
 
-# 3. Seed a snapshotted corpus
+# 3. Seed a snapshotted corpus (v1 ships with this repo — zero API cost)
 python3 scripts/seed_from_snapshot.py
 python3 scripts/seed_associations.py
 
@@ -72,6 +74,28 @@ Defaults assume:
 - token: `test-token`
 
 If the AutoMem volumes were reset, reseed before scoring so the manifest matches the memory IDs currently in the server.
+
+## Experimental: BEAM via shim
+
+`runners/run_beam.py` drives mem0's upstream BEAM runner (vendored at
+`third_party/memory-benchmarks/`) against the local AutoMem stack through
+`runners/beam_shim.py`, which translates mem0-OSS REST calls to AutoMem REST.
+Results land under `data/results/beam/<ts>-<tier>-<convs>/` and are explicitly
+**not** benchmark claims — see `data/results/beam/README.md` for the V1 shim
+caveat and the promotion path.
+
+```bash
+# One-time: pull submodule + install upstream deps (PEP 668 — use a venv)
+git submodule update --init
+python3 -m venv .venv-beam
+.venv-beam/bin/pip install -r third_party/memory-benchmarks/requirements.txt 'datasets>=2.14'
+
+# Smoke the shim standalone (no OpenAI calls, no upstream runner)
+python3 scripts/beam_shim_smoke.py --self-spawn
+
+# Smallest end-to-end run (needs OPENAI_API_KEY; ~$2 OpenAI at 100K/2-conv)
+OPENAI_API_KEY=... python3 runners/run_beam.py --tier 100K --conversations 0-1
+```
 
 ## Working Rules
 

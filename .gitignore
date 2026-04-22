@@ -5,6 +5,7 @@ __pycache__/
 .Python
 venv/
 .venv/
+.venv-beam/
 *.egg-info/
 dist/
 build/
@@ -21,11 +22,20 @@ data/transcripts/*.json
 data/transcripts/*.jsonl
 data/results/*.json
 data/results/*-comparison.md
+# BEAM artifacts: keep MANIFEST.json, shim.log, and docs; drop the 19MB+
+# judge-reasoning dump and the per-question predicted/ tree (reproducible).
+data/results/beam/*/beam_results_*.json
+data/results/beam/*/beam-output/
 
-# Seed memories — generated corpus files (can be rebuilt via scripts)
+# Seed memories — ignore generated corpora by default, but ship the small v1
+# snapshot so `scripts/seed_from_snapshot.py` works zero-cost after a fresh clone.
+# v2 is 5MB and cheaply regeneratable; keep it ignored.
 data/seed_memories/*.jsonl
 data/seed_memories/*.embedded.jsonl
 data/seed_memories/*.manifest.json
+!data/seed_memories/corpus_v1.jsonl
+!data/seed_memories/corpus_v1.embedded.jsonl
+!data/seed_memories/corpus_v1.manifest.json
 
 # Keep placeholder dirs
 !data/transcripts/.gitkeep
@@ -49,8 +59,13 @@ Thumbs.db
 *.swp
 *.swo
 
+# Claude Code / agent-local state
+.claude/
+
 # Logs / output artifacts
 *.log
 output/
 tmp/
+# BEAM per-run shim.log is the audit trail — keep these even though *.log is ignored
+!data/results/beam/*/shim.log
 

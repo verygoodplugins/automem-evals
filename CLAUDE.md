@@ -4,13 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-`automem-evals` is a **recall-quality evaluation harness** for the AutoMem server (`/Users/jgarturo/Projects/OpenAI/automem`). It is NOT a general eval framework — every runner, scenario, and metric is shaped around the `/recall` HTTP endpoint of a locally running AutoMem stack.
+`automem-evals` is a **recall-quality evaluation harness** for the [AutoMem](https://github.com/verygoodplugins/automem) server. It is NOT a general eval framework — every runner, scenario, and metric is shaped around the `/recall` HTTP endpoint of a locally running AutoMem stack.
 
 The end goal is answering "does this ruleset (the set of `recall_memory` parameters an agent is instructed to use) surface the right memories?" by running the **same scenarios** across different **rulesets** against a **seeded corpus** with known ground-truth hits.
 
 Official benchmark claims do **not** live here. `automem` remains the source of truth for official LoCoMo / LongMemEval harnesses, published baselines, and any benchmark numbers referenced in docs, CI, or release notes.
 
-See `docs/REPO_BOUNDARY.md` for the repo split and `automem/docs/EVALS_CONTRACT.md` for the local service contract this repo relies on.
+See `docs/REPO_BOUNDARY.md` for the repo split.
 
 ## Architecture — the three moving pieces
 
@@ -44,8 +44,8 @@ A scenario is `{id, phase, query?, project_slug?, expected_hit_tags}`. **Scoring
 Everything assumes Python 3.10+ (scripts use `dict | None`). **Stdlib only — no `requirements.txt`, no venv needed.**
 
 ```bash
-# 0. Start the AutoMem stack (separate repo, required)
-cd /Users/jgarturo/Projects/OpenAI/automem && docker compose up -d
+# 0. Start the AutoMem stack (sibling repo, required — assumed to be at ../automem)
+cd ../automem && docker compose up -d
 
 # Verify: http://localhost:8001/health reports falkordb + qdrant up
 

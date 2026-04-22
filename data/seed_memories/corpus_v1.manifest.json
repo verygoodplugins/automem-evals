@@ -1,0 +1,338 @@
+{
+  "memory_to_scenarios": {
+    "804fdc2f-c767-47b1-8d2d-ca8301a712d1": [
+      "PREF-COMMITS"
+    ],
+    "ec2c36e5-8cc5-4fa0-8d58-3ab652ea45fd": [
+      "PREF-COMMITS"
+    ],
+    "fe48451c-1e1e-41e8-8c36-c42b5d907f41": [
+      "PREF-COMMITS"
+    ],
+    "553ebfcb-3aea-4139-bf68-37a0774b13e0": [
+      "PREF-COMMITS"
+    ],
+    "6ff7160b-4eb7-4a41-9112-c9b7ace28b18": [
+      "PREF-STYLE"
+    ],
+    "a94d10cd-c005-49ea-b5cc-b728b385764c": [
+      "PREF-STYLE"
+    ],
+    "3d9fe7c6-bf05-4684-80a4-39da7e8dc1f3": [
+      "PREF-STYLE"
+    ],
+    "edbefd8d-7c9e-409c-ae98-04cf24f62982": [
+      "PREF-STYLE"
+    ],
+    "5f27c8b7-4a92-4440-b367-1491b2f43796": [
+      "PREF-TESTING"
+    ],
+    "6d12ee01-17b9-4004-9429-a552e7f1761e": [
+      "PREF-TESTING"
+    ],
+    "112e135c-46b7-4d54-b89f-cb7763942b20": [
+      "PREF-TESTING"
+    ],
+    "87242ca8-4b80-405e-847a-f93e66e2111e": [
+      "PREF-MEMORY"
+    ],
+    "ec18ef75-b9e2-4a70-9a98-dc67b16e072e": [
+      "PREF-MEMORY"
+    ],
+    "dc6c1240-2a30-4513-a2fa-d21175af5309": [
+      "PREF-COLLAB"
+    ],
+    "f3ccf4d4-5b74-4d55-87d2-01ecd510934a": [
+      "PREF-COLLAB"
+    ],
+    "3a9f7399-cd83-4751-909f-f8b2c70693eb": [
+      "PREF-COLLAB"
+    ],
+    "e6955adb-6f55-460f-a349-2aed0c81ac8e": [
+      "PREF-DEPLOY"
+    ],
+    "d5f62662-5822-4228-a43c-6d0394411996": [
+      "PREF-DEPLOY"
+    ],
+    "4860d130-ae24-4275-aced-d7506e275f97": [
+      "PREF-STYLE-OLD"
+    ],
+    "7a74ab54-f577-4017-a118-7027b93f0080": [
+      "PREF-TOOLING-OLD"
+    ],
+    "a1942fe7-27b3-4298-8bd0-f029b67da152": [
+      "TP-AUTH",
+      "TP-ARCH"
+    ],
+    "1d24e34b-58db-4f6d-ac88-9f4bdce94be9": [
+      "TP-ARCH"
+    ],
+    "c03f9a8c-4377-405c-acc3-0580ae7a37e0": [
+      "TP-AUTH"
+    ],
+    "caaa6a88-8f4d-4d8c-a05e-e057f6aacbfd": [
+      "TP-RETRY"
+    ],
+    "fb2719b7-1f13-4300-8121-915400e969ef": [
+      "TP-ARCH"
+    ],
+    "5965720b-2168-4d0d-b7d3-9fd0d37e49c8": [],
+    "cfc9b6dc-5e15-4d49-863b-73f32ef2f183": [
+      "TP-RATE",
+      "DEBUG-RATE"
+    ],
+    "1ae70324-c331-492d-98ca-f6417f1813ce": [
+      "TP-AUTH",
+      "DEBUG-AUTH"
+    ],
+    "14647dd7-c684-4a8c-b235-a0365ac4e0ab": [
+      "TP-MEM",
+      "DEBUG-MEM"
+    ],
+    "e98bb1d0-fafd-4440-aced-c943f9195b9f": [
+      "TP-CI",
+      "DEBUG-CI"
+    ],
+    "f5249686-b536-49d2-89f4-5f7d9fb5e70a": [
+      "TP-DEPLOY"
+    ],
+    "e4375aec-14df-4d6e-a831-8c4549d7e413": [
+      "TP-ARCH",
+      "PATTERN-CTX"
+    ],
+    "a3b67812-4aab-4256-bb3d-4793f37c50c0": [
+      "TP-ARCH",
+      "PATTERN-MIGRATE"
+    ],
+    "c3d66931-84eb-4835-97bc-733e0d1fabed": [
+      "PATTERN-FLAGS"
+    ],
+    "241ef7e7-c2be-4a7b-a310-b00cfa8d4b43": [
+      "TP-AUTH"
+    ],
+    "01e88260-fca1-4edc-bece-b6c727303334": [],
+    "7ff9b821-b5ec-4287-b73c-ca76f3e8c788": [],
+    "040a9b0a-79cc-48a3-b4f1-575d54c1008d": [],
+    "fe40174e-816a-476c-9152-35ea5228be2a": [
+      "TP-RETRY"
+    ],
+    "0f24b609-eb81-431c-b9e3-37d03cffdd01": [
+      "TP-CI"
+    ],
+    "ab219b48-c451-422a-84de-aef37aa88639": [
+      "TP-ARCH"
+    ],
+    "4ff55018-3e0a-4ee4-a671-f8cb5ebb9c03": [
+      "TP-DEPLOY"
+    ],
+    "9b277b35-b302-42c3-9dac-420b1ef74398": [
+      "TP-DEPLOY"
+    ],
+    "eedd01c1-9b7a-4dd8-a27f-1eff19559c5c": [
+      "DA-RSC"
+    ],
+    "c5408d9f-3af3-4c86-9885-832652aedd02": [
+      "DA-DATA"
+    ],
+    "f0efbfd4-7614-4728-a45c-296aaec8edcb": [],
+    "b049b030-6662-45ba-9432-e5a7fb90a93b": [
+      "DA-HYDRATION",
+      "DEBUG-HYDRATE"
+    ],
+    "1ec11e3f-5574-4790-ad94-cf16dc5935c3": [
+      "DA-HYDRATION",
+      "DEBUG-LOOP"
+    ],
+    "7a0f3b9f-cbf4-4b55-ab21-d540836d5485": [],
+    "05670e1e-9444-4441-8704-24ea2a257a9e": [
+      "DA-PATTERN"
+    ],
+    "f7bed6f2-29d9-4011-87bc-1a22f1c34f0c": [
+      "DA-PATTERN"
+    ],
+    "35f69673-e95b-4708-a130-93911ce32f2e": [
+      "DA-RSC"
+    ],
+    "8a2d2442-d602-4b76-973c-dd74a16a3734": [],
+    "fb0bcb5a-e2d2-498a-a52d-00125f506c0c": [],
+    "b8157e3e-8532-40c2-aeb8-fc7597c67fe9": [
+      "DA-DEPLOY"
+    ],
+    "a7d32a9a-b43f-4513-b397-f7e1fce96e84": [
+      "DA-CI"
+    ],
+    "71ec6b29-8f2a-4a82-b834-5fd3a48602f4": [
+      "OS-SUNSET"
+    ],
+    "f39d4325-a498-4993-9615-865fe4c78068": [
+      "OS-SUNSET"
+    ],
+    "4d93420f-4676-407e-846f-44047ccb6f2d": [
+      "DEBUG-AUTH"
+    ],
+    "44d623c4-d361-4021-b219-456acf2132fa": [],
+    "ea00902c-e1d4-4302-b01f-e840e53f4f2f": [],
+    "a02ccbde-3cb2-4459-8155-ef75d017c94c": [
+      "OS-SUNSET"
+    ],
+    "320fadce-06c7-4c9e-b619-d1ac6681b5f5": [
+      "OS-SUNSET"
+    ],
+    "1ac42076-0388-404a-a10e-86889b9bcedc": [],
+    "61f39c6c-78e1-4638-ac93-6adcc04b5423": [],
+    "eb536a99-294c-4963-90ae-107ef906507d": [],
+    "412aaa5c-9b86-41e2-b680-e7e2bc986f61": [],
+    "c33f82bb-d0c9-4222-bd27-513eeb10f6b6": [],
+    "7c73423f-5311-430b-b067-a8ed3b4ae015": [
+      "CROSS-RATE"
+    ],
+    "9dc370cd-2453-4037-9f72-54dcd335dc5d": [
+      "CROSS-AUTH"
+    ],
+    "957bfa8b-68e4-4fc3-9999-9b22f17e05ac": [],
+    "e74123cc-daa0-4b0b-87b2-f1818947ea74": [],
+    "8079079d-969f-48f2-8954-a753829816ed": [],
+    "167a59ca-edb8-45ad-9e46-b638b8d15384": [],
+    "65c9d276-e9eb-4ee8-8f28-1e1021e0a3d2": [],
+    "d224e5ec-d0f7-4a8d-ace4-d46760212627": [],
+    "0bc05dfe-2b0d-421c-97a9-11ee503aecdd": [],
+    "e5fe8cab-f654-439a-b718-ed9743fa9922": [
+      "CROSS-LOG"
+    ]
+  },
+  "scenario_to_memories": {
+    "PREF-COMMITS": [
+      "804fdc2f-c767-47b1-8d2d-ca8301a712d1",
+      "ec2c36e5-8cc5-4fa0-8d58-3ab652ea45fd",
+      "fe48451c-1e1e-41e8-8c36-c42b5d907f41",
+      "553ebfcb-3aea-4139-bf68-37a0774b13e0"
+    ],
+    "PREF-STYLE": [
+      "6ff7160b-4eb7-4a41-9112-c9b7ace28b18",
+      "a94d10cd-c005-49ea-b5cc-b728b385764c",
+      "3d9fe7c6-bf05-4684-80a4-39da7e8dc1f3",
+      "edbefd8d-7c9e-409c-ae98-04cf24f62982"
+    ],
+    "PREF-TESTING": [
+      "5f27c8b7-4a92-4440-b367-1491b2f43796",
+      "6d12ee01-17b9-4004-9429-a552e7f1761e",
+      "112e135c-46b7-4d54-b89f-cb7763942b20"
+    ],
+    "PREF-MEMORY": [
+      "87242ca8-4b80-405e-847a-f93e66e2111e",
+      "ec18ef75-b9e2-4a70-9a98-dc67b16e072e"
+    ],
+    "PREF-COLLAB": [
+      "dc6c1240-2a30-4513-a2fa-d21175af5309",
+      "f3ccf4d4-5b74-4d55-87d2-01ecd510934a",
+      "3a9f7399-cd83-4751-909f-f8b2c70693eb"
+    ],
+    "PREF-DEPLOY": [
+      "e6955adb-6f55-460f-a349-2aed0c81ac8e",
+      "d5f62662-5822-4228-a43c-6d0394411996"
+    ],
+    "PREF-STYLE-OLD": [
+      "4860d130-ae24-4275-aced-d7506e275f97"
+    ],
+    "PREF-TOOLING-OLD": [
+      "7a74ab54-f577-4017-a118-7027b93f0080"
+    ],
+    "TP-AUTH": [
+      "a1942fe7-27b3-4298-8bd0-f029b67da152",
+      "c03f9a8c-4377-405c-acc3-0580ae7a37e0",
+      "1ae70324-c331-492d-98ca-f6417f1813ce",
+      "241ef7e7-c2be-4a7b-a310-b00cfa8d4b43"
+    ],
+    "TP-ARCH": [
+      "a1942fe7-27b3-4298-8bd0-f029b67da152",
+      "1d24e34b-58db-4f6d-ac88-9f4bdce94be9",
+      "fb2719b7-1f13-4300-8121-915400e969ef",
+      "e4375aec-14df-4d6e-a831-8c4549d7e413",
+      "a3b67812-4aab-4256-bb3d-4793f37c50c0",
+      "ab219b48-c451-422a-84de-aef37aa88639"
+    ],
+    "TP-RETRY": [
+      "caaa6a88-8f4d-4d8c-a05e-e057f6aacbfd",
+      "fe40174e-816a-476c-9152-35ea5228be2a"
+    ],
+    "TP-RATE": [
+      "cfc9b6dc-5e15-4d49-863b-73f32ef2f183"
+    ],
+    "DEBUG-RATE": [
+      "cfc9b6dc-5e15-4d49-863b-73f32ef2f183"
+    ],
+    "DEBUG-AUTH": [
+      "1ae70324-c331-492d-98ca-f6417f1813ce",
+      "4d93420f-4676-407e-846f-44047ccb6f2d"
+    ],
+    "TP-MEM": [
+      "14647dd7-c684-4a8c-b235-a0365ac4e0ab"
+    ],
+    "DEBUG-MEM": [
+      "14647dd7-c684-4a8c-b235-a0365ac4e0ab"
+    ],
+    "TP-CI": [
+      "e98bb1d0-fafd-4440-aced-c943f9195b9f",
+      "0f24b609-eb81-431c-b9e3-37d03cffdd01"
+    ],
+    "DEBUG-CI": [
+      "e98bb1d0-fafd-4440-aced-c943f9195b9f"
+    ],
+    "TP-DEPLOY": [
+      "f5249686-b536-49d2-89f4-5f7d9fb5e70a",
+      "4ff55018-3e0a-4ee4-a671-f8cb5ebb9c03",
+      "9b277b35-b302-42c3-9dac-420b1ef74398"
+    ],
+    "PATTERN-CTX": [
+      "e4375aec-14df-4d6e-a831-8c4549d7e413"
+    ],
+    "PATTERN-MIGRATE": [
+      "a3b67812-4aab-4256-bb3d-4793f37c50c0"
+    ],
+    "PATTERN-FLAGS": [
+      "c3d66931-84eb-4835-97bc-733e0d1fabed"
+    ],
+    "DA-RSC": [
+      "eedd01c1-9b7a-4dd8-a27f-1eff19559c5c",
+      "35f69673-e95b-4708-a130-93911ce32f2e"
+    ],
+    "DA-DATA": [
+      "c5408d9f-3af3-4c86-9885-832652aedd02"
+    ],
+    "DA-HYDRATION": [
+      "b049b030-6662-45ba-9432-e5a7fb90a93b",
+      "1ec11e3f-5574-4790-ad94-cf16dc5935c3"
+    ],
+    "DEBUG-HYDRATE": [
+      "b049b030-6662-45ba-9432-e5a7fb90a93b"
+    ],
+    "DEBUG-LOOP": [
+      "1ec11e3f-5574-4790-ad94-cf16dc5935c3"
+    ],
+    "DA-PATTERN": [
+      "05670e1e-9444-4441-8704-24ea2a257a9e",
+      "f7bed6f2-29d9-4011-87bc-1a22f1c34f0c"
+    ],
+    "DA-DEPLOY": [
+      "b8157e3e-8532-40c2-aeb8-fc7597c67fe9"
+    ],
+    "DA-CI": [
+      "a7d32a9a-b43f-4513-b397-f7e1fce96e84"
+    ],
+    "OS-SUNSET": [
+      "71ec6b29-8f2a-4a82-b834-5fd3a48602f4",
+      "f39d4325-a498-4993-9615-865fe4c78068",
+      "a02ccbde-3cb2-4459-8155-ef75d017c94c",
+      "320fadce-06c7-4c9e-b619-d1ac6681b5f5"
+    ],
+    "CROSS-RATE": [
+      "7c73423f-5311-430b-b067-a8ed3b4ae015"
+    ],
+    "CROSS-AUTH": [
+      "9dc370cd-2453-4037-9f72-54dcd335dc5d"
+    ],
+    "CROSS-LOG": [
+      "e5fe8cab-f654-439a-b718-ed9743fa9922"
+    ]
+  }
+}
