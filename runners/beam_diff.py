@@ -26,7 +26,9 @@ def _by_qid(data: dict) -> dict[str, dict]:
     out = {}
     for ev in data.get("evaluations", []):
         qid = ev["question_id"]
-        cutoff = ev["cutoff_results"].get("top_100") or next(iter(ev["cutoff_results"].values()))
+        cutoff = ev["cutoff_results"].get("top_100") or next(
+            iter(ev["cutoff_results"].values())
+        )
         out[qid] = {
             "question_type": ev["question_type"],
             "question": ev["question"],
@@ -44,19 +46,27 @@ def _per_category(by_qid: dict) -> dict:
         a["total"] += 1
         a["correct"] += 1 if v["judgment"] == "PASS" else 0
         a["scores"].append(v["score"])
-    return {cat: {
-        "total": d["total"],
-        "correct": d["correct"],
-        "pass_rate": 100.0 * d["correct"] / d["total"] if d["total"] else 0.0,
-        "avg_score": sum(d["scores"]) / d["total"] if d["total"] else 0.0,
-    } for cat, d in agg.items()}
+    return {
+        cat: {
+            "total": d["total"],
+            "correct": d["correct"],
+            "pass_rate": 100.0 * d["correct"] / d["total"] if d["total"] else 0.0,
+            "avg_score": sum(d["scores"]) / d["total"] if d["total"] else 0.0,
+        }
+        for cat, d in agg.items()
+    }
 
 
 def _overall(by_qid: dict) -> dict:
     n = len(by_qid)
     correct = sum(1 for v in by_qid.values() if v["judgment"] == "PASS")
     avg = sum(v["score"] for v in by_qid.values()) / n if n else 0.0
-    return {"total": n, "correct": correct, "pass_rate": 100.0 * correct / n if n else 0.0, "avg_score": avg}
+    return {
+        "total": n,
+        "correct": correct,
+        "pass_rate": 100.0 * correct / n if n else 0.0,
+        "avg_score": avg,
+    }
 
 
 def _fmt_delta_pp(d: float) -> str:
@@ -89,13 +99,29 @@ def build_report(a_path: pathlib.Path, b_path: pathlib.Path) -> str:
     lines.append("")
     lines.append(f"| | A (before) | B (after) |")
     lines.append(f"|---|---|---|")
-    for key in ["run_id", "answerer_model", "judge_model", "top_k", "top_k_cutoffs", "chat_sizes", "conversations", "total_questions"]:
+    for key in [
+        "run_id",
+        "answerer_model",
+        "judge_model",
+        "judge_profile",
+        "judge_provider",
+        "judge_snapshot_pinned",
+        "top_k",
+        "top_k_cutoffs",
+        "chat_sizes",
+        "conversations",
+        "total_questions",
+    ]:
         lines.append(f"| {key} | {a_md.get(key, '—')} | {b_md.get(key, '—')} |")
     lines.append("")
 
     if only_a or only_b:
-        lines.append(f"⚠️  Asymmetric question sets: {len(only_a)} only in A, {len(only_b)} only in B, {len(common_qids)} in both.")
-        lines.append("All comparisons below use the intersection. Overall numbers report the full set per run.")
+        lines.append(
+            f"⚠️  Asymmetric question sets: {len(only_a)} only in A, {len(only_b)} only in B, {len(common_qids)} in both."
+        )
+        lines.append(
+            "All comparisons below use the intersection. Overall numbers report the full set per run."
+        )
         lines.append("")
 
     # Overall on full set per run
@@ -105,9 +131,15 @@ def build_report(a_path: pathlib.Path, b_path: pathlib.Path) -> str:
     lines.append("")
     lines.append("| metric | A | B | Δ |")
     lines.append("|---|---:|---:|---:|")
-    lines.append(f"| questions | {a_over['total']} | {b_over['total']} | {b_over['total'] - a_over['total']} |")
-    lines.append(f"| pass_rate | {a_over['pass_rate']:.2f}% | {b_over['pass_rate']:.2f}% | {_fmt_delta_pp(b_over['pass_rate'] - a_over['pass_rate'])} |")
-    lines.append(f"| avg_score | {a_over['avg_score']:.3f} | {b_over['avg_score']:.3f} | {_fmt_delta_score(b_over['avg_score'] - a_over['avg_score'])} |")
+    lines.append(
+        f"| questions | {a_over['total']} | {b_over['total']} | {b_over['total'] - a_over['total']} |"
+    )
+    lines.append(
+        f"| pass_rate | {a_over['pass_rate']:.2f}% | {b_over['pass_rate']:.2f}% | {_fmt_delta_pp(b_over['pass_rate'] - a_over['pass_rate'])} |"
+    )
+    lines.append(
+        f"| avg_score | {a_over['avg_score']:.3f} | {b_over['avg_score']:.3f} | {_fmt_delta_score(b_over['avg_score'] - a_over['avg_score'])} |"
+    )
     lines.append("")
 
     # Per-category (intersect to be fair when question sets differ)
@@ -139,8 +171,16 @@ def build_report(a_path: pathlib.Path, b_path: pathlib.Path) -> str:
     lines.append("")
 
     # Flipped questions (PASS → FAIL, FAIL → PASS)
-    newly_pass = [q for q in common_qids if a_q[q]["judgment"] == "FAIL" and b_q[q]["judgment"] == "PASS"]
-    newly_fail = [q for q in common_qids if a_q[q]["judgment"] == "PASS" and b_q[q]["judgment"] == "FAIL"]
+    newly_pass = [
+        q
+        for q in common_qids
+        if a_q[q]["judgment"] == "FAIL" and b_q[q]["judgment"] == "PASS"
+    ]
+    newly_fail = [
+        q
+        for q in common_qids
+        if a_q[q]["judgment"] == "PASS" and b_q[q]["judgment"] == "FAIL"
+    ]
     lines.append("## Question-level flips")
     lines.append("")
     lines.append(f"- Newly passing (A=FAIL → B=PASS): **{len(newly_pass)}**")
@@ -154,7 +194,9 @@ def build_report(a_path: pathlib.Path, b_path: pathlib.Path) -> str:
         for q in newly_pass[:20]:
             a = a_q[q]
             b = b_q[q]
-            lines.append(f"- [{a['question_type']}] `{q}` (A score={a['score']:.2f} → B score={b['score']:.2f})")
+            lines.append(
+                f"- [{a['question_type']}] `{q}` (A score={a['score']:.2f} → B score={b['score']:.2f})"
+            )
         if len(newly_pass) > 20:
             lines.append(f"- ...and {len(newly_pass) - 20} more.")
         lines.append("")
@@ -165,14 +207,18 @@ def build_report(a_path: pathlib.Path, b_path: pathlib.Path) -> str:
         for q in newly_fail[:20]:
             a = a_q[q]
             b = b_q[q]
-            lines.append(f"- [{a['question_type']}] `{q}` (A score={a['score']:.2f} → B score={b['score']:.2f})")
+            lines.append(
+                f"- [{a['question_type']}] `{q}` (A score={a['score']:.2f} → B score={b['score']:.2f})"
+            )
         if len(newly_fail) > 20:
             lines.append(f"- ...and {len(newly_fail) - 20} more.")
         lines.append("")
 
     # Per-category flip balance
     if common_qids:
-        cat_flips: dict[str, dict] = defaultdict(lambda: {"up": 0, "down": 0, "both_pass": 0, "both_fail": 0})
+        cat_flips: dict[str, dict] = defaultdict(
+            lambda: {"up": 0, "down": 0, "both_pass": 0, "both_fail": 0}
+        )
         for q in common_qids:
             a = a_q[q]
             b = b_q[q]
@@ -204,7 +250,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("a", type=pathlib.Path, help="Baseline (before) results JSON")
     ap.add_argument("b", type=pathlib.Path, help="Candidate (after) results JSON")
-    ap.add_argument("--out", type=pathlib.Path, default=None, help="Write markdown to file")
+    ap.add_argument(
+        "--out", type=pathlib.Path, default=None, help="Write markdown to file"
+    )
     args = ap.parse_args()
 
     if not args.a.exists():

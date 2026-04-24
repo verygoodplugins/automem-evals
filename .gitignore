@@ -18,14 +18,18 @@ build/
 *.ipynb
 
 # Data — generated / large files
+#
+# Policy: commit run metadata (MANIFEST.json), audit trails (shim.log,
+# shim_stats.jsonl), and curated reports (SUMMARY-*.md, docs/session_*.md).
+# Ignore raw model output and per-question trees — they're reproducible from
+# the seeded corpus + the committed ruleset + the pinned judge snapshot.
 data/transcripts/*.json
 data/transcripts/*.jsonl
 data/results/*.json
 data/results/*-comparison.md
-# BEAM artifacts: keep MANIFEST.json, shim.log, and docs; drop the 19MB+
-# judge-reasoning dump and the per-question predicted/ tree (reproducible).
-data/results/beam/*/beam_results_*.json
-data/results/beam/*/beam-output/
+# BEAM artifacts — recursive patterns so deeper run layouts don't leak through.
+data/results/beam/**/beam_results_*.json
+data/results/beam/**/beam-output/
 
 # Seed memories — ignore generated corpora by default, but ship the small v1
 # snapshot so `scripts/seed_from_snapshot.py` works zero-cost after a fresh clone.
