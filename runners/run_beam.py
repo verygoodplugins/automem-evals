@@ -41,7 +41,7 @@ import urllib.error
 import urllib.request
 import uuid
 
-from judge_policy import CANONICAL_BENCHMARK_JUDGE_MODEL, judge_metadata
+from judge_policy import CANONICAL_BENCHMARK_JUDGE_MODEL, DEFAULT_JUDGE_PROVIDER, judge_metadata
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 UPSTREAM = REPO / "third_party" / "memory-benchmarks"
@@ -269,7 +269,7 @@ def main() -> int:
     project_name = args.project_name or f"automem-{ts}"
     sweep_tag = args.sweep_tag or f"beam-run-{uuid.uuid4().hex[:8]}"
     effective_judge_model = args.judge_model or CANONICAL_BENCHMARK_JUDGE_MODEL
-    effective_judge_provider = "openai"
+    effective_judge_provider = DEFAULT_JUDGE_PROVIDER
     effective_judge_metadata = judge_metadata(
         effective_judge_model,
         provider=effective_judge_provider,

@@ -27,11 +27,11 @@ def judge_profile_for(
         return None
     if profile and profile.strip():
         return profile.strip()
+    if model_name == CANONICAL_BENCHMARK_JUDGE_MODEL:
+        return CANONICAL_BENCHMARK_JUDGE_PROFILE
     env_profile = os.getenv(env_var)
     if env_profile and env_profile.strip():
         return env_profile.strip()
-    if model_name == CANONICAL_BENCHMARK_JUDGE_MODEL:
-        return CANONICAL_BENCHMARK_JUDGE_PROFILE
     return f"custom-{model_name}"
 
 
