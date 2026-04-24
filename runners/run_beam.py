@@ -41,6 +41,8 @@ import urllib.error
 import urllib.request
 import uuid
 
+from judge_policy import CANONICAL_BENCHMARK_JUDGE_MODEL, judge_metadata
+
 REPO = pathlib.Path(__file__).resolve().parent.parent
 UPSTREAM = REPO / "third_party" / "memory-benchmarks"
 SHIM_V1 = REPO / "runners" / "beam_shim.py"
@@ -68,7 +70,7 @@ def _load_dotenv() -> None:
         if not line or line.startswith("#"):
             continue
         if line.startswith("export "):
-            line = line[len("export "):].lstrip()
+            line = line[len("export ") :].lstrip()
         if "=" not in line:
             continue
         key, _, value = line.partition("=")
@@ -111,12 +113,18 @@ def _wait_for_shim(url: str, timeout_s: float = 10.0) -> None:
 
 def _preflight(automem_url: str, token: str) -> None:
     if not os.environ.get("OPENAI_API_KEY"):
-        raise SystemExit("OPENAI_API_KEY is not set — BEAM needs it for the answerer and judge LLMs.")
+        raise SystemExit(
+            "OPENAI_API_KEY is not set — BEAM needs it for the answerer and judge LLMs."
+        )
     if not UPSTREAM.exists():
-        raise SystemExit(f"submodule missing: {UPSTREAM} — run `git submodule update --init`")
+        raise SystemExit(
+            f"submodule missing: {UPSTREAM} — run `git submodule update --init`"
+        )
 
     try:
-        req = urllib.request.Request(f"{automem_url}/health", headers={"X-Api-Key": token})
+        req = urllib.request.Request(
+            f"{automem_url}/health", headers={"X-Api-Key": token}
+        )
         with urllib.request.urlopen(req, timeout=3) as r:
             body = json.loads(r.read())
     except Exception as exc:
@@ -136,7 +144,10 @@ def _sweep_run_tag(automem_url: str, token: str, sweep_tag: str) -> int:
     while True:
         params = [("tags", sweep_tag), ("limit", "500"), ("query", "")]
         from urllib.parse import urlencode
-        req = urllib.request.Request(f"{automem_url}/recall?{urlencode(params)}", headers=hdrs)
+
+        req = urllib.request.Request(
+            f"{automem_url}/recall?{urlencode(params)}", headers=hdrs
+        )
         with urllib.request.urlopen(req, timeout=30) as r:
             resp = json.loads(r.read())
         results = resp.get("results") or []
@@ -147,7 +158,9 @@ def _sweep_run_tag(automem_url: str, token: str, sweep_tag: str) -> int:
             mid = mem.get("id") or r.get("id")
             if not mid:
                 continue
-            dr = urllib.request.Request(f"{automem_url}/memory/{mid}", method="DELETE", headers=hdrs)
+            dr = urllib.request.Request(
+                f"{automem_url}/memory/{mid}", method="DELETE", headers=hdrs
+            )
             try:
                 with urllib.request.urlopen(dr, timeout=10) as dresp:
                     dresp.read()
@@ -159,15 +172,57 @@ def _sweep_run_tag(automem_url: str, token: str, sweep_tag: str) -> int:
     return deleted
 
 
+def _annotate_result_json(path: pathlib.Path, metadata: dict[str, object]) -> None:
+    """Add wrapper-level judge metadata to copied upstream result JSON."""
+    try:
+        data = json.loads(path.read_text())
+        result_metadata = data.setdefault("metadata", {})
+        if isinstance(result_metadata, dict):
+            result_metadata.update(metadata)
+            path.write_text(json.dumps(data, indent=2))
+    except Exception as exc:
+        print(f"warning: could not annotate {path.name}: {exc}")
+
+
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Run upstream BEAM through the AutoMem shim")
-    ap.add_argument("--tier", default="100K", help=f"chat-sizes value, one of {sorted(VALID_CHAT_SIZES)}")
-    ap.add_argument("--conversations", default="0-1", help="BEAM conversation spec, e.g. 0-1 or 0,1,5")
-    ap.add_argument("--project-name", default=None, help="BEAM project name (default: automem-<ts>)")
-    ap.add_argument("--answerer-model", default=None, help="Override BEAM answerer model")
-    ap.add_argument("--judge-model", default=None, help="Override BEAM judge model")
+    ap = argparse.ArgumentParser(
+        description="Run upstream BEAM through the AutoMem shim"
+    )
+    ap.add_argument(
+        "--tier",
+        default="100K",
+        help=f"chat-sizes value, one of {sorted(VALID_CHAT_SIZES)}",
+    )
+    ap.add_argument(
+        "--conversations",
+        default="0-1",
+        help="BEAM conversation spec, e.g. 0-1 or 0,1,5",
+    )
+    ap.add_argument(
+        "--project-name", default=None, help="BEAM project name (default: automem-<ts>)"
+    )
+    ap.add_argument(
+        "--answerer-model", default=None, help="Override BEAM answerer model"
+    )
+    ap.add_argument(
+        "--judge-model",
+        default=None,
+        help=(
+            "Override BEAM judge model " f"(default: {CANONICAL_BENCHMARK_JUDGE_MODEL})"
+        ),
+    )
+    ap.add_argument(
+        "--judge-profile",
+        default=None,
+        help=(
+            "Metadata label for non-canonical comparison runs, "
+            "for example published-mem0-gpt-5."
+        ),
+    )
     ap.add_argument("--top-k", type=int, default=None, help="Override BEAM --top-k")
-    ap.add_argument("--extra", default="", help="Extra args appended to BEAM (space-separated)")
+    ap.add_argument(
+        "--extra", default="", help="Extra args appended to BEAM (space-separated)"
+    )
     ap.add_argument("--automem", default=DEFAULT_AUTOMEM)
     ap.add_argument("--token", default=DEFAULT_TOKEN)
     ap.add_argument(
@@ -194,7 +249,9 @@ def main() -> int:
         default=DEFAULT_EXTRACTION_MODEL,
         help="V2 only: OpenAI model used for fact extraction.",
     )
-    ap.add_argument("--dry-run", action="store_true", help="Print the upstream command and exit")
+    ap.add_argument(
+        "--dry-run", action="store_true", help="Print the upstream command and exit"
+    )
     args = ap.parse_args()
 
     if args.tier not in VALID_CHAT_SIZES:
@@ -211,6 +268,13 @@ def main() -> int:
 
     project_name = args.project_name or f"automem-{ts}"
     sweep_tag = args.sweep_tag or f"beam-run-{uuid.uuid4().hex[:8]}"
+    effective_judge_model = args.judge_model or CANONICAL_BENCHMARK_JUDGE_MODEL
+    effective_judge_provider = "openai"
+    effective_judge_metadata = judge_metadata(
+        effective_judge_model,
+        provider=effective_judge_provider,
+        profile=args.judge_profile,
+    )
     shim_port = _find_free_port()
     shim_url = f"http://127.0.0.1:{shim_port}"
     output_dir = run_dir / "beam-output"
@@ -222,18 +286,24 @@ def main() -> int:
     # needs longer budgets; upstream doesn't expose a CLI override. Pass-through
     # argv is identical.
     cmd = [
-        _beam_python(), str(REPO / "runners" / "beam_patched_main.py"),
-        "--project-name", project_name,
-        "--backend", "oss",
-        "--mem0-host", shim_url,
-        "--chat-sizes", args.tier,
-        "--conversations", args.conversations,
-        "--output-dir", str(output_dir),
+        _beam_python(),
+        str(REPO / "runners" / "beam_patched_main.py"),
+        "--project-name",
+        project_name,
+        "--backend",
+        "oss",
+        "--mem0-host",
+        shim_url,
+        "--chat-sizes",
+        args.tier,
+        "--conversations",
+        args.conversations,
+        "--output-dir",
+        str(output_dir),
     ]
     if args.answerer_model:
         cmd += ["--answerer-model", args.answerer_model]
-    if args.judge_model:
-        cmd += ["--judge-model", args.judge_model]
+    cmd += ["--judge-model", effective_judge_model]
     if args.top_k is not None:
         cmd += ["--top-k", str(args.top_k)]
     if args.extra:
@@ -250,7 +320,10 @@ def main() -> int:
         "project_name": project_name,
         "sweep_tag": sweep_tag,
         "shim_version": args.shim_version,
-        "extraction_model": args.extraction_model if args.shim_version == "v2" else None,
+        "extraction_model": (
+            args.extraction_model if args.shim_version == "v2" else None
+        ),
+        **effective_judge_metadata,
         "shim_url": shim_url,
         "automem_url": args.automem,
         "upstream_head": subprocess.check_output(
@@ -262,7 +335,10 @@ def main() -> int:
     (run_dir / "MANIFEST.json").write_text(json.dumps(manifest, indent=2))
     print(f"run dir:      {run_dir.relative_to(REPO)}")
     print(f"shim url:     {shim_url}")
-    print(f"shim version: {args.shim_version}" + (f" (extractor={args.extraction_model})" if args.shim_version == 'v2' else ""))
+    print(
+        f"shim version: {args.shim_version}"
+        + (f" (extractor={args.extraction_model})" if args.shim_version == "v2" else "")
+    )
     print(f"sweep tag:    {sweep_tag}")
     print(f"upstream cmd: {' '.join(cmd)}")
 
@@ -275,9 +351,18 @@ def main() -> int:
     shim_py = _beam_python() if args.shim_version == "v2" else sys.executable
     shim_path = SHIM_V2 if args.shim_version == "v2" else SHIM_V1
     shim_cmd = [
-        shim_py, str(shim_path), "--host", "127.0.0.1", "--port", str(shim_port),
-        "--upstream", args.automem, "--token", args.token,
-        "--sweep-tag", sweep_tag,
+        shim_py,
+        str(shim_path),
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(shim_port),
+        "--upstream",
+        args.automem,
+        "--token",
+        args.token,
+        "--sweep-tag",
+        sweep_tag,
     ]
     if args.shim_version == "v2":
         shim_cmd += ["--extraction-model", args.extraction_model]
@@ -314,6 +399,7 @@ def main() -> int:
         print(f"predicted dir: {predicted.relative_to(REPO)}")
         # Convenience: surface the top-level beam_results_*.json if present
         for fp in sorted(output_dir.glob("beam_results_*.json")):
+            _annotate_result_json(fp, effective_judge_metadata)
             shutil.copy(fp, run_dir / fp.name)
             print(f"copied: {fp.name}")
 
