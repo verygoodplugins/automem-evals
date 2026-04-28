@@ -52,6 +52,40 @@ Fixtures match the stdin shape the production hooks parse: `{tool_input: {comman
 ### 10. Metrics computed post-hoc, not during hook execution
 `hook_metrics.py` reads a snapshot JSON and emits a metrics JSON. Keeps the runner simple (just fire + drain + snapshot) and lets metrics evolve without re-running hooks.
 
+## Implementation findings worth keeping
+
+Found while building the runner. Each is a non-obvious property of the
+production code path that future variant work should not rediscover.
+
+### A. AutoMem `/recall` is GET with `X-Api-Key`, not POST + Bearer
+
+The `/recall` endpoint uses **GET with query params** and the
+`X-Api-Key` header (matches the existing `runners/compare_rulesets.py`
+pattern). POST with `Authorization: Bearer` returns 405. POST `/memory`
+silently accepted Bearer in testing — the runner uses `X-Api-Key`
+everywhere for consistency.
+
+### B. `/recall` response shape: `.results[].memory` not `.results[]`
+
+Each result is `{id, score, score_components, memory: {content, tags, type, importance, metadata, ...}, relations, ...}`. The `id` is at top level; everything else is nested under `memory`. Snapshots store the full result objects so callers downstream can pull `.memory.<field>`.
+
+### C. No `/memory/by-tag` endpoint — cleanup is per-id
+
+`DELETE /memory/<id>` works; `DELETE /memory/by-tag?tag=X` 404s.
+`cleanup_by_tag()` iterates the recall snapshot and deletes per-id.
+
+### D. The deploy hook excludes `'unknown'` from tags but leaves it in content
+
+`capture-deployment.sh` line 258: `if platform and platform != "unknown": tags.append(platform)` — but the content template (`Deployed X to Y on $DEPLOY_PLATFORM`) substitutes regardless. So the `'on unknown'` substring lands in content, then server-side NER hallucinates entity tags around it (e.g. `entity:organizations:deployed`). The audit's actual artifact is therefore in **content**, not tags. Updated `count_unknown_platform_in_content` accordingly.
+
+### E. `process-session-memory.py` emits records with `tags: null, type: null`
+
+Two of the seven baseline-run queue records have null tags/type because process-session-memory.py writes a different field shape than capture-*.sh. POSTs still succeed (server backfills); `type_validity.invalid_count` flags them as out-of-enum. Don't mistake this for a malformed JSON issue — it's a mis-typing issue at the hook layer, exactly what audit finding #5 flagged.
+
+### F. `bash -n` and `python -m py_compile` aren't enough — fixture-driven smoke is the real gate
+
+The hook scripts pass syntax check trivially but only the end-to-end smoke run exposes the bash/jq/python interaction (e.g. `tool_response` being either object-or-string in the jq expression). Don't ship a variant without firing fixtures through it.
+
 ## Out of scope (and where it goes)
 
 - Layer 2 recall probes with Haiku + caching → separate PR.
