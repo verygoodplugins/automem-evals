@@ -1,0 +1,22 @@
+{
+  "id": "09_negative_control_read",
+  "description": "PostToolUse event for tool_name='Read' (not 'Bash'). All capture-*.sh PostToolUse matchers in settings.json filter on matcher='Bash', so the runner's matcher resolution should NOT invoke any hook for this fixture. Negative control proving the runner correctly filters by tool_name.",
+  "adversarial_twist": "negative control — proves matcher filtering works",
+  "kind": "PostToolUse",
+  "tool_name": "Read",
+  "stdin": {
+    "tool_input": {
+      "file_path": "/Users/jgarturo/Projects/OpenAI/automem-evals/runners/compare_rulesets.py"
+    },
+    "tool_response": {
+      "content": "import json\nimport http.client\n# ... (truncated)"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": [],
+    "matchers_should_not_fire": ["build", "test", "deploy"],
+    "memories_emitted_min": 0,
+    "memories_emitted_max": 0
+  }
+}

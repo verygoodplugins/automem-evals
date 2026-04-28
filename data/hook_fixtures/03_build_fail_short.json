@@ -1,0 +1,23 @@
+{
+  "id": "03_build_fail_short",
+  "description": "npm run build, exit 1, short error trace. Build hook should emit a 'Build failed' memory with importance 0.8, type Insight, and 'failure' tag.",
+  "adversarial_twist": "mild — failure path",
+  "kind": "PostToolUse",
+  "tool_name": "Bash",
+  "stdin": {
+    "tool_input": {
+      "command": "npm run build"
+    },
+    "tool_response": {
+      "exit_code": 1,
+      "stdout": "> automem-evals@1.0.0 build\n> tsc -p .\n\nsrc/server.ts(42,17): error TS2304: Cannot find name 'foo'.\nsrc/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'?\n\nERROR: 2 errors found.\n"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": ["build"],
+    "matchers_should_not_fire": ["test", "deploy"],
+    "memories_emitted_min": 1,
+    "memories_emitted_max": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "05_deploy_railway_prod",
+  "description": "railway up, exit 0. Deploy hook should emit a 'Deployed to railway production' memory with platform=railway, env=production, importance 0.9 (production), type Context. URL should be extracted from output.",
+  "adversarial_twist": "none",
+  "kind": "PostToolUse",
+  "tool_name": "Bash",
+  "stdin": {
+    "tool_input": {
+      "command": "railway up"
+    },
+    "tool_response": {
+      "exit_code": 0,
+      "stdout": "Indexing... done\nUploading... done\nBuild logs: https://railway.com/project/abc/build/xyz\nBuild succeeded\nDeployment URL: https://my-app.up.railway.app\n"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": ["deploy"],
+    "matchers_should_not_fire": ["build", "test"],
+    "memories_emitted_min": 1,
+    "memories_emitted_max": 1
+  }
+}

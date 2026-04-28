@@ -1,0 +1,27 @@
+{
+  "id": "06_deploy_unknown_platform",
+  "description": "Custom 'deploy' command (ssh + systemctl) that passes the deploy regex but fails platform detection. Reproduces the audit's 'platform fallback to unknown' anti-pattern: capture-deployment.sh emits a memory with DEPLOY_PLATFORM='unknown' and tags=['deployment','unknown',...].",
+  "adversarial_twist": "high — exercises platform-fallback anti-pattern flagged in audit finding #3 (Tag-discipline drift)",
+  "kind": "PostToolUse",
+  "tool_name": "Bash",
+  "stdin": {
+    "tool_input": {
+      "command": "./scripts/deploy.sh && ssh prod-host 'systemctl restart myapp'"
+    },
+    "tool_response": {
+      "exit_code": 0,
+      "stdout": "deploying to prod-host...\ndeploy.sh: rsyncing dist/ -> prod-host:/srv/myapp/\nsent 4.2 MB, received 332 bytes\nrestarting myapp...\n● myapp.service active\ndeployed in 12s\n"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": ["deploy"],
+    "matchers_should_not_fire": ["build", "test"],
+    "memories_emitted_min": 1,
+    "memories_emitted_max": 1,
+    "expected_anti_patterns_in_emitted_memory": [
+      "tags should contain 'unknown' (the platform fallback)",
+      "metadata.platform should be 'unknown'"
+    ]
+  }
+}

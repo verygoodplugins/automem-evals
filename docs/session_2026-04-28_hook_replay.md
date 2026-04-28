@@ -18,10 +18,14 @@ Each run generates a `uuid4()` and tags every emitted memory with `eval-run-<uui
 
 **Rejected:** `docker compose down -v` between variants. Tradeoff: faster iteration (~3s vs ~30s reset), runs are inspectable retroactively, less risk of breaking concurrent work in the AutoMem stack. Cost: corpus accumulates eval residue if `--cleanup` isn't run; mitigated by wiring `--cleanup` from day one (see decision 5).
 
-### 3. `AUTOMEM_QUEUE` env override for queue isolation
-The runner sets `AUTOMEM_QUEUE` to a per-run temp file before invoking any hook. Hooks honor this env var (verified at b81c63a in `templates/claude-code/hooks/capture-*.sh`). Without it, the runner would corrupt the user's real `~/.claude/scripts/memory-queue.jsonl`.
+### 3. `HOME` override for queue isolation
+The runner sets `HOME=<temp_sandbox>` per fixture invocation. The hooks hard-code `MEMORY_QUEUE="$HOME/.claude/scripts/memory-queue.jsonl"` and `process-session-memory.py` uses `Path.home() / '.claude' / 'scripts' / 'memory-queue.jsonl'` — both with no env override. The runner cannot redirect via `AUTOMEM_QUEUE` env (the inline `VAR=value cmd` syntax in the hook overrides parent-shell values), so HOME-redirection is the only path that doesn't require patching the hook scripts.
 
-**Rejected:** running hooks in a Docker container for full filesystem isolation. Tradeoff: ~10× more setup; loses the "test the actual production code path" property.
+The sandbox is `/tmp/eval-<uuid>/` per run; the hook will create `.claude/scripts/memory-queue.jsonl` underneath.
+
+**Rejected:** patching the hooks at copy-time to read MEMORY_QUEUE from env. Tradeoff: defeats "test the actual production code path verbatim" — the whole point of the harness.
+
+**Rejected:** running hooks in a Docker container. Tradeoff: ~10× more setup; HOME override achieves the same isolation more cheaply.
 
 ### 4. Stdlib-only Python, no `requirements.txt`
 Mirrors `runners/compare_rulesets.py`. No venv, no install step.

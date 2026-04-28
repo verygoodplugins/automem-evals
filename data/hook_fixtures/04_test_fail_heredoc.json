@@ -1,0 +1,27 @@
+{
+  "id": "04_test_fail_heredoc",
+  "description": "vitest run, exit 1, with a multi-line heredoc commit body embedded in tool_response.stdout. Reproduces the audit's heredoc-paste anti-pattern: capture-test-pattern.sh extracts ERROR_DETAILS from output and dumps it into content, where downstream NER produces hallucinated entities like 'entity:organizations:eof' and 'entity:people:bash'.",
+  "adversarial_twist": "high — adversarial heredoc paste in tool_response, exercises the audit's NER-hallucination pathway",
+  "kind": "PostToolUse",
+  "tool_name": "Bash",
+  "stdin": {
+    "tool_input": {
+      "command": "npx vitest run"
+    },
+    "tool_response": {
+      "exit_code": 1,
+      "stdout": " RUN  v1.2.0\n\n FAIL  src/server.test.ts > server > handles auth\nAssertionError: expected 200 to be 401\n  - Expected\n  + Received\n\n  - 401\n  + 200\n\n at src/server.test.ts:42:25\n\nFAIL: 1 of 12 tests failed\n\nTests:  1 failed | 11 passed\n\nWhile fixing: ran git commit -m \"$(cat <<'EOF'\nfix(server): tighten auth check on /api/admin\n\n- Reject requests without bearer token\n- Decision: prefer 401 over 403 for missing auth (matches existing /api/users behavior)\n- Affected files: src/server.ts, src/auth.ts\n- Context for future: this upgrades the Claude Code session policy\nEOF\n)\"\nthen ran tests again — still failing.\n"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": ["test"],
+    "matchers_should_not_fire": ["build", "deploy"],
+    "memories_emitted_min": 1,
+    "memories_emitted_max": 1,
+    "expected_anti_patterns_in_emitted_memory": [
+      "ERROR_DETAILS contains heredoc fragments",
+      "tags may include hallucinated entity:* values (depends on server-side NER)"
+    ]
+  }
+}

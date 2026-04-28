@@ -1,0 +1,23 @@
+{
+  "id": "01_git_commit_golden",
+  "description": "Clean conventional-commit Bash event. No capture-*.sh internal regex matches; expected to be a no-op for all PostToolUse hooks.",
+  "adversarial_twist": "none",
+  "kind": "PostToolUse",
+  "tool_name": "Bash",
+  "stdin": {
+    "tool_input": {
+      "command": "git commit -m 'feat: add hook-replay scaffold'"
+    },
+    "tool_response": {
+      "exit_code": 0,
+      "stdout": "[feat/hook-eval-layer1 abc1234] feat: add hook-replay scaffold\n 2 files changed, 62 insertions(+)"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": [],
+    "matchers_should_not_fire": ["build", "test", "deploy"],
+    "memories_emitted_min": 0,
+    "memories_emitted_max": 0
+  }
+}
