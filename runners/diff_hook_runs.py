@@ -28,13 +28,20 @@ def _delta(a: float | int, b: float | int) -> str:
     return f"{diff:+.3f}"
 
 
-def _row(label: str, a, b, lower_is_better: bool = True) -> str:
+def _row(label: str, a, b, direction: str = "lower_is_better") -> str:
+    """direction: 'lower_is_better' | 'higher_is_better' | 'informational'."""
     delta = _delta(a, b)
     suffix = ""
-    if delta:
-        if (lower_is_better and a > b) or (not lower_is_better and a < b):
+    if delta and direction != "informational":
+        improved = (direction == "lower_is_better" and a > b) or (
+            direction == "higher_is_better" and a < b
+        )
+        regressed = (direction == "lower_is_better" and a < b) or (
+            direction == "higher_is_better" and a > b
+        )
+        if improved:
             suffix = " ✓"
-        elif (lower_is_better and a < b) or (not lower_is_better and a > b):
+        elif regressed:
             suffix = " ⚠️"
     return f"| {label} | {a} | {b} | {delta}{suffix} |"
 
@@ -72,7 +79,7 @@ def render_markdown(a: dict, b: dict) -> str:
     for key in ["with_confidence_pct", "with_origin_session_id_pct", "deploys_with_t_valid_pct"]:
         va = round(fp_a.get(key, 0.0), 3)
         vb = round(fp_b.get(key, 0.0), 3)
-        lines.append(_row(key, va, vb, lower_is_better=False))
+        lines.append(_row(key, va, vb, direction="higher_is_better"))
     lines.append("")
 
     # Content shape
@@ -83,9 +90,10 @@ def render_markdown(a: dict, b: dict) -> str:
     cs_a = a["content_shape"]["length_distribution"]
     cs_b = b["content_shape"]["length_distribution"]
     for key in ["le_150", "151_300", "301_1000", "gt_1000"]:
-        # Lower-is-better only really applies to gt_1000 (oversized records); rest is informational.
-        lib = key == "gt_1000"
-        lines.append(_row(key, cs_a.get(key, 0), cs_b.get(key, 0), lower_is_better=lib))
+        # Only gt_1000 is unambiguously "lower is better" (oversized records).
+        # Other buckets shift as record counts change — informational only.
+        direction = "lower_is_better" if key == "gt_1000" else "informational"
+        lines.append(_row(key, cs_a.get(key, 0), cs_b.get(key, 0), direction=direction))
     lines.append(_row("near_duplicate_rate", round(a["content_shape"]["near_duplicate_rate"], 3), round(b["content_shape"]["near_duplicate_rate"], 3)))
     lines.append("")
 
@@ -105,7 +113,7 @@ def render_markdown(a: dict, b: dict) -> str:
     lines.append(f"| metric | {a_name} | {b_name} | delta |")
     lines.append("|---|---:|---:|---:|")
     tv_a, tv_b = a["type_validity"], b["type_validity"]
-    lines.append(_row("valid_count", tv_a["valid_count"], tv_b["valid_count"], lower_is_better=False))
+    lines.append(_row("valid_count", tv_a["valid_count"], tv_b["valid_count"], direction="higher_is_better"))
     lines.append(_row("invalid_count", tv_a["invalid_count"], tv_b["invalid_count"]))
     lines.append("")
 

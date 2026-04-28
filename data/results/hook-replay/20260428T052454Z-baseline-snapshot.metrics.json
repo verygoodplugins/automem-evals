@@ -1,0 +1,38 @@
+{
+  "variant": "baseline",
+  "eval_run_id": "85e6f9dfef65",
+  "fixture_count": 9,
+  "queue_record_count": 7,
+  "recall_count": 7,
+  "anti_patterns": {
+    "session_summary_content": 1,
+    "hallucinated_entity_tags": 0,
+    "platform_unknown": 1
+  },
+  "field_presence": {
+    "with_confidence_pct": 0.0,
+    "with_origin_session_id_pct": 0.0,
+    "deploys_with_t_valid_pct": 1.0
+  },
+  "content_shape": {
+    "length_distribution": {
+      "le_150": 3,
+      "151_300": 4,
+      "301_1000": 0,
+      "gt_1000": 0
+    },
+    "near_duplicate_rate": 0.0
+  },
+  "tag_drift": {
+    "jest_collisions": 1,
+    "date_derived_tags": 0
+  },
+  "type_validity": {
+    "valid_count": 5,
+    "invalid_count": 2,
+    "invalid_examples": [
+      "None",
+      "None"
+    ]
+  }
+}
