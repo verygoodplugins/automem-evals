@@ -1,0 +1,32 @@
+{
+  "name": "baseline",
+  "source": {
+    "repo": "verygoodplugins/mcp-automem",
+    "ref": "4be6724",
+    "commit_message": "fix: wrap hook commands in bash -c for Windows Git Bash (#108)",
+    "captured_at": "2026-04-28T05:00:00Z"
+  },
+  "files": {
+    "settings.json": "templates/claude-code/settings.json",
+    "hooks/automem-session-start.sh": "templates/claude-code/hooks/automem-session-start.sh",
+    "hooks/capture-build-result.sh": "templates/claude-code/hooks/capture-build-result.sh",
+    "hooks/capture-deployment.sh": "templates/claude-code/hooks/capture-deployment.sh",
+    "hooks/capture-test-pattern.sh": "templates/claude-code/hooks/capture-test-pattern.sh",
+    "hooks/session-memory.sh": "templates/claude-code/hooks/session-memory.sh",
+    "scripts/memory-filters.json": "templates/claude-code/scripts/memory-filters.json",
+    "scripts/process-session-memory.py": "templates/claude-code/scripts/process-session-memory.py",
+    "scripts/python-command.sh": "templates/claude-code/scripts/python-command.sh",
+    "scripts/queue-cleanup.sh": "templates/claude-code/scripts/queue-cleanup.sh",
+    "scripts/smart-notify.sh": "templates/claude-code/scripts/smart-notify.sh"
+  },
+  "stop_hook_entries": [
+    "session-memory.sh (CLAUDE_HOOK_TYPE=session_end)",
+    "queue-cleanup.sh",
+    "npx @verygoodplugins/mcp-automem queue (flush)"
+  ],
+  "notes": [
+    "This is the shipped state matching the 2026-04-28 audit. session-memory.sh is wired into Stop, which is the source of the session-summary bleed CLAUDE.md forbids.",
+    "Current main (b81c63a, two commits later) has already removed session-memory.sh from Stop. Baseline pins to 4be6724 specifically to reproduce the audited bleed.",
+    "Verified bash -n passes on all five hooks + three scripts. process-session-memory.py compiles."
+  ]
+}

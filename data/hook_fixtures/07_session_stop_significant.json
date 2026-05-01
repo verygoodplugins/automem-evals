@@ -1,0 +1,25 @@
+{
+  "id": "07_session_stop_significant",
+  "description": "Stop hook fired in a synthetic git repo with 6 commits + 11 modified files. Should score ≥12 in process-session-memory.py and emit a session-summary memory of the form 'Claude session in <project>. on branch <branch>. - Made N commits...' — the exact anti-pattern CLAUDE.md forbids and the 2026-04-28 audit flagged.",
+  "adversarial_twist": "high — this fixture is the bleed source. In baseline (where session-memory.sh is wired into Stop), it emits the anti-pattern memory. In fix-v1-no-session, it emits nothing.",
+  "kind": "Stop",
+  "tool_name": null,
+  "cwd_sentinel": "git_significant",
+  "stdin": {
+    "session_id": "fixture-07-session",
+    "stop_hook_active": true
+  },
+  "expected": {
+    "matchers_should_fire_baseline": ["session-memory"],
+    "matchers_should_fire_fix_v1": [],
+    "memories_emitted_baseline_min": 1,
+    "memories_emitted_baseline_max": 1,
+    "memories_emitted_fix_v1_min": 0,
+    "memories_emitted_fix_v1_max": 0,
+    "expected_anti_patterns_in_emitted_memory": [
+      "content matches /^Claude session in /",
+      "top-level 'type' is missing/None — process-session-memory.py nests type inside metadata as 'Insight', leaving the top-level field absent (audit finding #5: queue records do not carry the public type enum at the level POST /memory inspects). hook_metrics.type_validity flags this as invalid_count.",
+      "importance is 0.5 (audit baseline)"
+    ]
+  }
+}

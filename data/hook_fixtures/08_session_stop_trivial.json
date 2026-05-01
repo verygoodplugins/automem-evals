@@ -1,0 +1,21 @@
+{
+  "id": "08_session_stop_trivial",
+  "description": "Stop hook fired in a synthetic git repo with 'git init' only — no commits, no file changes. Should score <12 in process-session-memory.py and NOT emit a session memory in either variant. Control case proving significance gating works.",
+  "adversarial_twist": "none — control",
+  "kind": "Stop",
+  "tool_name": null,
+  "cwd_sentinel": "git_trivial",
+  "stdin": {
+    "session_id": "fixture-08-session",
+    "stop_hook_active": true
+  },
+  "expected": {
+    "matchers_should_fire_baseline": ["session-memory"],
+    "matchers_should_fire_fix_v1": [],
+    "memories_emitted_baseline_min": 0,
+    "memories_emitted_baseline_max": 0,
+    "memories_emitted_fix_v1_min": 0,
+    "memories_emitted_fix_v1_max": 0,
+    "notes": "session-memory.sh runs in baseline but process-session-memory.py exits early below the 12-point significance threshold."
+  }
+}

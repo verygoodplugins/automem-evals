@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "description": "Sweep three classes of legacy auto-store noise from AutoMem. Each filter enumerates by its most-specific tag (first in tags_required_all), then validates the remaining tags + content prefix + before-date client-side. Per-id DELETE is used so we get per-memory verification before deletion. Run --dry-run first; --execute requires manual review of dry-run samples. expected_count_range is a hard guard that aborts the sweep if the matched count falls outside the bounds.",
+  "filters": [
+    {
+      "id": "SWEEP-WORKFLOW-SUMMARY",
+      "description": "Legacy daily-workflow-run reflection blobs from the scheduler hook killed in autohub commit f2cfed06d (2026-04-22). Server-side cluster e143ef72 reports ~1089 of these. Tags include 'summary' and 'workflow' which also appear on the daily-context-review briefs we WANT to keep — content_prefix_any disambiguates.",
+      "seed_tag": "scheduled",
+      "tags_required_all": ["scheduled", "summary", "workflow"],
+      "content_prefix_any": [
+        "# Daily Workflow Summary",
+        "# Workflow Execution Summary",
+        "# Workflow Summary",
+        "# Daily Blog Workflow Summary",
+        "# Executive Summary"
+      ],
+      "before": "2026-04-22T00:00:00Z",
+      "expected_count_range": [600, 1500]
+    },
+    {
+      "id": "SWEEP-MEMORY-CACHE",
+      "description": "Hourly memory-cache-refresh status pings from a dead workflow. Faucet already off (zero new stores in last 14 days as of 2026-04-28).",
+      "seed_tag": "memory-cache",
+      "tags_required_all": ["memory-cache", "hourly", "workflow"],
+      "content_prefix_any": ["Memory cache refresh:"],
+      "expected_count_range": [10, 10000]
+    },
+    {
+      "id": "SWEEP-SESSION-MILESTONE",
+      "description": "Per-session 'Claude session in <project>...' stores from the Claude Code SessionEnd/Stop hook (~/.claude/scripts/process-session-memory.py). Faucet still ON as of 2026-04-28 — disable the hook (Phase 1 of the plan) BEFORE running --execute against production or the lake refills. The hook tags with 'session-milestone' (hyphen) — see variants/baseline/scripts/process-session-memory.py:505. If a target server has older underscore-tagged 'session_milestone' legacy memories from a prior version, run a separate filter for them.",
+      "seed_tag": "session-milestone",
+      "tags_required_all": ["session-milestone"],
+      "content_prefix_any": ["Claude session in"],
+      "expected_count_range": [10, 10000]
+    }
+  ],
+  "preserve_queries": [
+    {
+      "name": "autojack-blog published artifacts",
+      "tags": ["autojack-blog", "published"],
+      "min_results": 5
+    },
+    {
+      "name": "user preferences",
+      "tags": ["preference"],
+      "min_results": 20
+    },
+    {
+      "name": "deployments",
+      "tags": ["deployment"],
+      "min_results": 5
+    },
+    {
+      "name": "bugfixes",
+      "tags": ["bugfix", "solution"],
+      "min_results": 10
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "id": "02_build_success",
+  "description": "npm run build, exit 0. Build hook should emit a 'Build succeeded' memory with importance 0.5, type Context.",
+  "adversarial_twist": "none",
+  "kind": "PostToolUse",
+  "tool_name": "Bash",
+  "stdin": {
+    "tool_input": {
+      "command": "npm run build"
+    },
+    "tool_response": {
+      "exit_code": 0,
+      "stdout": "> automem-evals@1.0.0 build\n> tsc -p .\n\n✓ Compiled in 1.2s, 2 warnings\ndist/main.js: 45 KB"
+    },
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+  },
+  "expected": {
+    "matchers_should_fire": ["build"],
+    "matchers_should_not_fire": ["test", "deploy"],
+    "memories_emitted_min": 1,
+    "memories_emitted_max": 1
+  }
+}

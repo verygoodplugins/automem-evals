@@ -1,0 +1,29 @@
+{
+  "name": "fix-v1-no-session",
+  "extends": "baseline",
+  "change": "Remove session-memory.sh entry from Stop hook in settings.json",
+  "rationale": "Tests whether disabling the session-summary anti-pattern (CLAUDE.md: 'never store session summaries') eliminates the bleed observed in the 2026-04-28 audit. Single-knob change for clean attribution.",
+  "files_overridden": [
+    "settings.json"
+  ],
+  "files_inherited_from_baseline": [
+    "hooks/automem-session-start.sh",
+    "hooks/capture-build-result.sh",
+    "hooks/capture-deployment.sh",
+    "hooks/capture-test-pattern.sh",
+    "hooks/session-memory.sh",
+    "scripts/memory-filters.json",
+    "scripts/process-session-memory.py",
+    "scripts/python-command.sh",
+    "scripts/queue-cleanup.sh",
+    "scripts/smart-notify.sh"
+  ],
+  "stop_hook_entries": [
+    "queue-cleanup.sh",
+    "npx @verygoodplugins/mcp-automem queue (flush)"
+  ],
+  "notes": [
+    "session-memory.sh remains on disk (inherited from baseline) but is no longer invoked by any matcher. Its content/quality is irrelevant in this variant.",
+    "Diff against baseline: lines 39-42 of baseline/settings.json removed (the {type:command, command:'...session-memory.sh...'} block in the Stop matcher)."
+  ]
+}
