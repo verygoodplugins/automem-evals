@@ -149,15 +149,26 @@ def _metadata_clause_matches(memory: dict, clause: dict) -> bool:
 
 
 def matches_filter(memory: dict, filter_spec: dict) -> bool:
-    """Apply all three validators: tags_required_all, content_prefix_any, before.
+    """Apply every configured validator on `filter_spec`.
 
-    The `before` guard parses both the memory timestamp and the configured
-    cutoff as datetimes and FAILS CLOSED (returns False) when the memory
-    timestamp is missing or unparseable. Earlier raw-string compare treated
-    a missing timestamp as the empty string '' — which is lexicographically
-    less than any ISO timestamp — so a missing-`created_at` record would
-    pass the `before` guard and become deletable. With actual data on the
-    line, prefer falsely sparing a record over falsely deleting one.
+    Supported keys (each is optional and AND-combined):
+    - `tags_required_all`: every listed tag must be present (case-insensitive).
+    - `tags_forbidden_any`: candidate is rejected if any listed tag is present.
+    - `metadata_required_all`: dotted-path equality (or list-membership) on
+      `memory["metadata"]`; every clause must match.
+    - `metadata_required_any`: list of metadata clauses; at least one must match.
+    - `content_prefix_any`: lstripped content must start with one of the prefixes.
+    - `content_regex_any`: lstripped content must match (re.search, MULTILINE)
+      one of the patterns. Compiled patterns are cached on `filter_spec` under
+      `_compiled_content_regex_any` to avoid recompiling per candidate.
+    - `before`: ISO timestamp cutoff. Both the cutoff and the memory's
+      `created_at` (or `timestamp`) are parsed as datetimes and the guard
+      FAILS CLOSED (returns False) when either is missing or unparseable.
+      Earlier raw-string compare treated a missing timestamp as the empty
+      string '' — lexicographically less than any ISO timestamp — so a
+      missing-`created_at` record would pass and become deletable. With
+      actual data on the line, prefer falsely sparing a record over falsely
+      deleting one.
     """
     mem_tags = {t.lower() for t in (memory.get("tags") or [])}
     required = {t.lower() for t in filter_spec.get("tags_required_all", [])}
@@ -186,8 +197,12 @@ def matches_filter(memory: dict, filter_spec: dict) -> bool:
 
     regexes = filter_spec.get("content_regex_any") or []
     if regexes:
+        compiled = filter_spec.get("_compiled_content_regex_any")
+        if compiled is None or len(compiled) != len(regexes):
+            compiled = [re.compile(pattern, flags=re.MULTILINE) for pattern in regexes]
+            filter_spec["_compiled_content_regex_any"] = compiled
         content = (memory.get("content") or "").lstrip()
-        if not any(re.search(pattern, content, flags=re.MULTILINE) for pattern in regexes):
+        if not any(regex.search(content) for regex in compiled):
             return False
 
     before = filter_spec.get("before")

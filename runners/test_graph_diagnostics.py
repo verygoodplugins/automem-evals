@@ -113,6 +113,31 @@ class ThresholdEvidenceTests(unittest.TestCase):
         )
         self.assertEqual(evidence["status"], "supports-lowering")
 
+    def test_threshold_evidence_falls_back_to_probed_thresholds(self):
+        evidence = gd.threshold_evidence(
+            {
+                "threshold_probe": {
+                    "top_k_neighbor_edges_at_thresholds": {
+                        "0.5": 200,
+                        "0.6": 120,
+                    }
+                }
+            }
+        )
+        self.assertEqual(evidence["status"], "measured")
+        self.assertIn("0.6 still returns 120", evidence["summary"])
+        self.assertIn("0.5 returns 200", evidence["summary"])
+
+    def test_threshold_evidence_handles_unparseable_threshold_keys(self):
+        evidence = gd.threshold_evidence(
+            {
+                "threshold_probe": {
+                    "top_k_neighbor_edges_at_thresholds": {"not-a-number": 5}
+                }
+            }
+        )
+        self.assertEqual(evidence["status"], "missing")
+
 
 class DockerCommandTests(unittest.TestCase):
     def test_build_docker_exec_command(self):

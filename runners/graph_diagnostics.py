@@ -220,23 +220,41 @@ def threshold_evidence(deep_probe: dict[str, Any] | None) -> dict[str, Any]:
     if not counts:
         return {"status": "missing", "summary": "threshold probe unavailable"}
 
-    def count_at(threshold: str) -> int:
-        return safe_count(counts.get(threshold))
+    parsed: list[tuple[str, float]] = []
+    for label in counts.keys():
+        try:
+            parsed.append((label, float(label)))
+        except (TypeError, ValueError):
+            continue
+    if not parsed:
+        return {"status": "missing", "summary": "threshold probe has no parseable thresholds"}
+    parsed.sort(key=lambda pair: pair[1])
 
-    at_65 = count_at("0.65")
-    at_75 = count_at("0.75")
-    lift = ratio(at_65 - at_75, at_75) if at_75 else 0.0
+    high_label = "0.75" if "0.75" in counts else parsed[-1][0]
+    high_value = float(high_label)
+    if "0.65" in counts and float("0.65") < high_value:
+        low_label = "0.65"
+    else:
+        below = [label for label, value in parsed if value < high_value]
+        low_label = below[0] if below else parsed[0][0]
+
+    high_count = safe_count(counts.get(high_label))
+    low_count = safe_count(counts.get(low_label))
+    lift = ratio(low_count - high_count, high_count) if high_count else 0.0
     top1 = probe.get("top1_similarity") or {}
     median = top1.get("p50")
 
-    if at_75 > 0:
+    if high_count > 0:
         summary = (
-            f"0.75 still returns {at_75} sampled top-k neighbor hits; "
-            f"0.65 returns {at_65} ({lift * 100:.1f}% more)."
+            f"{high_label} still returns {high_count} sampled top-k neighbor hits; "
+            f"{low_label} returns {low_count} ({lift * 100:.1f}% more)."
         )
         status = "measured"
     else:
-        summary = f"0.75 returns no sampled top-k hits; 0.65 returns {at_65}."
+        summary = (
+            f"{high_label} returns no sampled top-k hits; "
+            f"{low_label} returns {low_count}."
+        )
         status = "supports-lowering"
     if median is not None:
         summary += f" Top-1 median is {float(median):.4f}."
@@ -539,7 +557,10 @@ def claim_rows(analyses: dict[str, dict[str, Any]], source: dict[str, Any]) -> l
         legacy = (analysis.get("deep_probe") or {}).get("legacy_relation_similarity") or {}
         parallel = legacy.get("PARALLEL_CONTEXT") or {}
         discovered = (analysis.get("deep_probe") or {}).get("discovered_similarity") or {}
-        discovered_parallel = discovered.get("parallel_context") or {}
+        discovered_parallel = next(
+            (value for key, value in discovered.items() if str(key).lower() == "parallel_context"),
+            {},
+        ) or {}
         if parallel:
             parallel_notes.append(
                 f"{label}: legacy zero={pct(parallel.get('zero_similarity_share', 0))}"
