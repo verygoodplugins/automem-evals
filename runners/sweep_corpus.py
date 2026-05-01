@@ -35,9 +35,20 @@ Usage:
   python3 runners/sweep_corpus.py --scenario corpus_sweep_v1 \
       --endpoint https://automem.example.com --token "$AUTOMEM_TOKEN" --execute
 
+Around the sweep (defense-in-depth, post Codex adversarial review):
+  - --execute writes a full-record JSONL backup BEFORE deleting; if the
+    backup write fails, no deletes happen and the run aborts with exit 2.
+  - preserve_query regressions detected after deletes complete still let
+    summary.json be written (so the operator has audit data), but the
+    process exits 1 so any chained automation cannot treat the run as
+    successful.
+
 Exit codes:
   0 — success (dry-run completed, or --execute completed without regression)
-  1 — sweep aborted (count out of expected range, or preserve_query regressed)
+  1 — preserve_query regressed after --execute, or filter count out of
+      expected range (filter drift)
+  2 — pre-conditions failed (scenario missing, baseline counts couldn't be
+      captured, backup couldn't be written, etc.)
   2 — HTTP / config error
 """
 
@@ -170,6 +181,23 @@ def write_id_log(report_dir: pathlib.Path, filter_id: str, memories: list[dict])
             ts = m.get("created_at") or m.get("timestamp") or ""
             content_head = (m.get("content") or "").replace("\n", " ")[:80]
             f.write(f"{mid}\t{ts}\t{content_head}\n")
+    return path
+
+
+def write_full_backup(report_dir: pathlib.Path, filter_id: str, memories: list[dict]) -> pathlib.Path:
+    """Persist the full candidate records (one JSON object per line) BEFORE
+    --execute deletion. The .ids.txt log only stores id + 80-char content
+    prefix, which is insufficient to restore tags, metadata, or temporal
+    fields if the broad validators drift or a filter catches a real memory.
+
+    The caller MUST treat any exception from this function as a hard abort —
+    deleting without a restorable record is the failure mode this guards.
+    """
+    report_dir.mkdir(parents=True, exist_ok=True)
+    path = report_dir / f"{filter_id}.backup.jsonl"
+    with path.open("w", encoding="utf-8") as f:
+        for m in memories:
+            f.write(json.dumps(m, ensure_ascii=False, default=str) + "\n")
     return path
 
 
@@ -313,6 +341,20 @@ def main() -> int:
                 print(format_sample(m))
 
         if args.execute and candidates:
+            # Hard guard: persist full records BEFORE deletion. If we can't
+            # write the backup, abort — deleting without a restorable record
+            # is precisely the failure mode this protects against.
+            try:
+                backup_path = write_full_backup(report_dir, fid, candidates)
+                print(f"  backup:  {backup_path.relative_to(HERE)} ({len(candidates)} records)")
+            except Exception as e:
+                print(
+                    f"  ABORT: failed to write pre-delete backup for {fid}: {e}\n"
+                    f"  No deletes were performed for this filter.",
+                    file=sys.stderr,
+                )
+                return 2
+
             print(f"  deleting {len(candidates)}…")
             deleted, errors = execute_filter(
                 args.endpoint, args.token, spec, candidates
@@ -321,7 +363,7 @@ def main() -> int:
             for err in errors[:5]:
                 print(f"    ! {err}")
             summary.append(
-                {"id": fid, "matched": len(candidates), "deleted": deleted, "errors": len(errors)}
+                {"id": fid, "matched": len(candidates), "deleted": deleted, "errors": len(errors), "backup": str(backup_path.relative_to(HERE))}
             )
         else:
             summary.append(
@@ -331,6 +373,7 @@ def main() -> int:
 
     # 3. Post-sweep preserve counts (only meaningful if --execute).
     after: dict[str, int] = {}
+    preserve_regressions: list[str] = []
     if args.execute:
         print("post-sweep preserve counts:")
         try:
@@ -346,21 +389,19 @@ def main() -> int:
             print(f"  {q['name']}: {b} -> {a} {arrow}")
         print()
 
-        problems = assert_no_regression(before, after, preserve)
-        if problems:
+        preserve_regressions = assert_no_regression(before, after, preserve)
+        if preserve_regressions:
             print("REGRESSION DETECTED in preserve_queries:", file=sys.stderr)
-            for p in problems:
+            for p in preserve_regressions:
                 print(f"  ! {p}", file=sys.stderr)
             print(
                 "Sweep deletions were applied but some preserve counts dropped.\n"
                 "Investigate before running this filter set again.",
                 file=sys.stderr,
             )
-            # Don't return non-zero here — the deletes already happened. Surface
-            # the problem so the operator sees it, but exit cleanly so any
-            # downstream report generation runs.
 
-    # 4. Write summary JSON.
+    # 4. Write summary JSON. Always write before exiting so the report is
+    # available for diagnosis even when the sweep regressed.
     summary_payload = {
         "timestamp": ts,
         "endpoint": args.endpoint,
@@ -369,6 +410,7 @@ def main() -> int:
         "filters": summary,
         "preserve_before": before,
         "preserve_after": after,
+        "preserve_regressions": preserve_regressions,
     }
     (report_dir / "summary.json").write_text(json.dumps(summary_payload, indent=2))
     print(f"summary: {(report_dir / 'summary.json').relative_to(HERE)}")
@@ -378,6 +420,14 @@ def main() -> int:
             "\nThis was a DRY-RUN. Review the samples and id logs above, then "
             "rerun with --execute to perform deletions."
         )
+
+    # Fail closed at the end. The deletes already happened — that's exactly why
+    # the caller needs a non-zero exit: any downstream automation must NOT
+    # treat this run as successful and chain further destructive operations
+    # off it. summary.json contains preserve_regressions[] for programmatic
+    # parsing.
+    if preserve_regressions:
+        return 1
     return 0
 
 
