@@ -153,7 +153,13 @@ def _http_request(method: str, endpoint: str, path: str, token: str, body: dict 
 
 
 def health_check(endpoint: str, token: str) -> dict:
-    status, body = _http_request("GET", endpoint, "/health", token)
+    try:
+        status, body = _http_request("GET", endpoint, "/health", token)
+    except (ConnectionRefusedError, OSError) as e:
+        raise SystemExit(
+            f"AutoMem unreachable at {endpoint} ({e.__class__.__name__}: {e}). "
+            f"Did you 'docker compose up -d' in ../automem? Aborting before any hooks fire."
+        ) from None
     if status != 200 or body.get("status") != "healthy":
         raise SystemExit(
             f"AutoMem unhealthy at {endpoint} (status={status}, body={body!r}). "
@@ -298,19 +304,27 @@ def fire_fixtures(
     sandbox_home: Path,
     git_significant: Path | None,
     git_trivial: Path | None,
-) -> list[dict]:
+) -> tuple[list[dict], list[dict]]:
     """Fire each fixture in order. After all fire, read the queue file and
-    return the parsed records. Logs progress to stderr.
+    return (records, hook_failures). hook_failures captures every non-zero
+    hook exit so callers can fail closed — silently dropping a hook would
+    let a broken variant masquerade as an improvement (fewer bad records,
+    apparent win).
+
+    A fixture with `expected.expects_hook_failure: true` is allowed to
+    have its hooks exit non-zero without polluting hook_failures.
     """
     queue_path = sandbox_home / ".claude" / "scripts" / "memory-queue.jsonl"
     queue_path.parent.mkdir(parents=True, exist_ok=True)
     queue_path.write_text("")  # truncate
 
     fixture_log: list[dict] = []
+    hook_failures: list[dict] = []
     for fx in fixtures:
         fid = fx["id"]
         kind = fx["kind"]
         stdin_payload = fx.get("stdin", {})
+        expects_failure = bool(fx.get("expected", {}).get("expects_hook_failure"))
 
         if kind == "PostToolUse":
             tool_name = fx.get("tool_name")
@@ -338,6 +352,14 @@ def fire_fixtures(
             rc, out, err = run_hook(hook["command"], sandbox_home, stdin_payload, cwd)
             if rc != 0:
                 print(f"  {fid}: hook exited {rc}: {err.strip()[:200]}", file=sys.stderr)
+                if not expects_failure:
+                    hook_failures.append({
+                        "fixture_id": fid,
+                        "hook_command": (hook.get("command") or "")[:200],
+                        "returncode": rc,
+                        "stderr_excerpt": (err or "").strip()[:500],
+                        "stdout_excerpt": (out or "").strip()[:500],
+                    })
 
         fixture_log.append({"id": fid, "hooks_fired": len(hooks_to_fire)})
 
@@ -352,8 +374,15 @@ def fire_fixtures(
                 records.append(json.loads(line))
             except json.JSONDecodeError as e:
                 print(f"[WARN] queue line failed JSON parse: {e}: {line[:120]}", file=sys.stderr)
-    print(f"  fired {sum(f['hooks_fired'] for f in fixture_log)} hook(s); drained {len(records)} record(s) from queue", file=sys.stderr)
-    return records
+                hook_failures.append({
+                    "fixture_id": "<queue-drain>",
+                    "hook_command": "<json-decode>",
+                    "returncode": -1,
+                    "stderr_excerpt": f"{e}: {line[:120]}",
+                    "stdout_excerpt": "",
+                })
+    print(f"  fired {sum(f['hooks_fired'] for f in fixture_log)} hook(s); drained {len(records)} record(s) from queue; {len(hook_failures)} hook failure(s)", file=sys.stderr)
+    return records, hook_failures
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -395,21 +424,30 @@ def main(argv: list[str] | None = None) -> int:
         triv_dir = make_synthetic_git_trivial(sandbox) if needs_trivial else None
 
         print(f"[5/7] fire {len(fixtures)} fixtures", file=sys.stderr)
-        records = fire_fixtures(fixtures, settings, sandbox, sig_dir, triv_dir)
+        records, hook_failures = fire_fixtures(fixtures, settings, sandbox, sig_dir, triv_dir)
 
         print(f"[6/7] POST {len(records)} records to {args.endpoint}/memory with eval-run-{eval_run_id} tag", file=sys.stderr)
-        post_results = []
+        post_results: list[dict] = []
+        post_failures: list[dict] = []
         for rec in records:
             tagged = inject_eval_run_id(rec, eval_run_id)
             status, body = post_memory(tagged, args.endpoint, args.token)
             post_results.append({"status": status, "memory_id": (body or {}).get("memory_id") or (body or {}).get("id"), "tags": tagged.get("tags")})
+            if not (200 <= status < 300):
+                post_failures.append({
+                    "status": status,
+                    "response_body_excerpt": json.dumps(body, default=str)[:500],
+                    "content_excerpt": (rec.get("content") or "")[:200],
+                    "tags": tagged.get("tags"),
+                })
         ok = sum(1 for r in post_results if 200 <= r["status"] < 300)
-        print(f"      {ok}/{len(post_results)} POST'd successfully", file=sys.stderr)
+        print(f"      {ok}/{len(post_results)} POST'd successfully; {len(post_failures)} POST failure(s)", file=sys.stderr)
 
         # Recall the run for snapshot
         memories = recall_by_tag(f"eval-run-{eval_run_id}", args.endpoint, args.token)
         ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         snapshot_path = args.results_dir / f"{ts}-{args.variant}-snapshot.json"
+        run_failed = bool(hook_failures or post_failures)
         snapshot_obj = {
             "variant": args.variant,
             "eval_run_id": eval_run_id,
@@ -418,6 +456,9 @@ def main(argv: list[str] | None = None) -> int:
             "queue_records": records,
             "post_results": post_results,
             "recall_memories": memories,
+            "hook_failures": hook_failures,
+            "post_failures": post_failures,
+            "run_failed": run_failed,
             "captured_at": ts,
         }
         snapshot_path.write_text(json.dumps(snapshot_obj, indent=2, default=str))
@@ -430,6 +471,14 @@ def main(argv: list[str] | None = None) -> int:
         if not args.keep_sandbox:
             shutil.rmtree(sandbox, ignore_errors=True)
 
+    if run_failed:
+        print(
+            f"FAIL: run produced {len(hook_failures)} hook failure(s) and {len(post_failures)} POST failure(s). "
+            f"See {snapshot_path.relative_to(REPO_ROOT)} for stderr/response excerpts. "
+            f"Failing closed so a broken variant cannot masquerade as an improvement.",
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 

@@ -188,5 +188,40 @@ class TopLevelComputeTests(unittest.TestCase):
         self.assertEqual(m["type_validity"]["invalid_count"], 1)
 
 
+class FailClosedPropagationTests(unittest.TestCase):
+    """Codex adversarial review caught: a broken variant can fake an
+    improvement by silently dropping records when hooks crash. Metrics
+    must propagate run_failed so the diff renderer can refuse to
+    issue a verdict.
+    """
+
+    def test_run_failed_explicit_in_snapshot(self):
+        snap = _snapshot(queue=[])
+        snap["run_failed"] = True
+        m = hm.compute_metrics(snap)
+        self.assertTrue(m["run_failed"])
+
+    def test_run_failed_inferred_from_hook_failures(self):
+        snap = _snapshot(queue=[])
+        snap["hook_failures"] = [{"fixture_id": "fx1", "returncode": 1}]
+        m = hm.compute_metrics(snap)
+        self.assertTrue(m["run_failed"])
+        self.assertEqual(m["hook_failure_count"], 1)
+
+    def test_run_failed_inferred_from_post_failures(self):
+        snap = _snapshot(queue=[])
+        snap["post_failures"] = [{"status": 500, "response_body_excerpt": "{}"}]
+        m = hm.compute_metrics(snap)
+        self.assertTrue(m["run_failed"])
+        self.assertEqual(m["post_failure_count"], 1)
+
+    def test_clean_run_has_run_failed_false(self):
+        snap = _snapshot(queue=[{"content": "ok", "tags": ["build"], "type": "Context"}])
+        m = hm.compute_metrics(snap)
+        self.assertFalse(m["run_failed"])
+        self.assertEqual(m["hook_failure_count"], 0)
+        self.assertEqual(m["post_failure_count"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

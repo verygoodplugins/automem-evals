@@ -51,10 +51,23 @@ def render_markdown(a: dict, b: dict) -> str:
     b_name = b.get("variant", "B")
     a_id = a.get("eval_run_id", "?")
     b_id = b.get("eval_run_id", "?")
+    a_failed = bool(a.get("run_failed"))
+    b_failed = bool(b.get("run_failed"))
+    invalid = a_failed or b_failed
 
     lines: list[str] = []
     lines.append(f"# Hook-replay comparison: `{a_name}` vs `{b_name}`")
     lines.append("")
+    if invalid:
+        lines.append("> **⚠️ INVALID COMPARISON — at least one run failed closed.**")
+        lines.append(">")
+        if a_failed:
+            lines.append(f"> - `{a_name}`: {a.get('hook_failure_count', 0)} hook failure(s), {a.get('post_failure_count', 0)} POST failure(s)")
+        if b_failed:
+            lines.append(f"> - `{b_name}`: {b.get('hook_failure_count', 0)} hook failure(s), {b.get('post_failure_count', 0)} POST failure(s)")
+        lines.append(">")
+        lines.append("> Numbers below are reported for diagnosis only. Do NOT use as evidence of an improvement — a broken variant can drop bad records and look like a win. Re-run after fixing the underlying hook/POST errors before drawing conclusions.")
+        lines.append("")
     lines.append(f"- **A: `{a_name}`** — eval-run `{a_id}`, {a.get('queue_record_count', '?')} queue records, {a.get('recall_count', '?')} recalled.")
     lines.append(f"- **B: `{b_name}`** — eval-run `{b_id}`, {b.get('queue_record_count', '?')} queue records, {b.get('recall_count', '?')} recalled.")
     lines.append(f"- Generated: {datetime.now(timezone.utc).isoformat(timespec='seconds')}")
@@ -120,6 +133,10 @@ def render_markdown(a: dict, b: dict) -> str:
     # Verdict
     lines.append("## Verdict")
     lines.append("")
+    if invalid:
+        lines.append(f"⚠️ **No verdict — comparison is invalid.** At least one run failed closed (see banner above). The classifications below are not produced because broken variants can produce misleading apparent improvements.")
+        lines.append("")
+        return "\n".join(lines)
     eliminated: list[str] = []
     untouched: list[str] = []
     regressed: list[str] = []

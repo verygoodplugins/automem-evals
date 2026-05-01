@@ -182,12 +182,22 @@ def compute_metrics(snapshot: dict) -> dict:
     queue = snapshot.get("queue_records") or []
     recall = snapshot.get("recall_memories") or []
     fired = snapshot.get("fired_fixtures") or []
+    hook_failures = snapshot.get("hook_failures") or []
+    post_failures = snapshot.get("post_failures") or []
     return {
         "variant": snapshot.get("variant"),
         "eval_run_id": snapshot.get("eval_run_id"),
         "fixture_count": len(fired),
         "queue_record_count": len(queue),
         "recall_count": len(recall),
+        # Fail-closed propagation. A run with non-zero hook exits or non-2xx
+        # POSTs cannot be safely compared — broken variants can fake an
+        # improvement by silently dropping records. Downstream renderers
+        # (diff_hook_runs.py) MUST refuse to issue ✓ verdicts when either
+        # side has run_failed=True.
+        "run_failed": bool(snapshot.get("run_failed") or hook_failures or post_failures),
+        "hook_failure_count": len(hook_failures),
+        "post_failure_count": len(post_failures),
         "anti_patterns": {
             "session_summary_content": count_session_summary_content(queue),
             "hallucinated_entity_tags": count_hallucinated_entity_tags(recall),

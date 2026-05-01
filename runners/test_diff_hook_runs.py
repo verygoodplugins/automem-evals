@@ -16,13 +16,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import diff_hook_runs as dh
 
 
-def _metrics(variant, eval_run_id, q_count, recall_count, ap, fp, cs, td, tv):
+def _metrics(variant, eval_run_id, q_count, recall_count, ap, fp, cs, td, tv,
+             run_failed=False, hook_failure_count=0, post_failure_count=0):
     return {
         "variant": variant,
         "eval_run_id": eval_run_id,
         "fixture_count": 9,
         "queue_record_count": q_count,
         "recall_count": recall_count,
+        "run_failed": run_failed,
+        "hook_failure_count": hook_failure_count,
+        "post_failure_count": post_failure_count,
         "anti_patterns": ap,
         "field_presence": fp,
         "content_shape": cs,
@@ -87,6 +91,57 @@ class DiffRenderTests(unittest.TestCase):
         self.assertIn("## Verdict", out)
         # Verdict should call out the eliminated session summary
         self.assertIn("session_summary_content", out.lower().split("verdict")[1])
+
+
+class FailClosedRenderingTests(unittest.TestCase):
+    """A broken variant must not be allowed to display an apparent ✓ verdict.
+    Codex adversarial review finding: silent record drops fake improvements.
+    """
+
+    def _good(self):
+        return _metrics(
+            "baseline", "aaa", 7, 7,
+            ap={"session_summary_content": 1, "hallucinated_entity_tags": 0, "platform_unknown": 1},
+            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
+            cs={"length_distribution": {"le_150": 3, "151_300": 4, "301_1000": 0, "gt_1000": 0}, "near_duplicate_rate": 0.0},
+            td={"jest_collisions": 1, "date_derived_tags": 0},
+            tv={"valid_count": 5, "invalid_count": 2, "invalid_examples": []},
+        )
+
+    def _broken(self):
+        # Same numbers as a "successful" fix (improvement-looking) but flagged failed
+        m = _metrics(
+            "fix-v1", "bbb", 5, 5,
+            ap={"session_summary_content": 0, "hallucinated_entity_tags": 0, "platform_unknown": 1},
+            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
+            cs={"length_distribution": {"le_150": 2, "151_300": 3, "301_1000": 0, "gt_1000": 0}, "near_duplicate_rate": 0.0},
+            td={"jest_collisions": 1, "date_derived_tags": 0},
+            tv={"valid_count": 5, "invalid_count": 0, "invalid_examples": []},
+            run_failed=True, hook_failure_count=2, post_failure_count=0,
+        )
+        return m
+
+    def test_invalid_banner_when_either_run_failed(self):
+        out = dh.render_markdown(self._good(), self._broken())
+        self.assertIn("INVALID COMPARISON", out)
+        self.assertIn("2 hook failure(s)", out)
+
+    def test_invalid_run_suppresses_verdict_section(self):
+        out = dh.render_markdown(self._good(), self._broken())
+        verdict_section = out.split("## Verdict", 1)[1]
+        # No "Improved by" classification should be made
+        self.assertNotIn("Improved by", verdict_section)
+        self.assertIn("No verdict", verdict_section)
+
+    def test_clean_run_has_no_invalid_banner(self):
+        # Two clean runs should still render normally
+        a = self._good()
+        b = self._broken()
+        b["run_failed"] = False
+        b["hook_failure_count"] = 0
+        out = dh.render_markdown(a, b)
+        self.assertNotIn("INVALID COMPARISON", out)
+        self.assertIn("Improved by", out)
 
 
 if __name__ == "__main__":
