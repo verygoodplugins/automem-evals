@@ -2,7 +2,6 @@
   "name": "baseline",
   "source": {
     "repo": "verygoodplugins/mcp-automem",
-    "local_path": "/Users/jgarturo/Projects/OpenAI/mcp-servers/mcp-automem",
     "ref": "4be6724",
     "commit_message": "fix: wrap hook commands in bash -c for Windows Git Bash (#108)",
     "captured_at": "2026-04-28T05:00:00Z"

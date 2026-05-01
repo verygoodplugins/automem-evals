@@ -56,6 +56,63 @@ class WriteFullBackupTests(unittest.TestCase):
             self.assertEqual(path.read_text(), "")
 
 
+class MatchesFilterBeforeGuardTests(unittest.TestCase):
+    """Codex/Copilot finding: matches_filter must fail-closed when the memory
+    timestamp is missing or unparseable so a `before` guard can't silently
+    delete records that lack created_at/timestamp.
+    """
+
+    SPEC = {
+        "tags_required_all": ["scheduled", "summary"],
+        "content_prefix_any": ["# Summary"],
+        "before": "2026-04-22T00:00:00Z",
+    }
+
+    def _mem(self, **overrides):
+        base = {
+            "tags": ["scheduled", "summary", "workflow"],
+            "content": "# Summary\nblah",
+        }
+        base.update(overrides)
+        return base
+
+    def test_old_record_with_z_timestamp_passes(self):
+        m = self._mem(created_at="2026-04-01T12:00:00Z")
+        self.assertTrue(sc.matches_filter(m, self.SPEC))
+
+    def test_recent_record_excluded(self):
+        m = self._mem(created_at="2026-04-30T00:00:00Z")
+        self.assertFalse(sc.matches_filter(m, self.SPEC))
+
+    def test_missing_timestamp_fails_closed(self):
+        # No created_at and no timestamp => excluded (NOT included as old).
+        m = self._mem()
+        self.assertFalse(sc.matches_filter(m, self.SPEC))
+
+    def test_empty_timestamp_fails_closed(self):
+        m = self._mem(created_at="")
+        self.assertFalse(sc.matches_filter(m, self.SPEC))
+
+    def test_unparseable_timestamp_fails_closed(self):
+        m = self._mem(created_at="last Tuesday")
+        self.assertFalse(sc.matches_filter(m, self.SPEC))
+
+    def test_unparseable_before_cutoff_fails_closed(self):
+        spec = dict(self.SPEC, before="not-a-date")
+        m = self._mem(created_at="2026-04-01T12:00:00Z")
+        self.assertFalse(sc.matches_filter(m, spec))
+
+    def test_falls_back_to_timestamp_field(self):
+        # Some envelope variants use `timestamp` instead of `created_at`.
+        m = self._mem(timestamp="2026-04-01T12:00:00Z")
+        self.assertTrue(sc.matches_filter(m, self.SPEC))
+
+    def test_no_before_guard_skips_timestamp_check(self):
+        spec = {k: v for k, v in self.SPEC.items() if k != "before"}
+        m = self._mem()  # no timestamp at all
+        self.assertTrue(sc.matches_filter(m, spec))
+
+
 class AssertNoRegressionTests(unittest.TestCase):
     """Codex finding #1 hinges on this returning a list of problems that
     feeds the new fail-closed exit path. Make sure the contract is stable.

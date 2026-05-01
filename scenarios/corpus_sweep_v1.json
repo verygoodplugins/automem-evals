@@ -27,9 +27,9 @@
     },
     {
       "id": "SWEEP-SESSION-MILESTONE",
-      "description": "Per-session 'Claude session in <project>...' stores from the Claude Code SessionEnd/Stop hook (~/.claude/scripts/process-session-memory.py). Faucet still ON as of 2026-04-28 — disable the hook (Phase 1 of the plan) BEFORE running --execute against production or the lake refills.",
-      "seed_tag": "session_milestone",
-      "tags_required_all": ["session_milestone", "claude_code", "automated"],
+      "description": "Per-session 'Claude session in <project>...' stores from the Claude Code SessionEnd/Stop hook (~/.claude/scripts/process-session-memory.py). Faucet still ON as of 2026-04-28 — disable the hook (Phase 1 of the plan) BEFORE running --execute against production or the lake refills. The hook tags with 'session-milestone' (hyphen) — see variants/baseline/scripts/process-session-memory.py:505. If a target server has older underscore-tagged 'session_milestone' legacy memories from a prior version, run a separate filter for them.",
+      "seed_tag": "session-milestone",
+      "tags_required_all": ["session-milestone"],
       "content_prefix_any": ["Claude session in"],
       "expected_count_range": [10, 10000]
     }

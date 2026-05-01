@@ -33,7 +33,7 @@ Mirrors `runners/compare_rulesets.py`. No venv, no install step.
 **Rejected:** pulling in `httpx`, `pytest`. Tradeoff: a few more lines for HTTP boilerplate; first-run friction drops to zero.
 
 ### 5. `--cleanup` wired in v1, not deferred
-The runner accepts `--cleanup` and calls `DELETE /memory/by-tag?tag=eval-run-<uuid>` after metrics emit. Cheap to write, prevents corpus pollution from accumulating across iteration runs.
+The runner accepts `--cleanup` and, after metrics emit, deletes per-id (`DELETE /memory/<id>` for each eval-run-tagged record returned by the recall snapshot). Cheap to write, prevents corpus pollution from accumulating across iteration runs. (See finding C below for why per-id is the only option.)
 
 **Rejected:** "ship without --cleanup, add later." 10 LOC saved is not worth the debt.
 

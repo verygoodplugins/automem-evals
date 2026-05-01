@@ -10,8 +10,8 @@
     "stop_hook_active": true
   },
   "expected": {
-    "matchers_should_fire_baseline": ["session-memory", "queue-cleanup", "queue-flush"],
-    "matchers_should_fire_fix_v1": ["queue-cleanup", "queue-flush"],
+    "matchers_should_fire_baseline": ["session-memory"],
+    "matchers_should_fire_fix_v1": [],
     "memories_emitted_baseline_min": 0,
     "memories_emitted_baseline_max": 0,
     "memories_emitted_fix_v1_min": 0,

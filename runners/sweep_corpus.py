@@ -45,11 +45,11 @@ Around the sweep (defense-in-depth, post Codex adversarial review):
 
 Exit codes:
   0 — success (dry-run completed, or --execute completed without regression)
-  1 — preserve_query regressed after --execute, or filter count out of
-      expected range (filter drift)
-  2 — pre-conditions failed (scenario missing, baseline counts couldn't be
-      captured, backup couldn't be written, etc.)
-  2 — HTTP / config error
+  1 — preserve_query regressed after --execute, or filter count fell
+      outside expected_count_range (filter drift)
+  2 — pre-conditions, configuration, or HTTP failure (scenario file missing,
+      filter id not found, baseline counts couldn't be captured, backup
+      couldn't be written, post-sweep counts couldn't be captured, etc.)
 """
 
 from __future__ import annotations
@@ -111,8 +111,33 @@ def enumerate_by_tag(endpoint: str, token: str, tag: str) -> list[dict]:
     return out
 
 
+def _parse_iso_utc(value: str) -> dt.datetime | None:
+    """Parse an ISO 8601 UTC timestamp ('...Z' or '...+00:00'). Returns None
+    on missing/empty/unparseable input — callers fail-closed when this happens
+    on a candidate (this tool deletes data; an unparseable timestamp must NOT
+    be silently treated as 'old enough to delete').
+    """
+    if not value:
+        return None
+    try:
+        # datetime.fromisoformat does not accept 'Z' before 3.11; normalize.
+        normalized = value.replace("Z", "+00:00")
+        return dt.datetime.fromisoformat(normalized)
+    except (TypeError, ValueError):
+        return None
+
+
 def matches_filter(memory: dict, filter_spec: dict) -> bool:
-    """Apply all three validators: tags_required_all, content_prefix_any, before."""
+    """Apply all three validators: tags_required_all, content_prefix_any, before.
+
+    The `before` guard parses both the memory timestamp and the configured
+    cutoff as datetimes and FAILS CLOSED (returns False) when the memory
+    timestamp is missing or unparseable. Earlier raw-string compare treated
+    a missing timestamp as the empty string '' — which is lexicographically
+    less than any ISO timestamp — so a missing-`created_at` record would
+    pass the `before` guard and become deletable. With actual data on the
+    line, prefer falsely sparing a record over falsely deleting one.
+    """
     mem_tags = {t.lower() for t in (memory.get("tags") or [])}
     required = {t.lower() for t in filter_spec.get("tags_required_all", [])}
     if not required.issubset(mem_tags):
@@ -126,8 +151,16 @@ def matches_filter(memory: dict, filter_spec: dict) -> bool:
 
     before = filter_spec.get("before")
     if before:
-        ts = memory.get("created_at") or memory.get("timestamp") or ""
-        if ts >= before:
+        before_dt = _parse_iso_utc(before)
+        if before_dt is None:
+            # Configured cutoff is unparseable — that's a config error, not a
+            # per-memory issue. Fail-closed so a typo in the scenario doesn't
+            # delete everything.
+            return False
+        ts_dt = _parse_iso_utc(memory.get("created_at") or memory.get("timestamp") or "")
+        if ts_dt is None:
+            return False
+        if ts_dt >= before_dt:
             return False
 
     return True

@@ -45,6 +45,6 @@ Each `NN_<name>.json` file is one canned Claude Code event. The runner (`runners
 | 04_test_fail_heredoc | PostToolUse | Bash | test | Yes — heredoc body in tool_response, exercises NER hallucination |
 | 05_deploy_railway_prod | PostToolUse | Bash | deploy | No |
 | 06_deploy_unknown_platform | PostToolUse | Bash | deploy | Yes — platform fallback to "unknown" |
-| 07_session_stop_significant | Stop | — | session-memory + queue-cleanup + queue-flush | Yes — emits the session-summary anti-pattern |
-| 08_session_stop_trivial | Stop | — | queue-cleanup + queue-flush only (significance gates session-memory below threshold) | No |
+| 07_session_stop_significant | Stop | — | session-memory (replay runner skips queue-cleanup.sh + npx queue flush — see replay_hooks.matchers_for_tool) | Yes — emits the session-summary anti-pattern |
+| 08_session_stop_trivial | Stop | — | none — significance gates session-memory below threshold; queue-cleanup + npx flush are not exercised by replay | No |
 | 09_negative_control_read | PostToolUse | Read | (none — Bash matchers must filter out Read events) | Negative control |

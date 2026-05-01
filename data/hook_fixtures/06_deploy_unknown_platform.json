@@ -1,6 +1,6 @@
 {
   "id": "06_deploy_unknown_platform",
-  "description": "Custom 'deploy' command (ssh + systemctl) that passes the deploy regex but fails platform detection. Reproduces the audit's 'platform fallback to unknown' anti-pattern: capture-deployment.sh emits a memory with DEPLOY_PLATFORM='unknown' and tags=['deployment','unknown',...].",
+  "description": "Custom 'deploy' command (ssh + systemctl) that passes the deploy regex but fails platform detection. Reproduces the audit's 'platform fallback to unknown' anti-pattern: capture-deployment.sh emits a memory whose CONTENT contains 'on unknown' and METADATA has platform='unknown'. The hook explicitly excludes 'unknown' from the tag list (capture-deployment.sh:258-259), so the audit artifact lives in content+metadata, not tags — see docs/session_2026-04-28_hook_replay.md finding D.",
   "adversarial_twist": "high — exercises platform-fallback anti-pattern flagged in audit finding #3 (Tag-discipline drift)",
   "kind": "PostToolUse",
   "tool_name": "Bash",
@@ -20,8 +20,9 @@
     "memories_emitted_min": 1,
     "memories_emitted_max": 1,
     "expected_anti_patterns_in_emitted_memory": [
-      "tags should contain 'unknown' (the platform fallback)",
-      "metadata.platform should be 'unknown'"
+      "content should contain the substring 'on unknown' (platform-fallback bleed into content)",
+      "metadata.platform should be 'unknown'",
+      "tags should NOT contain 'unknown' — the hook filters it out, which is why the artifact lives in content/metadata"
     ]
   }
 }
