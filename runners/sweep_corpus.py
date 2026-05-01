@@ -58,6 +58,7 @@ import argparse
 import datetime as dt
 import json
 import pathlib
+import re
 import sys
 import time
 import urllib.error
@@ -127,6 +128,26 @@ def _parse_iso_utc(value: str) -> dt.datetime | None:
         return None
 
 
+def _get_path(data: dict, path: str):
+    current = data
+    for part in path.split("."):
+        if not isinstance(current, dict):
+            return None
+        current = current.get(part)
+    return current
+
+
+def _value_matches(actual, expected) -> bool:
+    if isinstance(expected, list):
+        return actual in expected
+    return actual == expected
+
+
+def _metadata_clause_matches(memory: dict, clause: dict) -> bool:
+    metadata = memory.get("metadata") or {}
+    return all(_value_matches(_get_path(metadata, key), value) for key, value in clause.items())
+
+
 def matches_filter(memory: dict, filter_spec: dict) -> bool:
     """Apply all three validators: tags_required_all, content_prefix_any, before.
 
@@ -143,10 +164,30 @@ def matches_filter(memory: dict, filter_spec: dict) -> bool:
     if not required.issubset(mem_tags):
         return False
 
+    forbidden = {t.lower() for t in filter_spec.get("tags_forbidden_any", [])}
+    if forbidden.intersection(mem_tags):
+        return False
+
+    metadata_required_all = filter_spec.get("metadata_required_all") or {}
+    if metadata_required_all and not _metadata_clause_matches(memory, metadata_required_all):
+        return False
+
+    metadata_required_any = filter_spec.get("metadata_required_any") or []
+    if metadata_required_any and not any(
+        _metadata_clause_matches(memory, clause) for clause in metadata_required_any
+    ):
+        return False
+
     prefixes = filter_spec.get("content_prefix_any") or []
     if prefixes:
         content = (memory.get("content") or "").lstrip()
         if not any(content.startswith(p) for p in prefixes):
+            return False
+
+    regexes = filter_spec.get("content_regex_any") or []
+    if regexes:
+        content = (memory.get("content") or "").lstrip()
+        if not any(re.search(pattern, content, flags=re.MULTILINE) for pattern in regexes):
             return False
 
     before = filter_spec.get("before")
