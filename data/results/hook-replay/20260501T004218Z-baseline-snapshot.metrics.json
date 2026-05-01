@@ -1,11 +1,14 @@
 {
-  "variant": "fix-v1-no-session",
-  "eval_run_id": "f4af328d3a6e",
+  "variant": "baseline",
+  "eval_run_id": "5c22a1f9a9c0",
   "fixture_count": 9,
-  "queue_record_count": 5,
-  "recall_count": 5,
+  "queue_record_count": 7,
+  "recall_count": 7,
+  "run_failed": false,
+  "hook_failure_count": 0,
+  "post_failure_count": 0,
   "anti_patterns": {
-    "session_summary_content": 0,
+    "session_summary_content": 1,
     "hallucinated_entity_tags": 0,
     "platform_unknown": 1
   },
@@ -16,8 +19,8 @@
   },
   "content_shape": {
     "length_distribution": {
-      "le_150": 2,
-      "151_300": 3,
+      "le_150": 3,
+      "151_300": 4,
       "301_1000": 0,
       "gt_1000": 0
     },
@@ -29,7 +32,10 @@
   },
   "type_validity": {
     "valid_count": 5,
-    "invalid_count": 0,
-    "invalid_examples": []
+    "invalid_count": 2,
+    "invalid_examples": [
+      "None",
+      "None"
+    ]
   }
 }

@@ -1,6 +1,6 @@
 {
-  "variant": "baseline",
-  "eval_run_id": "85e6f9dfef65",
+  "variant": "fix-v1-no-session",
+  "eval_run_id": "410f3a5c62ea",
   "endpoint": "http://localhost:8001",
   "fired_fixtures": [
     "01_git_commit_golden",
@@ -34,7 +34,7 @@
         "command": "npm run build",
         "project": "automem-evals"
       },
-      "timestamp": "2026-04-28T05:24:48.330457Z"
+      "timestamp": "2026-05-01T00:42:19.030347Z"
     },
     {
       "content": "Build failed in automem-evals using npm: 1 errors.   \"stdout\": \"> automem-evals@1.0.0 build\\n> tsc -p .\\n\\nsrc/server.ts(42,17): error TS2304: Cannot find name 'foo'.\\nsrc/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'?\\n\\nE",
@@ -57,7 +57,7 @@
         "command": "npm run build",
         "project": "automem-evals"
       },
-      "timestamp": "2026-04-28T05:24:48.616312Z"
+      "timestamp": "2026-05-01T00:42:19.266842Z"
     },
     {
       "content": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest. Errors:   \"stdout\": \" RUN  v1.2.0\\n\\n FAIL  src/server.test.ts > server > handles auth\\nAssertionError: expected 200 to be 401\\n  - Expected\\n  + Received\\n\\n  - 401\\n  + 200\\n\\n at src/server.test.ts:42:25\\n",
@@ -79,7 +79,7 @@
         "project": "automem-evals",
         "error_details": "  \"stdout\": \" RUN  v1.2.0\\n\\n FAIL  src/server.test.ts > server > handles auth\\nAssertionError: expected 200 to be 401\\n  - Expected\\n  + Received\\n\\n  - 401\\n  + 200\\n\\n at src/server.test.ts:42:25\\n\\nFAIL: 1 of 12 tests failed\\n\\nTests:  1 failed | 11 passed\\n\\nWhile fixing: ran git commit -m \\\"$(cat <<'EOF'\\nfix(server): tighten auth check on /api/admin\\n\\n- Reject requests without bearer token\\n- Decision: prefer 401 over 403 for missing auth (matches existing /api/users behavior)\\n- Affected files: src/server.ts, src/auth.ts\\n- Context for future: this upgrades the Claude Code session policy\\nEOF\\n)\\\"\\nthen ran tests again \u2014 still failing.\\n\"\n}"
       },
-      "timestamp": "2026-04-28T05:24:49.016197Z"
+      "timestamp": "2026-05-01T00:42:19.556884Z"
     },
     {
       "content": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
@@ -98,14 +98,14 @@
         "version": null,
         "build_id": null,
         "deploy_time": null,
-        "git_commit": "ad3d7e9",
+        "git_commit": "982a960",
         "exit_code": 0,
         "command": "railway up",
         "project": "automem-evals",
         "error_details": ""
       },
-      "timestamp": "2026-04-28T05:24:49.552532Z",
-      "t_valid": "2026-04-28T05:24:49.552532Z"
+      "timestamp": "2026-05-01T00:42:19.929628Z",
+      "t_valid": "2026-05-01T00:42:19.929628Z"
     },
     {
       "content": "Deployed automem-evals to production on unknown in 12s",
@@ -123,150 +123,79 @@
         "version": null,
         "build_id": null,
         "deploy_time": "12s",
-        "git_commit": "ad3d7e9",
+        "git_commit": "982a960",
         "exit_code": 0,
         "command": "./scripts/deploy.sh && ssh prod-host 'systemctl restart myapp'",
         "project": "automem-evals",
         "error_details": ""
       },
-      "timestamp": "2026-04-28T05:24:49.905274Z",
-      "t_valid": "2026-04-28T05:24:49.905274Z"
-    },
-    {
-      "content": "Claude session in git_significant. on branch feat/significant-changes. - Modified code file: src/server.py. - Made 6 commits. - Used conventional_commits. - Focused on: feature_development, bug_fixing. - Change size: small",
-      "metadata": {
-        "tags": [
-          "session-milestone",
-          "git_significant",
-          "feature",
-          "bugfix",
-          "test",
-          "docs",
-          "major"
-        ],
-        "type": "Insight",
-        "project": "git_significant",
-        "git_branch": "feat/significant-changes",
-        "git_repo": "",
-        "significance_score": 27.6,
-        "patterns": {
-          "commit_style": "conventional_commits",
-          "work_focus": [
-            "feature_development",
-            "bug_fixing",
-            "testing",
-            "documentation"
-          ],
-          "file_types": [
-            "md",
-            "py"
-          ],
-          "change_size": "small",
-          "branch_pattern": null
-        },
-        "reasons": [
-          "Modified code file: src/server.py",
-          "Made 6 commits",
-          "Significant commit pattern: test[:\\(]",
-          "Significant commit pattern: feat[:\\(]",
-          "Significant commit pattern: feat[:\\(]",
-          "Significant commit pattern: feat[:\\(]"
-        ],
-        "significance_level": "major"
-      },
-      "timestamp": "2026-04-28T05:24:50.171518Z"
-    },
-    {
-      "content": "Work pattern in git_significant: uses conventional_commits, focuses on feature_development, bug_fixing, works with md, py files",
-      "metadata": {
-        "tags": [
-          "pattern",
-          "work-style",
-          "git_significant"
-        ],
-        "type": "Pattern",
-        "project": "git_significant"
-      },
-      "timestamp": "2026-04-28T05:24:50.171778Z"
+      "timestamp": "2026-05-01T00:42:20.224741Z",
+      "t_valid": "2026-05-01T00:42:20.224741Z"
     }
   ],
   "post_results": [
     {
       "status": 201,
-      "memory_id": "39a5b956-7eb9-4c0c-adb4-72416bc0823a",
+      "memory_id": "574c305a-4816-4dac-b71e-5c21a6d122d7",
       "tags": [
         "build",
         "npm",
         "typescript",
         "automem-evals",
-        "eval-run-85e6f9dfef65"
+        "eval-run-410f3a5c62ea"
       ]
     },
     {
       "status": 201,
-      "memory_id": "cbff2936-ab76-42c5-8f2f-c0834f1745c6",
+      "memory_id": "787b3fcd-1847-445d-8315-2d15498aeda1",
       "tags": [
         "build",
         "npm",
         "typescript",
         "automem-evals",
         "failure",
-        "eval-run-85e6f9dfef65"
+        "eval-run-410f3a5c62ea"
       ]
     },
     {
       "status": 201,
-      "memory_id": "6fe0084a-d7c4-4feb-a110-42975aec326b",
+      "memory_id": "959387c3-a23f-41f4-baf4-a8268c0c524a",
       "tags": [
         "test",
         "jest-vitest",
         "typescript",
         "automem-evals",
         "failure",
-        "eval-run-85e6f9dfef65"
+        "eval-run-410f3a5c62ea"
       ]
     },
     {
       "status": 201,
-      "memory_id": "36a7e92e-2a93-46be-b316-2aac373f18c2",
+      "memory_id": "af812c63-08ef-4a29-be9b-aa21597b1bc4",
       "tags": [
         "deployment",
         "railway",
         "production",
         "automem-evals",
-        "eval-run-85e6f9dfef65"
+        "eval-run-410f3a5c62ea"
       ]
     },
     {
       "status": 201,
-      "memory_id": "85cc32c8-b774-49aa-97d2-3884f9e8d2c6",
+      "memory_id": "e58b913e-198d-4e44-99c6-b38913a6d1a0",
       "tags": [
         "deployment",
         "production",
         "automem-evals",
-        "eval-run-85e6f9dfef65"
-      ]
-    },
-    {
-      "status": 201,
-      "memory_id": "98726f37-2957-4caf-ad17-bc1b509766b9",
-      "tags": [
-        "eval-run-85e6f9dfef65"
-      ]
-    },
-    {
-      "status": 201,
-      "memory_id": "15c1c363-4584-442e-9286-e0a4a14360d4",
-      "tags": [
-        "eval-run-85e6f9dfef65"
+        "eval-run-410f3a5c62ea"
       ]
     }
   ],
   "recall_memories": [
     {
       "_query": "",
-      "final_score": 0.5499999730633295,
-      "id": "85cc32c8-b774-49aa-97d2-3884f9e8d2c6",
+      "final_score": 0.5499999997864262,
+      "id": "e58b913e-198d-4e44-99c6-b38913a6d1a0",
       "jit_enriched": true,
       "match_score": 0.9,
       "match_type": "trending",
@@ -274,17 +203,17 @@
         "confidence": 0.9,
         "content": "Deployed automem-evals to production on unknown in 12s",
         "enriched": true,
-        "enriched_at": "2026-04-28T05:24:54.098522+00:00",
-        "id": "85cc32c8-b774-49aa-97d2-3884f9e8d2c6",
+        "enriched_at": "2026-05-01T00:42:20.260528+00:00",
+        "id": "e58b913e-198d-4e44-99c6-b38913a6d1a0",
         "importance": 0.9,
-        "last_accessed": "2026-04-28T05:24:49.905274+00:00",
+        "last_accessed": "2026-05-01T00:42:20.224741+00:00",
         "metadata": {
           "build_id": null,
           "command": "./scripts/deploy.sh && ssh prod-host 'systemctl restart myapp'",
           "deploy_time": "12s",
           "enrichment": {
             "jit": true,
-            "jit_at": "2026-04-28T05:24:54.098522+00:00"
+            "jit_at": "2026-05-01T00:42:20.260528+00:00"
           },
           "entities": {
             "organizations": [
@@ -293,9 +222,9 @@
           },
           "environment": "production",
           "error_details": "",
-          "eval_run_id": "85e6f9dfef65",
+          "eval_run_id": "410f3a5c62ea",
           "exit_code": 0,
-          "git_commit": "ad3d7e9",
+          "git_commit": "982a960",
           "platform": "unknown",
           "project": "automem-evals",
           "url": null,
@@ -303,12 +232,12 @@
         },
         "processed": false,
         "summary": "Deployed automem-evals to production on unknown in 12s",
-        "t_valid": "2026-04-28T05:24:49.905274+00:00",
+        "t_valid": "2026-05-01T00:42:20.224741+00:00",
         "tag_prefixes": [
           "deployment",
           "production",
           "automem-evals",
-          "eval-run-85e6f9dfef65",
+          "eval-run-410f3a5c62ea",
           "entity",
           "entity:organizations",
           "entity:organizations:deployed"
@@ -317,23 +246,23 @@
           "deployment",
           "production",
           "automem-evals",
-          "eval-run-85e6f9dfef65",
+          "eval-run-410f3a5c62ea",
           "entity:organizations:deployed"
         ],
-        "timestamp": "2026-04-28T05:24:49.905274+00:00",
+        "timestamp": "2026-05-01T00:42:20.224741+00:00",
         "type": "Context",
-        "updated_at": "2026-04-28T05:24:49.905274+00:00"
+        "updated_at": "2026-05-01T00:42:20.224741+00:00"
       },
       "original_score": 0.9,
       "relations": [],
-      "score": 0.5499999730633295,
+      "score": 0.5499999997864262,
       "score_components": {
         "confidence": 0.9,
         "context": 0.0,
         "exact": 0.0,
         "importance": 0.9,
         "keyword": 0.9,
-        "recency": 0.9999997306332947,
+        "recency": 0.9999999978642619,
         "relation": 0.0,
         "relevance": 0.0,
         "tag": 0.0,
@@ -343,8 +272,8 @@
     },
     {
       "_query": "",
-      "final_score": 0.5499999707950874,
-      "id": "36a7e92e-2a93-46be-b316-2aac373f18c2",
+      "final_score": 0.549999997888741,
+      "id": "af812c63-08ef-4a29-be9b-aa21597b1bc4",
       "jit_enriched": true,
       "match_score": 0.9,
       "match_type": "trending",
@@ -352,17 +281,17 @@
         "confidence": 0.9,
         "content": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
         "enriched": true,
-        "enriched_at": "2026-04-28T05:24:54.103354+00:00",
-        "id": "36a7e92e-2a93-46be-b316-2aac373f18c2",
+        "enriched_at": "2026-05-01T00:42:20.264033+00:00",
+        "id": "af812c63-08ef-4a29-be9b-aa21597b1bc4",
         "importance": 0.9,
-        "last_accessed": "2026-04-28T05:24:49.552532+00:00",
+        "last_accessed": "2026-05-01T00:42:19.929628+00:00",
         "metadata": {
           "build_id": null,
           "command": "railway up",
           "deploy_time": null,
           "enrichment": {
             "jit": true,
-            "jit_at": "2026-04-28T05:24:54.103354+00:00"
+            "jit_at": "2026-05-01T00:42:20.264033+00:00"
           },
           "entities": {
             "organizations": [
@@ -371,9 +300,9 @@
           },
           "environment": "production",
           "error_details": "",
-          "eval_run_id": "85e6f9dfef65",
+          "eval_run_id": "410f3a5c62ea",
           "exit_code": 0,
-          "git_commit": "ad3d7e9",
+          "git_commit": "982a960",
           "platform": "railway",
           "project": "automem-evals",
           "url": "https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
@@ -381,13 +310,13 @@
         },
         "processed": false,
         "summary": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
-        "t_valid": "2026-04-28T05:24:49.552532+00:00",
+        "t_valid": "2026-05-01T00:42:19.929628+00:00",
         "tag_prefixes": [
           "deployment",
           "railway",
           "production",
           "automem-evals",
-          "eval-run-85e6f9dfef65",
+          "eval-run-410f3a5c62ea",
           "entity",
           "entity:organizations",
           "entity:organizations:deployed"
@@ -397,23 +326,23 @@
           "railway",
           "production",
           "automem-evals",
-          "eval-run-85e6f9dfef65",
+          "eval-run-410f3a5c62ea",
           "entity:organizations:deployed"
         ],
-        "timestamp": "2026-04-28T05:24:49.552532+00:00",
+        "timestamp": "2026-05-01T00:42:19.929628+00:00",
         "type": "Context",
-        "updated_at": "2026-04-28T05:24:49.552532+00:00"
+        "updated_at": "2026-05-01T00:42:19.929628+00:00"
       },
       "original_score": 0.9,
       "relations": [],
-      "score": 0.5499999707950874,
+      "score": 0.549999997888741,
       "score_components": {
         "confidence": 0.9,
         "context": 0.0,
         "exact": 0.0,
         "importance": 0.9,
         "keyword": 0.9,
-        "recency": 0.9999997079508745,
+        "recency": 0.99999997888741,
         "relation": 0.0,
         "relevance": 0.0,
         "tag": 0.0,
@@ -423,8 +352,8 @@
     },
     {
       "_query": "",
-      "final_score": 0.5499999647751093,
-      "id": "cbff2936-ab76-42c5-8f2f-c0834f1745c6",
+      "final_score": 0.5499999936269612,
+      "id": "787b3fcd-1847-445d-8315-2d15498aeda1",
       "jit_enriched": true,
       "match_score": 0.9,
       "match_type": "trending",
@@ -432,10 +361,10 @@
         "confidence": 0.9,
         "content": "Build failed in automem-evals using npm: 1 errors.   \"stdout\": \"> automem-evals@1.0.0 build\\n> tsc -p .\\n\\nsrc/server.ts(42,17): error TS2304: Cannot find name 'foo'.\\nsrc/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'?\\n\\nE",
         "enriched": true,
-        "enriched_at": "2026-04-28T05:24:54.111249+00:00",
-        "id": "cbff2936-ab76-42c5-8f2f-c0834f1745c6",
+        "enriched_at": "2026-05-01T00:42:20.269380+00:00",
+        "id": "787b3fcd-1847-445d-8315-2d15498aeda1",
         "importance": 0.9,
-        "last_accessed": "2026-04-28T05:24:48.616312+00:00",
+        "last_accessed": "2026-05-01T00:42:19.266842+00:00",
         "metadata": {
           "build_size": null,
           "build_time": null,
@@ -443,25 +372,25 @@
           "command": "npm run build",
           "enrichment": {
             "jit": true,
-            "jit_at": "2026-04-28T05:24:54.111249+00:00"
+            "jit_at": "2026-05-01T00:42:20.269380+00:00"
           },
           "entities": {},
           "errors": 1,
-          "eval_run_id": "85e6f9dfef65",
+          "eval_run_id": "410f3a5c62ea",
           "exit_code": 1,
           "project": "automem-evals",
           "warnings": 0
         },
         "processed": false,
         "summary": "Build failed in automem-evals using npm: 1 errors.",
-        "t_valid": "2026-04-28T05:24:48.616312+00:00",
+        "t_valid": "2026-05-01T00:42:19.266842+00:00",
         "tag_prefixes": [
           "build",
           "npm",
           "typescript",
           "automem-evals",
           "failure",
-          "eval-run-85e6f9dfef65"
+          "eval-run-410f3a5c62ea"
         ],
         "tags": [
           "build",
@@ -469,42 +398,22 @@
           "typescript",
           "automem-evals",
           "failure",
-          "eval-run-85e6f9dfef65"
+          "eval-run-410f3a5c62ea"
         ],
-        "timestamp": "2026-04-28T05:24:48.616312+00:00",
+        "timestamp": "2026-05-01T00:42:19.266842+00:00",
         "type": "Insight",
-        "updated_at": "2026-04-28T05:24:48.616312+00:00"
+        "updated_at": "2026-05-01T00:42:19.266842+00:00"
       },
       "original_score": 0.9,
-      "relations": [
-        {
-          "memory": {
-            "confidence": 0.9,
-            "id": "39a5b956-7eb9-4c0c-adb4-72416bc0823a",
-            "importance": 0.5,
-            "summary": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
-            "tags": [
-              "build",
-              "npm",
-              "typescript",
-              "automem-evals",
-              "eval-run-85e6f9dfef65"
-            ],
-            "timestamp": "2026-04-28T05:24:48.330457+00:00",
-            "type": "Context"
-          },
-          "strength": 1.0,
-          "type": "PRECEDED_BY"
-        }
-      ],
-      "score": 0.5499999647751093,
+      "relations": [],
+      "score": 0.5499999936269612,
       "score_components": {
         "confidence": 0.9,
         "context": 0.0,
         "exact": 0.0,
         "importance": 0.9,
         "keyword": 0.9,
-        "recency": 0.9999996477510931,
+        "recency": 0.9999999362696116,
         "relation": 0.0,
         "relevance": 0.0,
         "tag": 0.0,
@@ -514,8 +423,8 @@
     },
     {
       "_query": "",
-      "final_score": 0.5049999673463412,
-      "id": "6fe0084a-d7c4-4feb-a110-42975aec326b",
+      "final_score": 0.5049999954918981,
+      "id": "959387c3-a23f-41f4-baf4-a8268c0c524a",
       "jit_enriched": true,
       "match_score": 0.8,
       "match_type": "trending",
@@ -523,19 +432,19 @@
         "confidence": 0.9,
         "content": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest. Errors:   \"stdout\": \" RUN  v1.2.0\\n\\n FAIL  src/server.test.ts > server > handles auth\\nAssertionError: expected 200 to be 401\\n  - Expected\\n  + Received\\n\\n  - 401\\n  + 200\\n\\n at src/server.test.ts:42:25\\n",
         "enriched": true,
-        "enriched_at": "2026-04-28T05:24:54.118844+00:00",
-        "id": "6fe0084a-d7c4-4feb-a110-42975aec326b",
+        "enriched_at": "2026-05-01T00:42:20.275145+00:00",
+        "id": "959387c3-a23f-41f4-baf4-a8268c0c524a",
         "importance": 0.8,
-        "last_accessed": "2026-04-28T05:24:49.016197+00:00",
+        "last_accessed": "2026-05-01T00:42:19.556884+00:00",
         "metadata": {
           "command": "npx vitest run",
           "enrichment": {
             "jit": true,
-            "jit_at": "2026-04-28T05:24:54.118844+00:00"
+            "jit_at": "2026-05-01T00:42:20.275145+00:00"
           },
           "entities": {},
           "error_details": "  \"stdout\": \" RUN  v1.2.0\\n\\n FAIL  src/server.test.ts > server > handles auth\\nAssertionError: expected 200 to be 401\\n  - Expected\\n  + Received\\n\\n  - 401\\n  + 200\\n\\n at src/server.test.ts:42:25\\n\\nFAIL: 1 of 12 tests failed\\n\\nTests:  1 failed | 11 passed\\n\\nWhile fixing: ran git commit -m \\\"$(cat <<'EOF'\\nfix(server): tighten auth check on /api/admin\\n\\n- Reject requests without bearer token\\n- Decision: prefer 401 over 403 for missing auth (matches existing /api/users behavior)\\n- Affected files: src/server.ts, src/auth.ts\\n- Context for future: this upgrades the Claude Code session policy\\nEOF\\n)\\\"\\nthen ran tests again \u2014 still failing.\\n\"\n}",
-          "eval_run_id": "85e6f9dfef65",
+          "eval_run_id": "410f3a5c62ea",
           "exit_code": 1,
           "project": "automem-evals",
           "test_framework": "jest/vitest",
@@ -544,14 +453,14 @@
         },
         "processed": false,
         "summary": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest.",
-        "t_valid": "2026-04-28T05:24:49.016197+00:00",
+        "t_valid": "2026-05-01T00:42:19.556884+00:00",
         "tag_prefixes": [
           "test",
           "jest-vitest",
           "typescript",
           "automem-evals",
           "failure",
-          "eval-run-85e6f9dfef65"
+          "eval-run-410f3a5c62ea"
         ],
         "tags": [
           "test",
@@ -559,22 +468,22 @@
           "typescript",
           "automem-evals",
           "failure",
-          "eval-run-85e6f9dfef65"
+          "eval-run-410f3a5c62ea"
         ],
-        "timestamp": "2026-04-28T05:24:49.016197+00:00",
+        "timestamp": "2026-05-01T00:42:19.556884+00:00",
         "type": "Insight",
-        "updated_at": "2026-04-28T05:24:49.016197+00:00"
+        "updated_at": "2026-05-01T00:42:19.556884+00:00"
       },
       "original_score": 0.8,
       "relations": [],
-      "score": 0.5049999673463412,
+      "score": 0.5049999954918981,
       "score_components": {
         "confidence": 0.9,
         "context": 0.0,
         "exact": 0.0,
         "importance": 0.8,
         "keyword": 0.8,
-        "recency": 0.9999996734634131,
+        "recency": 0.9999999549189815,
         "relation": 0.0,
         "relevance": 0.0,
         "tag": 0.0,
@@ -584,231 +493,66 @@
     },
     {
       "_query": "",
-      "final_score": 0.3724999747767361,
-      "id": "15c1c363-4584-442e-9286-e0a4a14360d4",
+      "final_score": 0.36999999210620493,
+      "id": "574c305a-4816-4dac-b71e-5c21a6d122d7",
       "jit_enriched": true,
-      "match_score": 0.5,
-      "match_type": "trending",
-      "memory": {
-        "confidence": 0.95,
-        "content": "Work pattern in git_significant: uses conventional_commits, focuses on feature_development, bug_fixing, works with md, py files",
-        "enriched": true,
-        "enriched_at": "2026-04-28T05:24:54.123581+00:00",
-        "id": "15c1c363-4584-442e-9286-e0a4a14360d4",
-        "importance": 0.5,
-        "last_accessed": "2026-04-28T05:24:50.171778+00:00",
-        "metadata": {
-          "enrichment": {
-            "jit": true,
-            "jit_at": "2026-04-28T05:24:54.123581+00:00"
-          },
-          "entities": {},
-          "eval_run_id": "85e6f9dfef65",
-          "project": "git_significant",
-          "tags": [
-            "pattern",
-            "work-style",
-            "git_significant"
-          ],
-          "type": "Pattern"
-        },
-        "processed": false,
-        "summary": "Work pattern in git_significant: uses conventional_commits, focuses on feature_development, bug_fixing, works with md, py files",
-        "t_valid": "2026-04-28T05:24:50.171778+00:00",
-        "tag_prefixes": [
-          "eval-run-85e6f9dfef65"
-        ],
-        "tags": [
-          "eval-run-85e6f9dfef65"
-        ],
-        "timestamp": "2026-04-28T05:24:50.171778+00:00",
-        "type": "Pattern",
-        "updated_at": "2026-04-28T05:24:50.171778+00:00"
-      },
-      "original_score": 0.5,
-      "relations": [],
-      "score": 0.3724999747767361,
-      "score_components": {
-        "confidence": 0.95,
-        "context": 0.0,
-        "exact": 0.0,
-        "importance": 0.5,
-        "keyword": 0.5,
-        "recency": 0.9999997477673611,
-        "relation": 0.0,
-        "relevance": 0.0,
-        "tag": 0.0,
-        "vector": 0.0
-      },
-      "source": "graph"
-    },
-    {
-      "_query": "",
-      "final_score": 0.3699999747749614,
-      "id": "98726f37-2957-4caf-ad17-bc1b509766b9",
-      "jit_enriched": true,
-      "match_score": 0.5,
-      "match_type": "trending",
-      "memory": {
-        "confidence": 0.9,
-        "content": "Claude session in git_significant. on branch feat/significant-changes. - Modified code file: src/server.py. - Made 6 commits. - Used conventional_commits. - Focused on: feature_development, bug_fixing. - Change size: small",
-        "enriched": true,
-        "enriched_at": "2026-04-28T05:24:54.129640+00:00",
-        "id": "98726f37-2957-4caf-ad17-bc1b509766b9",
-        "importance": 0.5,
-        "last_accessed": "2026-04-28T05:24:50.171518+00:00",
-        "metadata": {
-          "enrichment": {
-            "jit": true,
-            "jit_at": "2026-04-28T05:24:54.129640+00:00"
-          },
-          "entities": {},
-          "eval_run_id": "85e6f9dfef65",
-          "git_branch": "feat/significant-changes",
-          "git_repo": "",
-          "patterns": {
-            "branch_pattern": null,
-            "change_size": "small",
-            "commit_style": "conventional_commits",
-            "file_types": [
-              "md",
-              "py"
-            ],
-            "work_focus": [
-              "feature_development",
-              "bug_fixing",
-              "testing",
-              "documentation"
-            ]
-          },
-          "project": "git_significant",
-          "reasons": [
-            "Modified code file: src/server.py",
-            "Made 6 commits",
-            "Significant commit pattern: test[:\\(]",
-            "Significant commit pattern: feat[:\\(]",
-            "Significant commit pattern: feat[:\\(]",
-            "Significant commit pattern: feat[:\\(]"
-          ],
-          "significance_level": "major",
-          "significance_score": 27.6,
-          "tags": [
-            "session-milestone",
-            "git_significant",
-            "feature",
-            "bugfix",
-            "test",
-            "docs",
-            "major"
-          ],
-          "type": "Insight"
-        },
-        "processed": false,
-        "summary": "Claude session in git_significant.",
-        "t_valid": "2026-04-28T05:24:50.171518+00:00",
-        "tag_prefixes": [
-          "eval-run-85e6f9dfef65"
-        ],
-        "tags": [
-          "eval-run-85e6f9dfef65"
-        ],
-        "timestamp": "2026-04-28T05:24:50.171518+00:00",
-        "type": "Context",
-        "updated_at": "2026-04-28T05:24:50.171518+00:00"
-      },
-      "original_score": 0.5,
-      "relations": [],
-      "score": 0.3699999747749614,
-      "score_components": {
-        "confidence": 0.9,
-        "context": 0.0,
-        "exact": 0.0,
-        "importance": 0.5,
-        "keyword": 0.5,
-        "recency": 0.9999997477496142,
-        "relation": 0.0,
-        "relevance": 0.0,
-        "tag": 0.0,
-        "vector": 0.0
-      },
-      "source": "graph"
-    },
-    {
-      "_query": "",
-      "final_score": 0.36999996293679266,
-      "id": "39a5b956-7eb9-4c0c-adb4-72416bc0823a",
       "match_score": 0.5,
       "match_type": "trending",
       "memory": {
         "confidence": 0.9,
         "content": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
         "enriched": true,
-        "enriched_at": "2026-04-28T05:24:53.358279+00:00",
-        "id": "39a5b956-7eb9-4c0c-adb4-72416bc0823a",
+        "enriched_at": "2026-05-01T00:42:20.278574+00:00",
+        "id": "574c305a-4816-4dac-b71e-5c21a6d122d7",
         "importance": 0.5,
-        "last_accessed": "2026-04-28T05:24:48.330457+00:00",
+        "last_accessed": "2026-05-01T00:42:19.030347+00:00",
         "metadata": {
           "build_size": "45 KB",
           "build_time": "1.2",
           "build_tool": "npm",
           "command": "npm run build",
           "enrichment": {
-            "forced": false,
-            "last_run": "2026-04-28T05:24:53.358256+00:00",
-            "patterns_detected": [
-              {
-                "key_terms": [
-                  "caroline",
-                  "melanie",
-                  "really",
-                  "great",
-                  "painting"
-                ],
-                "similar_memories": 10,
-                "type": "Context"
-              }
-            ],
-            "semantic_neighbors": [],
-            "temporal_links": 0
+            "jit": true,
+            "jit_at": "2026-05-01T00:42:20.278574+00:00"
           },
           "entities": {},
           "errors": 0,
-          "eval_run_id": "85e6f9dfef65",
+          "eval_run_id": "410f3a5c62ea",
           "exit_code": 0,
           "project": "automem-evals",
           "warnings": 1
         },
-        "processed": true,
+        "processed": false,
         "summary": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
-        "t_valid": "2026-04-28T05:24:48.330457+00:00",
+        "t_valid": "2026-05-01T00:42:19.030347+00:00",
         "tag_prefixes": [
           "build",
           "npm",
           "typescript",
           "automem-evals",
-          "eval-run-85e6f9dfef65"
+          "eval-run-410f3a5c62ea"
         ],
         "tags": [
           "build",
           "npm",
           "typescript",
           "automem-evals",
-          "eval-run-85e6f9dfef65"
+          "eval-run-410f3a5c62ea"
         ],
-        "timestamp": "2026-04-28T05:24:48.330457+00:00",
+        "timestamp": "2026-05-01T00:42:19.030347+00:00",
         "type": "Context",
-        "updated_at": "2026-04-28T05:24:48.330457+00:00"
+        "updated_at": "2026-05-01T00:42:19.030347+00:00"
       },
       "original_score": 0.5,
       "relations": [],
-      "score": 0.36999996293679266,
+      "score": 0.36999999210620493,
       "score_components": {
         "confidence": 0.9,
         "context": 0.0,
         "exact": 0.0,
         "importance": 0.5,
         "keyword": 0.5,
-        "recency": 0.999999629367927,
+        "recency": 0.9999999210620499,
         "relation": 0.0,
         "relevance": 0.0,
         "tag": 0.0,
@@ -817,5 +561,8 @@
       "source": "graph"
     }
   ],
-  "captured_at": "20260428T052454Z"
+  "hook_failures": [],
+  "post_failures": [],
+  "run_failed": false,
+  "captured_at": "20260501T004220Z"
 }

@@ -1,8 +1,8 @@
 # Hook-replay comparison: `baseline` vs `fix-v1-no-session`
 
-- **A: `baseline`** — eval-run `85e6f9dfef65`, 7 queue records, 7 recalled.
-- **B: `fix-v1-no-session`** — eval-run `f4af328d3a6e`, 5 queue records, 5 recalled.
-- Generated: 2026-04-28T05:26:28+00:00
+- **A: `baseline`** — eval-run `5c22a1f9a9c0`, 7 queue records, 7 recalled.
+- **B: `fix-v1-no-session`** — eval-run `410f3a5c62ea`, 5 queue records, 5 recalled.
+- Generated: 2026-05-01T00:43:13+00:00
 
 ## Anti-pattern signatures (lower is better)
 
