@@ -1,0 +1,93 @@
+{
+  "version": 2,
+  "description": "Stage-1 cleanup filters from the 2026-05-01 local mirror inventory. Each filter targets a deterministic generated/noise class with zero preserve-tag overlap in the mirror inventory. Run one filter at a time: dry-run, sample review, execute, then recall comparison.",
+  "filters": [
+    {
+      "id": "SWEEP-LOCOMO-BENCHMARK",
+      "description": "Synthetic LoCoMo fixture memories from benchmark seeding. Keep real AutoMem LoCoMo implementation/result memories that lack the locomo-test tag.",
+      "seed_tag": "locomo-test",
+      "tags_required_all": ["locomo-test"],
+      "expected_count_range": [900, 1000]
+    },
+    {
+      "id": "SWEEP-BUILD-RESULTS",
+      "description": "Mechanical build hook result memories.",
+      "seed_tag": "build",
+      "tags_required_all": ["build"],
+      "content_prefix_any": ["Build succeeded in", "Build failed in"],
+      "expected_count_range": [450, 600]
+    },
+    {
+      "id": "SWEEP-TEST-RESULTS",
+      "description": "Mechanical test hook result memories.",
+      "seed_tag": "test",
+      "tags_required_all": ["test"],
+      "content_prefix_any": ["Test suite passed", "Test suite failed"],
+      "expected_count_range": [500, 650]
+    },
+    {
+      "id": "SWEEP-MOLTBOOK-ENGAGEMENT-PINGS",
+      "description": "Repeated Moltbook engagement status pings.",
+      "seed_tag": "moltbook-engagement",
+      "tags_required_all": ["moltbook-engagement", "autohub"],
+      "content_prefix_any": ["moltbook engagement: action=", "Moltbook engagement: action="],
+      "expected_count_range": [300, 360]
+    },
+    {
+      "id": "SWEEP-TWITTER-ENGAGEMENT-PINGS",
+      "description": "Repeated Twitter engagement status pings.",
+      "seed_tag": "twitter-posts",
+      "tags_required_all": ["twitter-posts", "autohub"],
+      "content_prefix_any": ["twitter engagement: action=", "Twitter engagement: action="],
+      "expected_count_range": [130, 180]
+    },
+    {
+      "id": "SWEEP-STARTED-SESSION",
+      "description": "Cursor session-start records.",
+      "seed_tag": "session-start",
+      "tags_required_all": ["session-start"],
+      "content_prefix_any": ["Started session in project"],
+      "expected_count_range": [100, 170]
+    },
+    {
+      "id": "SWEEP-ENGAGEMENT-WORKFLOW-SUMMARY",
+      "description": "Operational scheduled workflow summaries for engagement/autojack workflows only. Leaves daily context, morning routine, support dashboard, problem workflow, and self-observation summaries for manual review.",
+      "seed_tag": "scheduled",
+      "tags_required_all": ["workflow", "summary", "scheduled"],
+      "metadata_required_all": {"type": "workflow-summary"},
+      "metadata_required_any": [
+        {
+          "workflow_name": [
+            "Moltbook Engagement",
+            "Twitter Engagement",
+            "AutoJack Daily Reflection",
+            "AutoJack Blog - Multi-Source Daily Post"
+          ]
+        }
+      ],
+      "expected_count_range": [500, 560]
+    }
+  ],
+  "preserve_queries": [
+    {
+      "name": "autojack-blog published artifacts",
+      "tags": ["autojack-blog", "published"],
+      "min_results": 5
+    },
+    {
+      "name": "user preferences",
+      "tags": ["preference"],
+      "min_results": 20
+    },
+    {
+      "name": "deployments",
+      "tags": ["deployment"],
+      "min_results": 5
+    },
+    {
+      "name": "bugfixes",
+      "tags": ["bugfix", "solution"],
+      "min_results": 10
+    }
+  ]
+}

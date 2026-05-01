@@ -113,6 +113,66 @@ class MatchesFilterBeforeGuardTests(unittest.TestCase):
         self.assertTrue(sc.matches_filter(m, spec))
 
 
+class MatchesFilterExtendedGuardsTests(unittest.TestCase):
+    def test_forbidden_tags_exclude_candidate(self):
+        spec = {
+            "tags_required_all": ["session-milestone"],
+            "tags_forbidden_any": ["bugfix", "solution"],
+        }
+        self.assertFalse(
+            sc.matches_filter(
+                {"tags": ["session-milestone", "bugfix"], "content": "Claude session in x"},
+                spec,
+            )
+        )
+
+    def test_metadata_required_all_matches(self):
+        spec = {
+            "tags_required_all": ["workflow"],
+            "metadata_required_all": {"type": "workflow-summary"},
+        }
+        self.assertTrue(
+            sc.matches_filter(
+                {
+                    "tags": ["workflow"],
+                    "content": "# Summary",
+                    "metadata": {"type": "workflow-summary"},
+                },
+                spec,
+            )
+        )
+
+    def test_metadata_required_any_supports_lists(self):
+        spec = {
+            "tags_required_all": ["workflow"],
+            "metadata_required_any": [
+                {"workflow_name": ["Moltbook Engagement", "Twitter Engagement"]}
+            ],
+        }
+        self.assertTrue(
+            sc.matches_filter(
+                {
+                    "tags": ["workflow"],
+                    "content": "# Summary",
+                    "metadata": {"workflow_name": "Twitter Engagement"},
+                },
+                spec,
+            )
+        )
+
+    def test_content_regex_any_matches_multiline_content(self):
+        spec = {
+            "tags_required_all": ["build"],
+            "content_regex_any": [r"^Build (succeeded|failed) in "],
+        }
+        self.assertTrue(
+            sc.matches_filter(
+                {"tags": ["build"], "content": "Build succeeded in automem using npm"},
+                spec,
+            )
+        )
+
+
 class AssertNoRegressionTests(unittest.TestCase):
     """Codex finding #1 hinges on this returning a list of problems that
     feeds the new fail-closed exit path. Make sure the contract is stable.

@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "description": "Realistic recall probes for AutoMem cleanup evaluation. These queries are based on observed mirror history, workflow logs, hook output classes, and prior cleanup findings. Use with runners/compare_recall_endpoints.py to compare a baseline endpoint against a cleaned endpoint.",
+  "queries": [
+    {
+      "id": "PREF-AUTOMEM-SESSION-START",
+      "group": "preserve",
+      "description": "User preference/process memory that should survive any cleanup.",
+      "query": "What memory usage preferences should I follow at session start for AutoMem?",
+      "params": {"tags": ["preference"], "limit": 10}
+    },
+    {
+      "id": "PREF-PR-TITLES",
+      "group": "preserve",
+      "description": "GitHub workflow preference; protects recent durable user correction.",
+      "query": "How should GitHub PR titles be formatted, and should they use a Codex prefix?",
+      "params": {"tags": ["preference"], "limit": 10}
+    },
+    {
+      "id": "DEPLOY-AUTOMEM-EVALS",
+      "group": "preserve",
+      "description": "Deployment memories should be unchanged by build/test cleanup.",
+      "query": "What production deployments happened for automem-evals on docker or vercel?",
+      "params": {"tags": ["deployment"], "limit": 10}
+    },
+    {
+      "id": "BACKUP-AUTH-DECISION",
+      "group": "preserve",
+      "description": "AutoMem backup auth/testing decisions should survive cleanup.",
+      "query": "What was decided about AutoMem backup auth, API testing, and admin token requirements?",
+      "params": {"tags": ["automem", "backup"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "AUTOMEM-EVALS-BEAM-RESULT",
+      "group": "preserve",
+      "description": "Benchmark/eval results should survive benchmark-fixture cleanup.",
+      "query": "What happened in the automem-evals BEAM V1 vs V2 full bucket result?",
+      "params": {"tags": ["automem-evals", "beam"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "AUTOMEM-EVALS-CLEANUP-RESULT",
+      "group": "preserve",
+      "description": "Recent cleanup findings should remain recallable.",
+      "query": "What did we learn about SWEEP-MEMORY-CACHE, SWEEP-SESSION-MILESTONE, and local mirror cleanup?",
+      "params": {"tags": ["automem-evals"], "limit": 10}
+    },
+    {
+      "id": "AUTOJACK-BLOG-PUBLISHED",
+      "group": "preserve",
+      "description": "Published artifacts are an explicit preserve class.",
+      "query": "Which AutoJack blog posts were recently published and what topics did they cover?",
+      "params": {"tags": ["autojack-blog", "published"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "BUGFIX-D1-SYNC",
+      "group": "preserve",
+      "description": "Bugfix/solution memories should survive session/build/test cleanup.",
+      "query": "What was the root cause of the D1 sync foreign-key storm and how was it fixed?",
+      "params": {"tags": ["bugfix", "solution"], "limit": 10}
+    },
+    {
+      "id": "LOCOMO-REAL-BENCHMARK",
+      "group": "preserve",
+      "description": "Protect real LoCoMo implementation/result memories while deleting locomo-test fixtures.",
+      "query": "What is the real AutoMem LoCoMo benchmark implementation status or benchmark result, not Caroline/Melanie test conversations?",
+      "params": {"tags": ["automem", "locomo"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "AGENT-WP-FUSION-SNIPPET",
+      "group": "mixed",
+      "description": "Agent summaries may be noisy, but customer/support task recall can be valuable.",
+      "query": "What did the WP Fusion agent do for the WooCommerce total orders snippet task?",
+      "params": {"tags": ["agent", "result-summary"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "AGENT-RECALL-ISSUE",
+      "group": "mixed",
+      "description": "Checks whether agent-result cleanup would lose useful GitHub issue context.",
+      "query": "Which GitHub issue was created about memory recall being broken in chat, voice, or social contexts?",
+      "params": {"tags": ["agent", "result-summary"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "WORKFLOW-DAILY-CONTEXT",
+      "group": "mixed",
+      "description": "Some workflow summaries may be useful context; treat top-result changes as review-worthy.",
+      "query": "What daily context or morning routine summaries matter for current work?",
+      "params": {"tags": ["workflow", "summary"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "BUILD-NOISE",
+      "group": "noise",
+      "description": "Mechanical build hook records should disappear after build cleanup.",
+      "query": "Build succeeded in automem-website using npm",
+      "params": {"tags": ["build"], "limit": 10}
+    },
+    {
+      "id": "TEST-NOISE",
+      "group": "noise",
+      "description": "Mechanical test hook records should disappear after test cleanup.",
+      "query": "Test suite passed 0 tests in autohub using jest vitest",
+      "params": {"tags": ["test"], "limit": 10}
+    },
+    {
+      "id": "SESSION-MILESTONE-NOISE",
+      "group": "noise",
+      "description": "Session milestone summaries are a cleanup target, but only after preserve-tag exclusions.",
+      "query": "Claude session in autohub modified files change size branch",
+      "params": {"tags": ["session_milestone", "session-milestone"], "limit": 10}
+    },
+    {
+      "id": "WORKFLOW-SUMMARY-NOISE",
+      "group": "noise",
+      "description": "Scheduled workflow execution summaries are a cleanup target.",
+      "query": "Workflow Execution Summary Moltbook Engagement scheduled workflow summary",
+      "params": {"tags": ["workflow", "summary", "scheduled"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "TWITTER-ENGAGEMENT-PING",
+      "group": "noise",
+      "description": "Repeated Twitter engagement status pings are a cleanup target.",
+      "query": "twitter engagement action skip no fresh signal posted false",
+      "params": {"tags": ["twitter-posts"], "limit": 10}
+    },
+    {
+      "id": "MOLTBOOK-ENGAGEMENT-PING",
+      "group": "noise",
+      "description": "Repeated Moltbook engagement status pings are a cleanup target.",
+      "query": "moltbook engagement action post high_signal_digest candidates posted true",
+      "params": {"tags": ["moltbook-engagement"], "limit": 10}
+    },
+    {
+      "id": "AGENT-RESULT-NOISE",
+      "group": "noise",
+      "description": "Generic agent result summaries are a cleanup candidate after stronger probes.",
+      "query": "Agent hub-developer completed task rounds tools result summary",
+      "params": {"tags": ["agent", "result-summary"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "WORK-PATTERN-NOISE",
+      "group": "noise",
+      "description": "Automated work-pattern summaries are a cleanup candidate.",
+      "query": "Work pattern in autohub focuses on bug fixing work style automated",
+      "params": {"tags": ["work_style", "automated"], "tag_mode": "all", "limit": 10}
+    },
+    {
+      "id": "STARTED-SESSION-NOISE",
+      "group": "noise",
+      "description": "Cursor session-start records are a cleanup target.",
+      "query": "Started session in project claude automation hub branch",
+      "params": {"tags": ["session-start"], "limit": 10}
+    },
+    {
+      "id": "LOCOMO-FIXTURE-NOISE",
+      "group": "noise",
+      "description": "Synthetic LoCoMo fixture memories are a cleanup target.",
+      "query": "Caroline Melanie cup guitar pottery locomo test conversation",
+      "params": {"tags": ["locomo-test"], "limit": 10}
+    }
+  ]
+}
