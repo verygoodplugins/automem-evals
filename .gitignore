@@ -31,6 +31,11 @@ data/results/*-comparison.md
 data/results/beam/**/beam_results_*.json
 data/results/beam/**/beam-output/
 
+# Sweep runs — raw per-run artifacts (qdrant dumps, health snapshots, probe diffs,
+# token files). Reproducible from the seeded corpus + the committed runner.
+# If a curated audit file emerges (e.g. SUMMARY.md per run), add a `!` exception.
+data/sweep_runs/
+
 # Seed memories — ignore generated corpora by default, but ship the small v1
 # snapshot so `scripts/seed_from_snapshot.py` works zero-cost after a fresh clone.
 # v2 is 5MB and cheaply regeneratable; keep it ignored.
