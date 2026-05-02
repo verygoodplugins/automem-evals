@@ -77,6 +77,7 @@ BUILD_TIME=""
 BUILD_SIZE=""
 WARNINGS=0
 ERRORS=0
+DIAGNOSTIC_PATTERN="error:|Error:|ERROR|error [A-Z][A-Z0-9]*[0-9]+|TS[0-9]{4,}|Cannot find|cannot find|not found|failed|Failed|FAIL"
 
 if [ "$BUILD_TOOL" = "npm" ] || [ "$BUILD_TOOL" = "yarn" ]; then
     BUILD_TIME=$(echo "$OUTPUT" | grep -oE "in [0-9.]+s" | grep -oE "[0-9.]+" | head -1)
@@ -88,7 +89,7 @@ elif [ "$BUILD_TOOL" = "webpack" ] || [ "$BUILD_TOOL" = "vite" ]; then
     BUILD_SIZE=$(echo "$OUTPUT" | grep -oE "dist.*[0-9.]+ [KMG]B" | grep -oE "[0-9.]+ [KMG]B" | head -1)
 fi
 
-ERRORS=$(echo "$OUTPUT" | grep -c -E "ERROR|error:|Error:" | head -1 || true)
+ERRORS=$(echo "$OUTPUT" | grep -c -E "$DIAGNOSTIC_PATTERN" | head -1 || true)
 ERRORS="${ERRORS:-0}"
 
 IMPORTANCE=0.5
@@ -107,7 +108,10 @@ fi
 
 ERROR_DETAILS=""
 if [ "$EXIT_CODE" -ne 0 ] || [ "$ERRORS" -gt 0 ]; then
-    ERROR_DETAILS=$(echo "$OUTPUT" | grep -A 2 -E "ERROR|error:|Error:" | head -10)
+    ERROR_DETAILS=$(echo "$OUTPUT" | grep -A 2 -E "$DIAGNOSTIC_PATTERN" | head -10)
+    if [ -z "$ERROR_DETAILS" ]; then
+        ERROR_DETAILS=$(echo "$OUTPUT" | sed '/^[[:space:]]*$/d' | head -10)
+    fi
 fi
 
 if [ "$EXIT_CODE" -eq 0 ]; then

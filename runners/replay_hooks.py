@@ -440,6 +440,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = p.parse_args(argv)
     manifest_path = resolve_manifest_output(args.manifest_output)
+    if args.cleanup and manifest_path:
+        raise SystemExit(
+            "--cleanup cannot be combined with --manifest-output: cleanup deletes "
+            "the eval-run memories that the scoring manifest references."
+        )
 
     args.results_dir.mkdir(parents=True, exist_ok=True)
 

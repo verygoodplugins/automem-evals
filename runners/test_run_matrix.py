@@ -130,6 +130,41 @@ class ManifestConfigTests(unittest.TestCase):
 
 
 class AggregationTests(unittest.TestCase):
+    def test_run_task_error_preserves_expected_denominator(self):
+        task = rm.MatrixTask(
+            endpoint=rm.EndpointSpec("baseline", "http://localhost:8001"),
+            ruleset_name="r1",
+            scenario={
+                "id": "S1",
+                "phase": 2,
+                "expected_hit_tags": ["TAG-A", "TAG-B"],
+            },
+            manifest_name="m1.manifest.json",
+        )
+        manifest = {
+            "memory_to_scenarios": {
+                "m1": ["TAG-A"],
+                "m2": ["TAG-B"],
+                "m3": ["OTHER"],
+            },
+            "scenario_to_memories": {
+                "TAG-A": ["m1"],
+                "TAG-B": ["m2"],
+                "OTHER": ["m3"],
+            },
+        }
+        original = rm.cr.run_phase
+        try:
+            rm.cr.run_phase = lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("boom"))
+            row = rm.run_task(task, "token", {"r1": {}}, {"baseline": manifest})
+        finally:
+            rm.cr.run_phase = original
+
+        self.assertEqual(row["status"], "error")
+        self.assertEqual(row["metrics"]["expected_in_corpus"], 2)
+        self.assertEqual(row["metrics"]["hits_total"], 0)
+        self.assertEqual(row["metrics"]["recall"], 0.0)
+
     def test_aggregate_results_groups_endpoint_ruleset_pairs(self):
         rows = [
             {

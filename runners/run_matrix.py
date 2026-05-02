@@ -160,16 +160,7 @@ def run_task(
         error = None
     except Exception as exc:  # fail per cell; the report must show holes
         run = {"params": {}, "response": {"results": []}}
-        metrics = {
-            "results_returned": 0,
-            "expected_in_corpus": 0,
-            "hits_total": 0,
-            "hits_in_top_k": 0,
-            "precision_at_k": 0.0,
-            "recall": 0.0,
-            "rank_of_first_hit": None,
-            "top_score": None,
-        }
+        metrics = cr.score_scenario(run, task.scenario, manifests[task.endpoint.label])
         status = "error"
         error = str(exc)
 
