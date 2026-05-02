@@ -24,6 +24,8 @@ PUBLIC_TYPE_ENUM = {"Decision", "Pattern", "Preference", "Style", "Habit", "Insi
 SESSION_SUMMARY_RE = re.compile(r"^Claude session in ")
 HALLUCINATED_ENTITY_RE = re.compile(r"^entity:[^:]+:(eof|bash|context|decision)$")
 DATE_TAG_RE = re.compile(r"^20\d\d(-\d\d)?$")
+SERIALIZED_TOOL_RESPONSE_RE = re.compile(r'"(?:stdout|stderr)"\s*:')
+HEREDOC_FRAGMENT_RE = re.compile(r"(cat <<'?EOF'?|git commit -m .*\$\(cat <<|^EOF$)", re.MULTILINE)
 
 
 # ---------------------------------------------------------------------------
@@ -64,6 +66,26 @@ def count_unknown_platform_in_content(queue: list[dict]) -> int:
         if "on unknown" in (r.get("content") or ""):
             n += 1
     return n
+
+
+def _record_text(record: dict) -> str:
+    """Concatenate user-visible fields where hook output can leak."""
+    parts = [record.get("content") or ""]
+    metadata = record.get("metadata") or {}
+    for value in metadata.values():
+        if isinstance(value, str):
+            parts.append(value)
+    return "\n".join(parts)
+
+
+def count_serialized_tool_response_fragments(queue: list[dict]) -> int:
+    """Records whose stored text contains serialized tool_response JSON fields."""
+    return sum(1 for r in queue if SERIALIZED_TOOL_RESPONSE_RE.search(_record_text(r)))
+
+
+def count_heredoc_fragments(queue: list[dict]) -> int:
+    """Records whose stored text leaks shell heredoc / commit-paste fragments."""
+    return sum(1 for r in queue if HEREDOC_FRAGMENT_RE.search(_record_text(r)))
 
 
 # ---------------------------------------------------------------------------
@@ -201,6 +223,8 @@ def compute_metrics(snapshot: dict) -> dict:
             "session_summary_content": count_session_summary_content(queue),
             "hallucinated_entity_tags": count_hallucinated_entity_tags(recall),
             "platform_unknown": count_unknown_platform_in_content(queue),
+            "serialized_tool_response": count_serialized_tool_response_fragments(queue),
+            "heredoc_fragments": count_heredoc_fragments(queue),
         },
         "field_presence": {
             "with_confidence_pct": pct_with_field(queue, "confidence"),

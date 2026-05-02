@@ -154,5 +154,73 @@ class InjectEvalRunIdTests(unittest.TestCase):
         self.assertEqual(before, after)
 
 
+class ManifestHelpersTests(unittest.TestCase):
+    def test_main_rejects_manifest_output_with_cleanup_before_health_check(self):
+        with self.assertRaises(SystemExit) as ctx:
+            rh.main(
+                [
+                    "--variant", "baseline",
+                    "--cleanup",
+                    "--manifest-output", "hook.manifest.json",
+                ]
+            )
+        self.assertIn("cannot be combined", str(ctx.exception))
+
+    def test_resolve_manifest_output_bare_filename_uses_seed_dir(self):
+        path = rh.resolve_manifest_output("hook-v2.manifest.json")
+        self.assertEqual(path, rh.DEFAULT_MANIFEST_DIR / "hook-v2.manifest.json")
+
+    def test_build_manifest_from_successful_posts(self):
+        manifest = rh.build_manifest_from_posts(
+            [
+                {"memory_id": "m1", "fixture_id": "02_build_success", "status": 200},
+                {"memory_id": "m2", "fixture_id": "04_test_fail_heredoc", "status": 200},
+                {"memory_id": None, "fixture_id": "ignored", "status": 500},
+            ]
+        )
+        self.assertEqual(
+            manifest["memory_to_scenarios"],
+            {
+                "m1": ["02_build_success"],
+                "m2": ["04_test_fail_heredoc"],
+            },
+        )
+        self.assertEqual(
+            manifest["scenario_to_memories"],
+            {
+                "02_build_success": ["m1"],
+                "04_test_fail_heredoc": ["m2"],
+            },
+        )
+
+
+class SanitizedHookReplayTests(unittest.TestCase):
+    def test_sanitized_build_failure_keeps_compiler_diagnostics(self):
+        fixture_path = rh.REPO_ROOT / "data" / "hook_fixtures" / "03_build_fail_short.json"
+        fixture = json.loads(fixture_path.read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            sandbox = Path(tmp) / "home"
+            sandbox.mkdir()
+            resolved = rh.resolve_variant("fix-v2-sanitize-content")
+            settings = rh.materialize_variant(resolved, sandbox)
+            records, failures, fixture_ids = rh.fire_fixtures(
+                [fixture],
+                settings,
+                sandbox,
+                git_significant=None,
+                git_trivial=None,
+            )
+
+        self.assertEqual(failures, [])
+        self.assertEqual(fixture_ids, ["03_build_fail_short"])
+        self.assertEqual(len(records), 1)
+        record = records[0]
+        text = record["content"] + "\n" + record["metadata"]["error_details"]
+        self.assertIn("src/server.ts", text)
+        self.assertIn("TS2304", text)
+        self.assertNotIn('"stdout"', text)
+        self.assertNotIn("cat <<", text)
+
+
 if __name__ == "__main__":
     unittest.main()

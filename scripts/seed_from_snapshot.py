@@ -14,6 +14,9 @@ Requirements:
 
 Usage:
   python3 scripts/seed_from_snapshot.py [--endpoint http://localhost:8001] [--token test-token]
+  python3 scripts/seed_from_snapshot.py \
+      --endpoint http://localhost:8011 \
+      --manifest-output corpus_v1-8011.manifest.json
 """
 
 import argparse
@@ -41,6 +44,15 @@ def request(method: str, url: str, token: str, payload: dict | None = None) -> d
         return json.loads(r.read())
 
 
+def resolve_manifest_output(value: str | None) -> pathlib.Path:
+    if not value:
+        return MANIFEST
+    path = pathlib.Path(value)
+    if path.is_absolute() or path.parent != pathlib.Path("."):
+        return path
+    return HERE / "data" / "seed_memories" / path
+
+
 def wait_for_enrichment(endpoint: str, token: str, expected_min: int) -> None:
     for i in range(60):
         h = request("GET", f"{endpoint}/health", token)
@@ -60,7 +72,16 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--endpoint", default="http://localhost:8001")
     ap.add_argument("--token", default="test-token")
+    ap.add_argument(
+        "--manifest-output",
+        default=None,
+        help=(
+            "Manifest output path. Bare filenames are written under "
+            "data/seed_memories/. Defaults to corpus_v1.manifest.json."
+        ),
+    )
     args = ap.parse_args()
+    manifest_path = resolve_manifest_output(args.manifest_output)
 
     if not SNAPSHOT.exists():
         print(f"snapshot not found: {SNAPSHOT}. run snapshot_corpus.py first.", file=sys.stderr)
@@ -122,11 +143,16 @@ def main() -> int:
     print("waiting for enrichment")
     wait_for_enrichment(args.endpoint, args.token, expected_min=len(manifest))
 
-    MANIFEST.write_text(json.dumps({
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps({
         "memory_to_scenarios": manifest,
         "scenario_to_memories": scenario_to_mids,
     }, indent=2))
-    print(f"manifest: {MANIFEST.relative_to(HERE)}")
+    try:
+        display = manifest_path.relative_to(HERE)
+    except ValueError:
+        display = manifest_path
+    print(f"manifest: {display}")
     return 0 if failures == 0 else 1
 
 

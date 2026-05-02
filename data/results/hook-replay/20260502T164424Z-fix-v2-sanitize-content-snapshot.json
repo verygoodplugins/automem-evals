@@ -1,0 +1,673 @@
+{
+  "variant": "fix-v2-sanitize-content",
+  "eval_run_id": "af5218e81475",
+  "endpoint": "http://localhost:8041",
+  "fired_fixtures": [
+    "01_git_commit_golden",
+    "02_build_success",
+    "03_build_fail_short",
+    "04_test_fail_heredoc",
+    "05_deploy_railway_prod",
+    "06_deploy_unknown_platform",
+    "07_session_stop_significant",
+    "08_session_stop_trivial",
+    "09_negative_control_read"
+  ],
+  "queue_records": [
+    {
+      "content": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
+      "tags": [
+        "build",
+        "npm",
+        "typescript",
+        "automem-evals"
+      ],
+      "importance": 0.5,
+      "type": "Context",
+      "metadata": {
+        "build_tool": "npm",
+        "build_time": "1.2",
+        "build_size": "45 KB",
+        "warnings": 1,
+        "errors": 0,
+        "exit_code": 0,
+        "command": "npm run build",
+        "project": "automem-evals",
+        "error_details": ""
+      },
+      "timestamp": "2026-05-02T16:44:23.417514Z"
+    },
+    {
+      "content": "Build failed in automem-evals using npm: 3 errors. src/server.ts(42,17): error TS2304: Cannot find name 'foo'. src/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'? ERROR: 2 errors found.",
+      "tags": [
+        "build",
+        "npm",
+        "typescript",
+        "automem-evals",
+        "failure"
+      ],
+      "importance": 0.9,
+      "type": "Insight",
+      "metadata": {
+        "build_tool": "npm",
+        "build_time": null,
+        "build_size": null,
+        "warnings": 0,
+        "errors": 3,
+        "exit_code": 1,
+        "command": "npm run build",
+        "project": "automem-evals",
+        "error_details": "src/server.ts(42,17): error TS2304: Cannot find name 'foo'. src/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'? ERROR: 2 errors found."
+      },
+      "timestamp": "2026-05-02T16:44:23.677978Z"
+    },
+    {
+      "content": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest. Errors: FAIL src/server.test.ts > server > handles auth AssertionError: expected 200 to be 401 - Expected + Received -- FAIL: 1 of 12 tests failed Tests: 1 failed | 11 passed",
+      "tags": [
+        "test",
+        "jest-vitest",
+        "typescript",
+        "automem-evals",
+        "failure"
+      ],
+      "importance": 0.8,
+      "type": "Insight",
+      "metadata": {
+        "test_framework": "jest/vitest",
+        "tests_passed": 11,
+        "tests_failed": 1,
+        "exit_code": 1,
+        "command": "npx vitest run",
+        "project": "automem-evals",
+        "error_details": "FAIL src/server.test.ts > server > handles auth AssertionError: expected 200 to be 401 - Expected + Received -- FAIL: 1 of 12 tests failed Tests: 1 failed | 11 passed"
+      },
+      "timestamp": "2026-05-02T16:44:24.027315Z"
+    },
+    {
+      "content": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
+      "tags": [
+        "deployment",
+        "railway",
+        "production",
+        "automem-evals"
+      ],
+      "importance": 0.9,
+      "type": "Context",
+      "metadata": {
+        "platform": "railway",
+        "environment": "production",
+        "url": "https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
+        "version": null,
+        "build_id": null,
+        "deploy_time": null,
+        "git_commit": "57bc8d1",
+        "exit_code": 0,
+        "command": "railway up",
+        "project": "automem-evals",
+        "error_details": ""
+      },
+      "timestamp": "2026-05-02T16:44:24.450338Z",
+      "t_valid": "2026-05-02T16:44:24.450338Z"
+    },
+    {
+      "content": "Deployed automem-evals to production on unknown in 12s",
+      "tags": [
+        "deployment",
+        "production",
+        "automem-evals"
+      ],
+      "importance": 0.9,
+      "type": "Context",
+      "metadata": {
+        "platform": "unknown",
+        "environment": "production",
+        "url": null,
+        "version": null,
+        "build_id": null,
+        "deploy_time": "12s",
+        "git_commit": "57bc8d1",
+        "exit_code": 0,
+        "command": "./scripts/deploy.sh && ssh prod-host 'systemctl restart myapp'",
+        "project": "automem-evals",
+        "error_details": ""
+      },
+      "timestamp": "2026-05-02T16:44:24.746184Z",
+      "t_valid": "2026-05-02T16:44:24.746184Z"
+    }
+  ],
+  "post_results": [
+    {
+      "status": 201,
+      "memory_id": "3af6f6aa-8676-49b4-94bd-b8b8b178c28e",
+      "fixture_id": "02_build_success",
+      "tags": [
+        "build",
+        "npm",
+        "typescript",
+        "automem-evals",
+        "eval-run-af5218e81475"
+      ]
+    },
+    {
+      "status": 201,
+      "memory_id": "81d49e4e-827e-492e-bae5-58f30ab83fcf",
+      "fixture_id": "03_build_fail_short",
+      "tags": [
+        "build",
+        "npm",
+        "typescript",
+        "automem-evals",
+        "failure",
+        "eval-run-af5218e81475"
+      ]
+    },
+    {
+      "status": 201,
+      "memory_id": "9a2a1ba9-122f-46e8-873a-36704990bf2f",
+      "fixture_id": "04_test_fail_heredoc",
+      "tags": [
+        "test",
+        "jest-vitest",
+        "typescript",
+        "automem-evals",
+        "failure",
+        "eval-run-af5218e81475"
+      ]
+    },
+    {
+      "status": 201,
+      "memory_id": "eaac53e5-f9e0-4efc-95b3-97f3d1816893",
+      "fixture_id": "05_deploy_railway_prod",
+      "tags": [
+        "deployment",
+        "railway",
+        "production",
+        "automem-evals",
+        "eval-run-af5218e81475"
+      ]
+    },
+    {
+      "status": 201,
+      "memory_id": "bcf7d9c4-4e45-45d1-a92a-13f60b012765",
+      "fixture_id": "06_deploy_unknown_platform",
+      "tags": [
+        "deployment",
+        "production",
+        "automem-evals",
+        "eval-run-af5218e81475"
+      ]
+    }
+  ],
+  "recall_memories": [
+    {
+      "_query": "",
+      "final_score": 0.5499999997775334,
+      "id": "bcf7d9c4-4e45-45d1-a92a-13f60b012765",
+      "jit_enriched": true,
+      "match_score": 0.9,
+      "match_type": "trending",
+      "memory": {
+        "confidence": 0.9,
+        "content": "Deployed automem-evals to production on unknown in 12s",
+        "enriched": true,
+        "enriched_at": "2026-05-02T16:44:24.786087+00:00",
+        "id": "bcf7d9c4-4e45-45d1-a92a-13f60b012765",
+        "importance": 0.9,
+        "last_accessed": "2026-05-02T16:44:24.746184+00:00",
+        "metadata": {
+          "build_id": null,
+          "command": "./scripts/deploy.sh && ssh prod-host 'systemctl restart myapp'",
+          "deploy_time": "12s",
+          "enrichment": {
+            "jit": true,
+            "jit_at": "2026-05-02T16:44:24.786087+00:00"
+          },
+          "entities": {
+            "organizations": [
+              "Deployed"
+            ]
+          },
+          "environment": "production",
+          "error_details": "",
+          "eval_run_id": "af5218e81475",
+          "exit_code": 0,
+          "git_commit": "57bc8d1",
+          "platform": "unknown",
+          "project": "automem-evals",
+          "url": null,
+          "version": null
+        },
+        "processed": false,
+        "summary": "Deployed automem-evals to production on unknown in 12s",
+        "t_valid": "2026-05-02T16:44:24.746184+00:00",
+        "tag_prefixes": [
+          "deployment",
+          "production",
+          "automem-evals",
+          "eval-run-af5218e81475",
+          "entity",
+          "entity:organizations",
+          "entity:organizations:deployed"
+        ],
+        "tags": [
+          "deployment",
+          "production",
+          "automem-evals",
+          "eval-run-af5218e81475",
+          "entity:organizations:deployed"
+        ],
+        "timestamp": "2026-05-02T16:44:24.746184+00:00",
+        "type": "Context",
+        "updated_at": "2026-05-02T16:44:24.746184+00:00"
+      },
+      "original_score": 0.9,
+      "relations": [],
+      "score": 0.5499999997775334,
+      "score_components": {
+        "confidence": 0.9,
+        "context": 0.0,
+        "exact": 0.0,
+        "importance": 0.9,
+        "keyword": 0.9,
+        "recency": 0.9999999977753343,
+        "relation": 0.0,
+        "relevance": 0.0,
+        "tag": 0.0,
+        "vector": 0.0
+      },
+      "source": "graph"
+    },
+    {
+      "_query": "",
+      "final_score": 0.5499999978750707,
+      "id": "eaac53e5-f9e0-4efc-95b3-97f3d1816893",
+      "jit_enriched": true,
+      "match_score": 0.9,
+      "match_type": "trending",
+      "memory": {
+        "confidence": 0.9,
+        "content": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
+        "enriched": true,
+        "enriched_at": "2026-05-02T16:44:24.793982+00:00",
+        "id": "eaac53e5-f9e0-4efc-95b3-97f3d1816893",
+        "importance": 0.9,
+        "last_accessed": "2026-05-02T16:44:24.450338+00:00",
+        "metadata": {
+          "build_id": null,
+          "command": "railway up",
+          "deploy_time": null,
+          "enrichment": {
+            "jit": true,
+            "jit_at": "2026-05-02T16:44:24.793982+00:00"
+          },
+          "entities": {
+            "organizations": [
+              "Deployed"
+            ]
+          },
+          "environment": "production",
+          "error_details": "",
+          "eval_run_id": "af5218e81475",
+          "exit_code": 0,
+          "git_commit": "57bc8d1",
+          "platform": "railway",
+          "project": "automem-evals",
+          "url": "https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
+          "version": null
+        },
+        "processed": false,
+        "summary": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
+        "t_valid": "2026-05-02T16:44:24.450338+00:00",
+        "tag_prefixes": [
+          "deployment",
+          "railway",
+          "production",
+          "automem-evals",
+          "eval-run-af5218e81475",
+          "entity",
+          "entity:organizations",
+          "entity:organizations:deployed"
+        ],
+        "tags": [
+          "deployment",
+          "railway",
+          "production",
+          "automem-evals",
+          "eval-run-af5218e81475",
+          "entity:organizations:deployed"
+        ],
+        "timestamp": "2026-05-02T16:44:24.450338+00:00",
+        "type": "Context",
+        "updated_at": "2026-05-02T16:44:24.450338+00:00"
+      },
+      "original_score": 0.9,
+      "relations": [],
+      "score": 0.5499999978750707,
+      "score_components": {
+        "confidence": 0.9,
+        "context": 0.0,
+        "exact": 0.0,
+        "importance": 0.9,
+        "keyword": 0.9,
+        "recency": 0.9999999787507073,
+        "relation": 0.0,
+        "relevance": 0.0,
+        "tag": 0.0,
+        "vector": 0.0
+      },
+      "source": "graph"
+    },
+    {
+      "_query": "",
+      "final_score": 0.5499999929086742,
+      "id": "81d49e4e-827e-492e-bae5-58f30ab83fcf",
+      "jit_enriched": true,
+      "match_score": 0.9,
+      "match_type": "trending",
+      "memory": {
+        "confidence": 0.9,
+        "content": "Build failed in automem-evals using npm: 3 errors. src/server.ts(42,17): error TS2304: Cannot find name 'foo'. src/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'? ERROR: 2 errors found.",
+        "enriched": true,
+        "enriched_at": "2026-05-02T16:44:24.801393+00:00",
+        "id": "81d49e4e-827e-492e-bae5-58f30ab83fcf",
+        "importance": 0.9,
+        "last_accessed": "2026-05-02T16:44:23.677978+00:00",
+        "metadata": {
+          "build_size": null,
+          "build_time": null,
+          "build_tool": "npm",
+          "command": "npm run build",
+          "enrichment": {
+            "jit": true,
+            "jit_at": "2026-05-02T16:44:24.801393+00:00"
+          },
+          "entities": {},
+          "error_details": "src/server.ts(42,17): error TS2304: Cannot find name 'foo'. src/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'? ERROR: 2 errors found.",
+          "errors": 3,
+          "eval_run_id": "af5218e81475",
+          "exit_code": 1,
+          "project": "automem-evals",
+          "warnings": 0
+        },
+        "processed": false,
+        "summary": "Build failed in automem-evals using npm: 3 errors.",
+        "t_valid": "2026-05-02T16:44:23.677978+00:00",
+        "tag_prefixes": [
+          "build",
+          "npm",
+          "typescript",
+          "automem-evals",
+          "failure",
+          "eval-run-af5218e81475"
+        ],
+        "tags": [
+          "build",
+          "npm",
+          "typescript",
+          "automem-evals",
+          "failure",
+          "eval-run-af5218e81475"
+        ],
+        "timestamp": "2026-05-02T16:44:23.677978+00:00",
+        "type": "Insight",
+        "updated_at": "2026-05-02T16:44:23.677978+00:00"
+      },
+      "original_score": 0.9,
+      "relations": [],
+      "score": 0.5499999929086742,
+      "score_components": {
+        "confidence": 0.9,
+        "context": 0.0,
+        "exact": 0.0,
+        "importance": 0.9,
+        "keyword": 0.9,
+        "recency": 0.9999999290867413,
+        "relation": 0.0,
+        "relevance": 0.0,
+        "tag": 0.0,
+        "vector": 0.0
+      },
+      "source": "graph"
+    },
+    {
+      "_query": "",
+      "final_score": 0.5049999951548483,
+      "id": "9a2a1ba9-122f-46e8-873a-36704990bf2f",
+      "jit_enriched": true,
+      "match_score": 0.8,
+      "match_type": "trending",
+      "memory": {
+        "confidence": 0.9,
+        "content": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest. Errors: FAIL src/server.test.ts > server > handles auth AssertionError: expected 200 to be 401 - Expected + Received -- FAIL: 1 of 12 tests failed Tests: 1 failed | 11 passed",
+        "enriched": true,
+        "enriched_at": "2026-05-02T16:44:24.811672+00:00",
+        "id": "9a2a1ba9-122f-46e8-873a-36704990bf2f",
+        "importance": 0.8,
+        "last_accessed": "2026-05-02T16:44:24.027315+00:00",
+        "metadata": {
+          "command": "npx vitest run",
+          "enrichment": {
+            "jit": true,
+            "jit_at": "2026-05-02T16:44:24.811672+00:00"
+          },
+          "entities": {},
+          "error_details": "FAIL src/server.test.ts > server > handles auth AssertionError: expected 200 to be 401 - Expected + Received -- FAIL: 1 of 12 tests failed Tests: 1 failed | 11 passed",
+          "eval_run_id": "af5218e81475",
+          "exit_code": 1,
+          "project": "automem-evals",
+          "test_framework": "jest/vitest",
+          "tests_failed": 1,
+          "tests_passed": 11
+        },
+        "processed": false,
+        "summary": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest.",
+        "t_valid": "2026-05-02T16:44:24.027315+00:00",
+        "tag_prefixes": [
+          "test",
+          "jest-vitest",
+          "typescript",
+          "automem-evals",
+          "failure",
+          "eval-run-af5218e81475"
+        ],
+        "tags": [
+          "test",
+          "jest-vitest",
+          "typescript",
+          "automem-evals",
+          "failure",
+          "eval-run-af5218e81475"
+        ],
+        "timestamp": "2026-05-02T16:44:24.027315+00:00",
+        "type": "Insight",
+        "updated_at": "2026-05-02T16:44:24.027315+00:00"
+      },
+      "original_score": 0.8,
+      "relations": [],
+      "score": 0.5049999951548483,
+      "score_components": {
+        "confidence": 0.9,
+        "context": 0.0,
+        "exact": 0.0,
+        "importance": 0.8,
+        "keyword": 0.8,
+        "recency": 0.9999999515484825,
+        "relation": 0.0,
+        "relevance": 0.0,
+        "tag": 0.0,
+        "vector": 0.0
+      },
+      "source": "graph"
+    },
+    {
+      "_query": "",
+      "final_score": 0.36999999123374483,
+      "id": "3af6f6aa-8676-49b4-94bd-b8b8b178c28e",
+      "jit_enriched": true,
+      "match_score": 0.5,
+      "match_type": "trending",
+      "memory": {
+        "confidence": 0.9,
+        "content": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
+        "enriched": true,
+        "enriched_at": "2026-05-02T16:44:24.816164+00:00",
+        "id": "3af6f6aa-8676-49b4-94bd-b8b8b178c28e",
+        "importance": 0.5,
+        "last_accessed": "2026-05-02T16:44:23.417514+00:00",
+        "metadata": {
+          "build_size": "45 KB",
+          "build_time": "1.2",
+          "build_tool": "npm",
+          "command": "npm run build",
+          "enrichment": {
+            "jit": true,
+            "jit_at": "2026-05-02T16:44:24.816164+00:00"
+          },
+          "entities": {},
+          "error_details": "",
+          "errors": 0,
+          "eval_run_id": "af5218e81475",
+          "exit_code": 0,
+          "project": "automem-evals",
+          "warnings": 1
+        },
+        "processed": false,
+        "summary": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
+        "t_valid": "2026-05-02T16:44:23.417514+00:00",
+        "tag_prefixes": [
+          "build",
+          "npm",
+          "typescript",
+          "automem-evals",
+          "eval-run-af5218e81475"
+        ],
+        "tags": [
+          "build",
+          "npm",
+          "typescript",
+          "automem-evals",
+          "eval-run-af5218e81475"
+        ],
+        "timestamp": "2026-05-02T16:44:23.417514+00:00",
+        "type": "Context",
+        "updated_at": "2026-05-02T16:44:23.417514+00:00"
+      },
+      "original_score": 0.5,
+      "relations": [
+        {
+          "memory": {
+            "confidence": 0.9,
+            "id": "186c4fed-0d13-4c2a-9bc0-358cfa3175e5",
+            "importance": 0.9,
+            "summary": "Deployed automem-evals to production on railway: https://railway.com/project/abc/build/xyz\\nBuild succeeded\\nDeployment URL: https://my-app.up.railway.app",
+            "tags": [
+              "deployment",
+              "railway",
+              "production",
+              "automem-evals",
+              "eval-run-e063bda3f52c"
+            ],
+            "timestamp": "2026-05-02T15:31:59.729427+00:00",
+            "type": "Context"
+          },
+          "strength": 1.0,
+          "type": "PRECEDED_BY"
+        },
+        {
+          "memory": {
+            "confidence": 0.9,
+            "id": "2ff0d012-dcf8-449d-94c5-419cf91626c8",
+            "importance": 0.9,
+            "summary": "Build failed in automem-evals using npm: 1 errors.",
+            "tags": [
+              "build",
+              "npm",
+              "typescript",
+              "automem-evals",
+              "failure"
+            ],
+            "timestamp": "2026-05-02T15:31:59.012281+00:00",
+            "type": "Insight"
+          },
+          "strength": 1.0,
+          "type": "PRECEDED_BY"
+        },
+        {
+          "memory": {
+            "confidence": 0.9,
+            "id": "d6ba9bcc-314e-40b1-9065-7b583bf51b59",
+            "importance": 0.5,
+            "summary": "Build succeeded in automem-evals using npm (time: 1.2s, size: 45 KB, warnings: 1)",
+            "tags": [
+              "build",
+              "npm",
+              "typescript",
+              "automem-evals",
+              "eval-run-e063bda3f52c"
+            ],
+            "timestamp": "2026-05-02T15:31:58.780976+00:00",
+            "type": "Context"
+          },
+          "strength": 1.0,
+          "type": "PRECEDED_BY"
+        },
+        {
+          "memory": {
+            "confidence": 0.9,
+            "id": "dc8c39bf-4b82-4696-a85a-ca385be9414f",
+            "importance": 0.8,
+            "summary": "Test failures in automem-evals: 1 failed, 11 passed using jest/vitest.",
+            "tags": [
+              "test",
+              "jest-vitest",
+              "typescript",
+              "automem-evals",
+              "failure"
+            ],
+            "timestamp": "2026-05-02T15:31:59.307021+00:00",
+            "type": "Insight"
+          },
+          "strength": 1.0,
+          "type": "PRECEDED_BY"
+        },
+        {
+          "memory": {
+            "confidence": 0.9,
+            "id": "8d74dffe-7a04-4fbd-a36b-c3f7ed41fcd3",
+            "importance": 0.9,
+            "summary": "Deployed automem-evals to production on unknown in 12s",
+            "tags": [
+              "deployment",
+              "production",
+              "automem-evals",
+              "eval-run-e063bda3f52c",
+              "entity:organizations:deployed"
+            ],
+            "timestamp": "2026-05-02T15:32:00.008925+00:00",
+            "type": "Context"
+          },
+          "strength": 1.0,
+          "type": "PRECEDED_BY"
+        }
+      ],
+      "score": 0.36999999123374483,
+      "score_components": {
+        "confidence": 0.9,
+        "context": 0.0,
+        "exact": 0.0,
+        "importance": 0.5,
+        "keyword": 0.5,
+        "recency": 0.9999999123374486,
+        "relation": 0.0,
+        "relevance": 0.0,
+        "tag": 0.0,
+        "vector": 0.0
+      },
+      "source": "graph"
+    }
+  ],
+  "hook_failures": [],
+  "post_failures": [],
+  "run_failed": false,
+  "captured_at": "20260502T164424Z"
+}

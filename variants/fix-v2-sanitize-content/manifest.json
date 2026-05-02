@@ -1,0 +1,25 @@
+{
+  "name": "fix-v2-sanitize-content",
+  "extends": "fix-v1-no-session",
+  "change": "Sanitize build/test hook failure content before queueing memories.",
+  "rationale": "Tests whether parsing stdout/stderr directly and stripping shell-paste fragments preserves useful build/test recall while eliminating serialized tool_response and heredoc leakage.",
+  "files_overridden": [
+    "hooks/capture-build-result.sh",
+    "hooks/capture-test-pattern.sh"
+  ],
+  "files_inherited_from_fix_v1": [
+    "settings.json",
+    "hooks/automem-session-start.sh",
+    "hooks/capture-deployment.sh",
+    "hooks/session-memory.sh",
+    "scripts/memory-filters.json",
+    "scripts/process-session-memory.py",
+    "scripts/python-command.sh",
+    "scripts/queue-cleanup.sh",
+    "scripts/smart-notify.sh"
+  ],
+  "notes": [
+    "This is cumulative over fix-v1-no-session, so session-memory.sh remains non-invoked.",
+    "The sanitize delta is scoped to build/test content and metadata.error_details."
+  ]
+}

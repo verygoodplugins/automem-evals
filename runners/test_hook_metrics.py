@@ -63,6 +63,22 @@ class AntiPatternSignaturesTests(unittest.TestCase):
         m = hm.count_unknown_platform_in_content(queue)
         self.assertEqual(m, 1)
 
+    def test_serialized_tool_response_counts_content_and_metadata(self):
+        queue = [
+            {"content": 'Build failed.   "stdout": "tsc failed"', "metadata": {}},
+            {"content": "Test failed", "metadata": {"error_details": '  "stderr": "boom"'}},
+            {"content": "Build failed from clean stdout text", "metadata": {}},
+        ]
+        self.assertEqual(hm.count_serialized_tool_response_fragments(queue), 2)
+
+    def test_heredoc_fragments_count_content_and_metadata(self):
+        queue = [
+            {"content": "git commit -m \"$(cat <<'EOF'"},
+            {"content": "Test failed", "metadata": {"error_details": "EOF\nthen ran tests"}},
+            {"content": "normal failure summary"},
+        ]
+        self.assertEqual(hm.count_heredoc_fragments(queue), 2)
+
 
 class FieldPresenceTests(unittest.TestCase):
     # Audit Appendix finding #4: hooks never set confidence, originSessionId, t_valid
@@ -185,6 +201,8 @@ class TopLevelComputeTests(unittest.TestCase):
         self.assertEqual(m["anti_patterns"]["session_summary_content"], 1)
         self.assertEqual(m["anti_patterns"]["hallucinated_entity_tags"], 1)
         self.assertEqual(m["anti_patterns"]["platform_unknown"], 1)
+        self.assertEqual(m["anti_patterns"]["serialized_tool_response"], 0)
+        self.assertEqual(m["anti_patterns"]["heredoc_fragments"], 0)
         self.assertEqual(m["type_validity"]["invalid_count"], 1)
 
 
