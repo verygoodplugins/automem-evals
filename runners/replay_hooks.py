@@ -33,6 +33,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_VARIANTS_DIR = REPO_ROOT / "variants"
 DEFAULT_FIXTURES_DIR = REPO_ROOT / "data" / "hook_fixtures"
 DEFAULT_RESULTS_DIR = REPO_ROOT / "data" / "results" / "hook-replay"
+DEFAULT_MANIFEST_DIR = REPO_ROOT / "data" / "seed_memories"
 DEFAULT_ENDPOINT = "http://localhost:8001"
 DEFAULT_TOKEN = "test-token"
 
@@ -126,6 +127,31 @@ def inject_eval_run_id(record: dict, eval_run_id: str) -> dict:
     md["eval_run_id"] = eval_run_id
     out["metadata"] = md
     return out
+
+
+def resolve_manifest_output(value: str | None) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if path.is_absolute() or path.parent != Path("."):
+        return path
+    return DEFAULT_MANIFEST_DIR / path
+
+
+def build_manifest_from_posts(post_results: list[dict]) -> dict:
+    memory_to_scenarios: dict[str, list[str]] = {}
+    scenario_to_memories: dict[str, list[str]] = {}
+    for result in post_results:
+        memory_id = result.get("memory_id")
+        fixture_id = result.get("fixture_id")
+        if not memory_id or not fixture_id:
+            continue
+        memory_to_scenarios[memory_id] = [fixture_id]
+        scenario_to_memories.setdefault(fixture_id, []).append(memory_id)
+    return {
+        "memory_to_scenarios": memory_to_scenarios,
+        "scenario_to_memories": scenario_to_memories,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -304,7 +330,7 @@ def fire_fixtures(
     sandbox_home: Path,
     git_significant: Path | None,
     git_trivial: Path | None,
-) -> tuple[list[dict], list[dict]]:
+) -> tuple[list[dict], list[dict], list[str]]:
     """Fire each fixture in order. After all fire, read the queue file and
     return (records, hook_failures). hook_failures captures every non-zero
     hook exit so callers can fail closed — silently dropping a hook would
@@ -320,6 +346,8 @@ def fire_fixtures(
 
     fixture_log: list[dict] = []
     hook_failures: list[dict] = []
+    record_fixture_ids: list[str] = []
+    observed_queue_lines = 0
     for fx in fixtures:
         fid = fx["id"]
         kind = fx["kind"]
@@ -362,6 +390,13 @@ def fire_fixtures(
                     })
 
         fixture_log.append({"id": fid, "hooks_fired": len(hooks_to_fire)})
+        current_lines = [
+            line for line in queue_path.read_text().splitlines()
+            if line.strip()
+        ] if queue_path.exists() else []
+        new_count = max(0, len(current_lines) - observed_queue_lines)
+        record_fixture_ids.extend([fid] * new_count)
+        observed_queue_lines = len(current_lines)
 
     # Drain queue
     records: list[dict] = []
@@ -382,7 +417,7 @@ def fire_fixtures(
                     "stdout_excerpt": "",
                 })
     print(f"  fired {sum(f['hooks_fired'] for f in fixture_log)} hook(s); drained {len(records)} record(s) from queue; {len(hook_failures)} hook failure(s)", file=sys.stderr)
-    return records, hook_failures
+    return records, hook_failures, record_fixture_ids
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -395,7 +430,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--token", default=DEFAULT_TOKEN)
     p.add_argument("--cleanup", action="store_true", help="Delete eval-run-<uuid>-tagged memories after snapshot")
     p.add_argument("--keep-sandbox", action="store_true", help="Don't rm -rf the per-run sandbox dir on exit")
+    p.add_argument(
+        "--manifest-output",
+        default=None,
+        help=(
+            "Write a scoring manifest for posted records. Bare filenames are "
+            "written under data/seed_memories/."
+        ),
+    )
     args = p.parse_args(argv)
+    manifest_path = resolve_manifest_output(args.manifest_output)
 
     args.results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -424,15 +468,21 @@ def main(argv: list[str] | None = None) -> int:
         triv_dir = make_synthetic_git_trivial(sandbox) if needs_trivial else None
 
         print(f"[5/7] fire {len(fixtures)} fixtures", file=sys.stderr)
-        records, hook_failures = fire_fixtures(fixtures, settings, sandbox, sig_dir, triv_dir)
+        records, hook_failures, record_fixture_ids = fire_fixtures(fixtures, settings, sandbox, sig_dir, triv_dir)
 
         print(f"[6/7] POST {len(records)} records to {args.endpoint}/memory with eval-run-{eval_run_id} tag", file=sys.stderr)
         post_results: list[dict] = []
         post_failures: list[dict] = []
-        for rec in records:
+        for index, rec in enumerate(records):
+            fixture_id = record_fixture_ids[index] if index < len(record_fixture_ids) else None
             tagged = inject_eval_run_id(rec, eval_run_id)
             status, body = post_memory(tagged, args.endpoint, args.token)
-            post_results.append({"status": status, "memory_id": (body or {}).get("memory_id") or (body or {}).get("id"), "tags": tagged.get("tags")})
+            post_results.append({
+                "status": status,
+                "memory_id": (body or {}).get("memory_id") or (body or {}).get("id"),
+                "fixture_id": fixture_id,
+                "tags": tagged.get("tags"),
+            })
             if not (200 <= status < 300):
                 post_failures.append({
                     "status": status,
@@ -463,6 +513,15 @@ def main(argv: list[str] | None = None) -> int:
         }
         snapshot_path.write_text(json.dumps(snapshot_obj, indent=2, default=str))
         print(f"[7/7] snapshot -> {snapshot_path.relative_to(REPO_ROOT)}", file=sys.stderr)
+
+        if manifest_path:
+            manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            manifest_path.write_text(json.dumps(build_manifest_from_posts(post_results), indent=2))
+            try:
+                display_manifest = manifest_path.relative_to(REPO_ROOT)
+            except ValueError:
+                display_manifest = manifest_path
+            print(f"      manifest -> {display_manifest}", file=sys.stderr)
 
         if args.cleanup:
             cleanup_result = cleanup_by_tag(f"eval-run-{eval_run_id}", args.endpoint, args.token)

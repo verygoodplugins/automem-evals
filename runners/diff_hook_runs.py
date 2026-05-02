@@ -79,7 +79,13 @@ def render_markdown(a: dict, b: dict) -> str:
     lines.append(f"| metric | {a_name} | {b_name} | delta |")
     lines.append("|---|---:|---:|---:|")
     ap_a, ap_b = a["anti_patterns"], b["anti_patterns"]
-    for key in ["session_summary_content", "hallucinated_entity_tags", "platform_unknown"]:
+    for key in [
+        "session_summary_content",
+        "hallucinated_entity_tags",
+        "platform_unknown",
+        "serialized_tool_response",
+        "heredoc_fragments",
+    ]:
         lines.append(_row(key, ap_a.get(key, 0), ap_b.get(key, 0)))
     lines.append("")
 
@@ -149,7 +155,13 @@ def render_markdown(a: dict, b: dict) -> str:
         else:
             regressed.append(f"{label}: {a_val} → {b_val}")
 
-    for key in ["session_summary_content", "hallucinated_entity_tags", "platform_unknown"]:
+    for key in [
+        "session_summary_content",
+        "hallucinated_entity_tags",
+        "platform_unknown",
+        "serialized_tool_response",
+        "heredoc_fragments",
+    ]:
         _classify(key, ap_a.get(key, 0), ap_b.get(key, 0))
     _classify("type_validity.invalid_count", tv_a["invalid_count"], tv_b["invalid_count"])
     _classify("tag_drift.jest_collisions", td_a.get("jest_collisions", 0), td_b.get("jest_collisions", 0))

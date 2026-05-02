@@ -154,5 +154,34 @@ class InjectEvalRunIdTests(unittest.TestCase):
         self.assertEqual(before, after)
 
 
+class ManifestHelpersTests(unittest.TestCase):
+    def test_resolve_manifest_output_bare_filename_uses_seed_dir(self):
+        path = rh.resolve_manifest_output("hook-v2.manifest.json")
+        self.assertEqual(path, rh.DEFAULT_MANIFEST_DIR / "hook-v2.manifest.json")
+
+    def test_build_manifest_from_successful_posts(self):
+        manifest = rh.build_manifest_from_posts(
+            [
+                {"memory_id": "m1", "fixture_id": "02_build_success", "status": 200},
+                {"memory_id": "m2", "fixture_id": "04_test_fail_heredoc", "status": 200},
+                {"memory_id": None, "fixture_id": "ignored", "status": 500},
+            ]
+        )
+        self.assertEqual(
+            manifest["memory_to_scenarios"],
+            {
+                "m1": ["02_build_success"],
+                "m2": ["04_test_fail_heredoc"],
+            },
+        )
+        self.assertEqual(
+            manifest["scenario_to_memories"],
+            {
+                "02_build_success": ["m1"],
+                "04_test_fail_heredoc": ["m2"],
+            },
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

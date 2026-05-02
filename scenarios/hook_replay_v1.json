@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "description": "Recall probes for useful memories emitted by hook replay variants. Expected hit tags are fixture IDs from data/hook_fixtures/*.json, resolved through replay_hooks.py --manifest-output.",
+  "scenarios": [
+    {
+      "id": "HR-BUILD-SUCCESS",
+      "phase": 2,
+      "description": "Recall the useful successful build record.",
+      "query": "Build succeeded in automem-evals using npm warnings compiled size",
+      "project_slug": "automem-evals",
+      "expected_hit_tags": ["02_build_success"]
+    },
+    {
+      "id": "HR-BUILD-FAILURE",
+      "phase": 2,
+      "description": "Recall the useful failed build record without needing serialized tool_response noise.",
+      "query": "Build failed in automem-evals using npm TypeScript TS2304 foo bar",
+      "project_slug": "automem-evals",
+      "expected_hit_tags": ["03_build_fail_short"]
+    },
+    {
+      "id": "HR-TEST-FAILURE",
+      "phase": 2,
+      "description": "Recall the useful failed test record without heredoc commit-paste leakage.",
+      "query": "Test failures in automem-evals using jest vitest server auth expected 200 to be 401",
+      "project_slug": "automem-evals",
+      "expected_hit_tags": ["04_test_fail_heredoc"]
+    },
+    {
+      "id": "HR-DEPLOY-RAILWAY",
+      "phase": 2,
+      "description": "Recall the useful Railway production deploy record.",
+      "query": "Deployed automem-evals to production on railway deployment URL",
+      "project_slug": "automem-evals",
+      "expected_hit_tags": ["05_deploy_railway_prod"]
+    }
+  ]
+}
