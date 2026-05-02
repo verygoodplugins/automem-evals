@@ -44,14 +44,89 @@ class TaskExpansionTests(unittest.TestCase):
             rm.EndpointSpec("atomic", "http://localhost:8011"),
         ]
         scenarios = [{"id": "S1", "phase": 1}, {"id": "S2", "phase": 2}]
-        tasks = rm.build_tasks(endpoints, ["r1", "r2"], scenarios)
+        tasks = rm.build_tasks(
+            endpoints,
+            ["r1", "r2"],
+            scenarios,
+            {"baseline": "corpus_v1.manifest.json", "atomic": "atomic.manifest.json"},
+        )
         self.assertEqual(len(tasks), 8)
         self.assertEqual(tasks[0].endpoint.label, "baseline")
         self.assertEqual(tasks[0].ruleset_name, "r1")
         self.assertEqual(tasks[0].scenario["id"], "S1")
+        self.assertEqual(tasks[0].manifest_name, "corpus_v1.manifest.json")
         self.assertEqual(tasks[-1].endpoint.label, "atomic")
         self.assertEqual(tasks[-1].ruleset_name, "r2")
         self.assertEqual(tasks[-1].scenario["id"], "S2")
+        self.assertEqual(tasks[-1].manifest_name, "atomic.manifest.json")
+
+
+class ManifestConfigTests(unittest.TestCase):
+    def test_resolve_manifest_names_defaults_and_overrides(self):
+        endpoints = [
+            rm.EndpointSpec("baseline", "http://localhost:8001"),
+            rm.EndpointSpec("atomic", "http://localhost:8011"),
+        ]
+        names = rm.resolve_manifest_names(
+            endpoints,
+            "corpus_v1.manifest.json",
+            ["atomic=atomic.manifest.json"],
+        )
+        self.assertEqual(
+            names,
+            {
+                "baseline": "corpus_v1.manifest.json",
+                "atomic": "atomic.manifest.json",
+            },
+        )
+
+    def test_resolve_manifest_names_rejects_unknown_endpoint(self):
+        endpoints = [rm.EndpointSpec("baseline", "http://localhost:8001")]
+        with self.assertRaises(ValueError):
+            rm.resolve_manifest_names(
+                endpoints,
+                "corpus_v1.manifest.json",
+                ["missing=other.manifest.json"],
+            )
+
+    def test_validate_endpoint_manifest_reports_missing_ids(self):
+        endpoint = rm.EndpointSpec("baseline", "http://localhost:8001")
+        manifest = {"memory_to_scenarios": {"a": [], "b": [], "c": []}}
+        original = rm.memory_exists
+        try:
+            rm.memory_exists = lambda _endpoint, _token, memory_id: memory_id != "b"
+            check = rm.validate_endpoint_manifest(
+                endpoint,
+                "token",
+                manifest,
+                {"memory_count": 3},
+            )
+        finally:
+            rm.memory_exists = original
+
+        self.assertEqual(check["status"], "failed")
+        self.assertEqual(check["found_count"], 2)
+        self.assertEqual(check["missing_count"], 1)
+        self.assertEqual(check["missing_sample"], ["b"])
+
+    def test_validate_endpoint_manifest_strict_count_fails_on_extra_memories(self):
+        endpoint = rm.EndpointSpec("baseline", "http://localhost:8001")
+        manifest = {"memory_to_scenarios": {"a": []}}
+        original = rm.memory_exists
+        try:
+            rm.memory_exists = lambda _endpoint, _token, _memory_id: True
+            check = rm.validate_endpoint_manifest(
+                endpoint,
+                "token",
+                manifest,
+                {"memory_count": 10},
+                strict_memory_count=True,
+            )
+        finally:
+            rm.memory_exists = original
+
+        self.assertEqual(check["status"], "failed")
+        self.assertIn("memory_count 10 != manifest count 1", check["problems"])
 
 
 class AggregationTests(unittest.TestCase):
@@ -121,13 +196,25 @@ class MarkdownTests(unittest.TestCase):
             "scenarios_name": "session_start_v1",
             "manifest_name": "corpus_v1.manifest.json",
             "json_path": "data/results/matrix/test.json",
-            "endpoints": [{"label": "baseline", "url": "http://localhost:8001"}],
+            "endpoints": [
+                {
+                    "label": "baseline",
+                    "url": "http://localhost:8001",
+                    "manifest": "corpus_v1.manifest.json",
+                }
+            ],
             "health": {
                 "baseline": {
                     "status": "healthy",
                     "memory_count": 78,
                     "vector_count": 78,
                     "sync_status": "synced",
+                }
+            },
+            "manifest_checks": {
+                "baseline": {
+                    "status": "ok",
+                    "missing_count": 0,
                 }
             },
             "aggregate": [
