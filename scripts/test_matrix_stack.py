@@ -27,6 +27,7 @@ class MatrixStackTests(unittest.TestCase):
         text = ms.render_override(
             {"api": 8011, "falkor": 6389, "falkor_ui": 3010, "qdrant": 6343}
         )
+        self.assertIn("ports: !override", text)
         self.assertIn('"8011:8001"', text)
         self.assertIn('"6389:6379"', text)
         self.assertIn('"3010:3000"', text)
