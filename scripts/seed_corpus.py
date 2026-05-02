@@ -8,6 +8,10 @@ Seed a JSONL corpus into the local AutoMem server.
 
 Usage:
   python3 scripts/seed_corpus.py [--endpoint http://localhost:8001] [--token test-token]
+  python3 scripts/seed_corpus.py \
+      --endpoint http://localhost:8011 \
+      --corpus corpus_v2.jsonl \
+      --manifest-output corpus_v2-8011.manifest.json
 """
 
 import argparse
@@ -34,6 +38,15 @@ def request(method: str, url: str, token: str, payload: dict | None = None) -> d
     )
     with urllib.request.urlopen(req, timeout=20) as r:
         return json.loads(r.read())
+
+
+def resolve_manifest_output(value: str | None, default_path: pathlib.Path) -> pathlib.Path:
+    if not value:
+        return default_path
+    path = pathlib.Path(value)
+    if path.is_absolute() or path.parent != pathlib.Path("."):
+        return path
+    return HERE / "data" / "seed_memories" / path
 
 
 def wait_for_enrichment(endpoint: str, token: str, expected_min: int) -> None:
@@ -65,10 +78,21 @@ def main() -> int:
     ap.add_argument("--token", default="test-token")
     ap.add_argument("--corpus", default="corpus_v1.jsonl",
                     help="Corpus filename under data/seed_memories/ (default: corpus_v1.jsonl)")
+    ap.add_argument(
+        "--manifest-output",
+        default=None,
+        help=(
+            "Manifest output path. Bare filenames are written under "
+            "data/seed_memories/. Defaults to <corpus>.manifest.json."
+        ),
+    )
     args = ap.parse_args()
 
     CORPUS = HERE / "data" / "seed_memories" / args.corpus
-    MANIFEST = HERE / "data" / "seed_memories" / args.corpus.replace(".jsonl", ".manifest.json")
+    MANIFEST = resolve_manifest_output(
+        args.manifest_output,
+        HERE / "data" / "seed_memories" / args.corpus.replace(".jsonl", ".manifest.json"),
+    )
 
     if not CORPUS.exists():
         print(f"corpus not found: {CORPUS}. run scripts/generate_corpus*.py first.", file=sys.stderr)
@@ -116,11 +140,16 @@ def main() -> int:
     print("waiting for enrichment to drain")
     wait_for_enrichment(args.endpoint, args.token, expected_min=len(manifest))
 
+    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps({
         "memory_to_scenarios": manifest,
         "scenario_to_memories": scenario_to_mids,
     }, indent=2))
-    print(f"manifest: {MANIFEST.relative_to(HERE)}")
+    try:
+        display = MANIFEST.relative_to(HERE)
+    except ValueError:
+        display = MANIFEST
+    print(f"manifest: {display}")
     print(f"scenarios mapped: {list(scenario_to_mids.keys())}")
     return 0 if failures == 0 else 1
 
