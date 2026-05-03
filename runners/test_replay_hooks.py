@@ -222,5 +222,35 @@ class SanitizedHookReplayTests(unittest.TestCase):
         self.assertNotIn("cat <<", text)
 
 
+class AddFieldsHookReplayTests(unittest.TestCase):
+    def test_v3_build_failure_adds_storage_fields(self):
+        fixture_path = rh.REPO_ROOT / "data" / "hook_fixtures" / "03_build_fail_short.json"
+        fixture = json.loads(fixture_path.read_text())
+        with tempfile.TemporaryDirectory() as tmp:
+            sandbox = Path(tmp) / "home"
+            sandbox.mkdir()
+            resolved = rh.resolve_variant("fix-v3-add-fields")
+            settings = rh.materialize_variant(resolved, sandbox)
+            records, failures, fixture_ids = rh.fire_fixtures(
+                [fixture],
+                settings,
+                sandbox,
+                git_significant=None,
+                git_trivial=None,
+            )
+
+        self.assertEqual(failures, [])
+        self.assertEqual(fixture_ids, ["03_build_fail_short"])
+        self.assertEqual(len(records), 1)
+        record = records[0]
+        self.assertEqual(record["confidence"], 0.9)
+        self.assertIn("t_valid", record)
+        self.assertNotIn("t_invalid", record)
+        self.assertEqual(
+            record["metadata"]["originSessionId"],
+            "fixture-03-build-fail-short",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

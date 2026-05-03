@@ -109,6 +109,15 @@ class FieldPresenceTests(unittest.TestCase):
         ]
         self.assertEqual(hm.pct_deploys_with_t_valid(queue), 0.5)
 
+    def test_top_level_temporal_field_presence(self):
+        queue = [
+            {"t_valid": "2026-04-28T00:00:00Z"},
+            {"t_invalid": "2026-05-01T00:00:00Z"},
+            {"t_valid": None},
+        ]
+        self.assertEqual(hm.pct_with_field(queue, "t_valid"), 1 / 3)
+        self.assertEqual(hm.pct_with_field(queue, "t_invalid"), 1 / 3)
+
 
 class ContentShapeTests(unittest.TestCase):
     def test_length_distribution(self):
@@ -188,7 +197,7 @@ class TopLevelComputeTests(unittest.TestCase):
                  "tags": ["session-milestone"], "type": "Memory"},
                 {"content": "Build succeeded in automem-evals using npm",
                  "tags": ["build", "npm", "automem-evals"], "type": "Context",
-                 "confidence": 0.7},
+                 "confidence": 0.7, "t_valid": "2026-04-28T00:00:00Z"},
                 {"content": "Deployed to production on unknown",
                  "tags": ["deployment", "unknown"], "type": "Context"},
             ],
@@ -203,6 +212,8 @@ class TopLevelComputeTests(unittest.TestCase):
         self.assertEqual(m["anti_patterns"]["platform_unknown"], 1)
         self.assertEqual(m["anti_patterns"]["serialized_tool_response"], 0)
         self.assertEqual(m["anti_patterns"]["heredoc_fragments"], 0)
+        self.assertAlmostEqual(m["field_presence"]["with_t_valid_pct"], 1 / 3)
+        self.assertEqual(m["field_presence"]["with_t_invalid_pct"], 0.0)
         self.assertEqual(m["type_validity"]["invalid_count"], 1)
 
 

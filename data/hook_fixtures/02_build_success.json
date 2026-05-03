@@ -12,7 +12,8 @@
       "exit_code": 0,
       "stdout": "> automem-evals@1.0.0 build\n> tsc -p .\n\n✓ Compiled in 1.2s, 2 warnings\ndist/main.js: 45 KB"
     },
-    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+    "session_id": "fixture-02-build-success"
   },
   "expected": {
     "matchers_should_fire": ["build"],

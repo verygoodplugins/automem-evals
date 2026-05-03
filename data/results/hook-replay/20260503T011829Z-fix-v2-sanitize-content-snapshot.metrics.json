@@ -1,0 +1,42 @@
+{
+  "variant": "fix-v2-sanitize-content",
+  "eval_run_id": "4b1de8d0b1b7",
+  "fixture_count": 9,
+  "queue_record_count": 5,
+  "recall_count": 5,
+  "run_failed": false,
+  "hook_failure_count": 0,
+  "post_failure_count": 0,
+  "anti_patterns": {
+    "session_summary_content": 0,
+    "hallucinated_entity_tags": 0,
+    "platform_unknown": 1,
+    "serialized_tool_response": 0,
+    "heredoc_fragments": 0
+  },
+  "field_presence": {
+    "with_confidence_pct": 0.0,
+    "with_origin_session_id_pct": 0.0,
+    "with_t_valid_pct": 0.4,
+    "with_t_invalid_pct": 0.0,
+    "deploys_with_t_valid_pct": 1.0
+  },
+  "content_shape": {
+    "length_distribution": {
+      "le_150": 2,
+      "151_300": 3,
+      "301_1000": 0,
+      "gt_1000": 0
+    },
+    "near_duplicate_rate": 0.0
+  },
+  "tag_drift": {
+    "jest_collisions": 1,
+    "date_derived_tags": 0
+  },
+  "type_validity": {
+    "valid_count": 5,
+    "invalid_count": 0,
+    "invalid_examples": []
+  }
+}

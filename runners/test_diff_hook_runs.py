@@ -40,7 +40,7 @@ class DiffRenderTests(unittest.TestCase):
         self.a = _metrics(
             "baseline", "aaaaaaaaaaaa", 7, 7,
             ap={"session_summary_content": 1, "hallucinated_entity_tags": 0, "platform_unknown": 1},
-            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
+            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "with_t_valid_pct": 0.2, "with_t_invalid_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
             cs={"length_distribution": {"le_150": 3, "151_300": 4, "301_1000": 0, "gt_1000": 0}, "near_duplicate_rate": 0.0},
             td={"jest_collisions": 1, "date_derived_tags": 0},
             tv={"valid_count": 5, "invalid_count": 2, "invalid_examples": ["None", "None"]},
@@ -48,7 +48,7 @@ class DiffRenderTests(unittest.TestCase):
         self.b = _metrics(
             "fix-v1-no-session", "bbbbbbbbbbbb", 5, 5,
             ap={"session_summary_content": 0, "hallucinated_entity_tags": 0, "platform_unknown": 1},
-            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
+            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 1.0, "with_t_valid_pct": 1.0, "with_t_invalid_pct": 0.0, "deploys_with_t_valid_pct": 1.0},
             cs={"length_distribution": {"le_150": 2, "151_300": 3, "301_1000": 0, "gt_1000": 0}, "near_duplicate_rate": 0.0},
             td={"jest_collisions": 1, "date_derived_tags": 0},
             tv={"valid_count": 5, "invalid_count": 0, "invalid_examples": []},
@@ -92,6 +92,13 @@ class DiffRenderTests(unittest.TestCase):
         # Verdict should call out the eliminated session summary
         self.assertIn("session_summary_content", out.lower().split("verdict")[1])
 
+    def test_field_presence_verdict_calls_out_improvements(self):
+        out = dh.render_markdown(self.a, self.b)
+        verdict = out.split("## Verdict", 1)[1]
+        self.assertIn("Field presence improved", verdict)
+        self.assertIn("with_origin_session_id_pct", verdict)
+        self.assertIn("with_t_valid_pct", verdict)
+
 
 class FailClosedRenderingTests(unittest.TestCase):
     """A broken variant must not be allowed to display an apparent ✓ verdict.
@@ -102,7 +109,7 @@ class FailClosedRenderingTests(unittest.TestCase):
         return _metrics(
             "baseline", "aaa", 7, 7,
             ap={"session_summary_content": 1, "hallucinated_entity_tags": 0, "platform_unknown": 1},
-            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
+            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "with_t_valid_pct": 0.2, "with_t_invalid_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
             cs={"length_distribution": {"le_150": 3, "151_300": 4, "301_1000": 0, "gt_1000": 0}, "near_duplicate_rate": 0.0},
             td={"jest_collisions": 1, "date_derived_tags": 0},
             tv={"valid_count": 5, "invalid_count": 2, "invalid_examples": []},
@@ -113,7 +120,7 @@ class FailClosedRenderingTests(unittest.TestCase):
         m = _metrics(
             "fix-v1", "bbb", 5, 5,
             ap={"session_summary_content": 0, "hallucinated_entity_tags": 0, "platform_unknown": 1},
-            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
+            fp={"with_confidence_pct": 0.0, "with_origin_session_id_pct": 0.0, "with_t_valid_pct": 1.0, "with_t_invalid_pct": 0.0, "deploys_with_t_valid_pct": 0.0},
             cs={"length_distribution": {"le_150": 2, "151_300": 3, "301_1000": 0, "gt_1000": 0}, "near_duplicate_rate": 0.0},
             td={"jest_collisions": 1, "date_derived_tags": 0},
             tv={"valid_count": 5, "invalid_count": 0, "invalid_examples": []},

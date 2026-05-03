@@ -12,7 +12,8 @@
       "exit_code": 0,
       "stdout": "deploying to prod-host...\ndeploy.sh: rsyncing dist/ -> prod-host:/srv/myapp/\nsent 4.2 MB, received 332 bytes\nrestarting myapp...\n● myapp.service active\ndeployed in 12s\n"
     },
-    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+    "session_id": "fixture-06-deploy-unknown-platform"
   },
   "expected": {
     "matchers_should_fire": ["deploy"],
