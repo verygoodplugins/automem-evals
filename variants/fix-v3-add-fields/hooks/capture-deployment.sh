@@ -47,7 +47,7 @@ INPUT_JSON=$(cat)
 # Parse JSON fields, fall back to env vars for backward compat
 COMMAND=$(echo "$INPUT_JSON" | jq -r '.tool_input.command // empty' 2>/dev/null)
 COMMAND="${COMMAND:-${CLAUDE_LAST_COMMAND:-${CLAUDE_CONTEXT:-${TOOL_NAME:-}}}}"
-OUTPUT=$(echo "$INPUT_JSON" | jq -r '.tool_response // empty' 2>/dev/null)
+OUTPUT=$(echo "$INPUT_JSON" | jq -r '.tool_response | if type == "object" then [(.stdout // ""), (.stderr // "")] | map(select(. != "")) | join("\n") else (. // "") end' 2>/dev/null)
 OUTPUT="${OUTPUT:-${CLAUDE_COMMAND_OUTPUT:-${TOOL_RESULT:-}}}"
 EXIT_CODE=$(echo "$INPUT_JSON" | jq -r '.tool_response | if type == "object" then (.exit_code // .exitCode // 0) else 0 end' 2>/dev/null)
 EXIT_CODE="${EXIT_CODE:-${CLAUDE_EXIT_CODE:-0}}"
@@ -234,7 +234,7 @@ def to_int(value, default=0):
 def truncate(text, max_len):
     """Truncate text to max_len to prevent oversized queue entries."""
     if text and len(text) > max_len:
-        return text[:max_len] + "..."
+        return text[:max_len - 3] + "..."
     return text
 
 def content_hash(text):
