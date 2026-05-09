@@ -90,15 +90,22 @@ def render_markdown(a: dict, b: dict) -> str:
     lines.append("")
 
     # Field presence
-    lines.append("## Field presence (higher is better — fraction of records with field)")
+    lines.append("## Field presence (fraction of records with field)")
     lines.append("")
     lines.append(f"| metric | {a_name} | {b_name} | delta |")
     lines.append("|---|---:|---:|---:|")
     fp_a, fp_b = a["field_presence"], b["field_presence"]
-    for key in ["with_confidence_pct", "with_origin_session_id_pct", "deploys_with_t_valid_pct"]:
+    field_rows = [
+        ("with_confidence_pct", "higher_is_better"),
+        ("with_origin_session_id_pct", "higher_is_better"),
+        ("with_t_valid_pct", "higher_is_better"),
+        ("with_t_invalid_pct", "informational"),
+        ("deploys_with_t_valid_pct", "higher_is_better"),
+    ]
+    for key, direction in field_rows:
         va = round(fp_a.get(key, 0.0), 3)
         vb = round(fp_b.get(key, 0.0), 3)
-        lines.append(_row(key, va, vb, direction="higher_is_better"))
+        lines.append(_row(key, va, vb, direction=direction))
     lines.append("")
 
     # Content shape
@@ -144,6 +151,7 @@ def render_markdown(a: dict, b: dict) -> str:
         lines.append("")
         return "\n".join(lines)
     eliminated: list[str] = []
+    field_improved: list[str] = []
     untouched: list[str] = []
     regressed: list[str] = []
 
@@ -167,9 +175,27 @@ def render_markdown(a: dict, b: dict) -> str:
     _classify("tag_drift.jest_collisions", td_a.get("jest_collisions", 0), td_b.get("jest_collisions", 0))
     _classify("tag_drift.date_derived_tags", td_a.get("date_derived_tags", 0), td_b.get("date_derived_tags", 0))
 
+    for key in [
+        "with_confidence_pct",
+        "with_origin_session_id_pct",
+        "with_t_valid_pct",
+        "deploys_with_t_valid_pct",
+    ]:
+        a_val = round(fp_a.get(key, 0.0), 3)
+        b_val = round(fp_b.get(key, 0.0), 3)
+        if b_val > a_val:
+            field_improved.append(f"{key}: {a_val} -> {b_val}")
+        elif b_val < a_val:
+            regressed.append(f"{key}: {a_val} -> {b_val}")
+
     if eliminated:
         lines.append(f"**Improved by `{b_name}`:**")
         for e in eliminated:
+            lines.append(f"- {e}")
+        lines.append("")
+    if field_improved:
+        lines.append(f"**Field presence improved by `{b_name}`:**")
+        for e in field_improved:
             lines.append(f"- {e}")
         lines.append("")
     if untouched:

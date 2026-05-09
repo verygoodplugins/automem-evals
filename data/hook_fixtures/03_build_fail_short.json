@@ -12,7 +12,8 @@
       "exit_code": 1,
       "stdout": "> automem-evals@1.0.0 build\n> tsc -p .\n\nsrc/server.ts(42,17): error TS2304: Cannot find name 'foo'.\nsrc/server.ts(43,5): error TS2552: Cannot find name 'bar'. Did you mean 'baz'?\n\nERROR: 2 errors found.\n"
     },
-    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+    "session_id": "fixture-03-build-fail-short"
   },
   "expected": {
     "matchers_should_fire": ["build"],

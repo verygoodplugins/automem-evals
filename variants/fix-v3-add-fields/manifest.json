@@ -1,0 +1,26 @@
+{
+  "name": "fix-v3-add-fields",
+  "extends": "fix-v2-sanitize-content",
+  "change": "Add explicit confidence, originSessionId, and t_valid fields to hook-emitted memories.",
+  "rationale": "Tests whether the hook layer can provide first-class storage fields without regressing fix-v2's content sanitization wins.",
+  "files_overridden": [
+    "hooks/capture-build-result.sh",
+    "hooks/capture-test-pattern.sh",
+    "hooks/capture-deployment.sh"
+  ],
+  "files_inherited_from_fix_v2": [
+    "settings.json",
+    "hooks/automem-session-start.sh",
+    "hooks/session-memory.sh",
+    "scripts/memory-filters.json",
+    "scripts/process-session-memory.py",
+    "scripts/python-command.sh",
+    "scripts/queue-cleanup.sh",
+    "scripts/smart-notify.sh"
+  ],
+  "notes": [
+    "This is cumulative over fix-v2-sanitize-content, so Stop session summaries remain disabled and build/test output remains sanitized.",
+    "t_valid is set to the queue record timestamp for all emitted hook records. t_invalid remains unset because these events have no known expiry.",
+    "originSessionId is copied from hook stdin session_id/sessionId or CLAUDE_SESSION_ID when available."
+  ]
+}

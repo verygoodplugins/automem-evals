@@ -12,7 +12,8 @@
       "exit_code": 0,
       "stdout": "Indexing... done\nUploading... done\nBuild logs: https://railway.com/project/abc/build/xyz\nBuild succeeded\nDeployment URL: https://my-app.up.railway.app\n"
     },
-    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+    "session_id": "fixture-05-deploy-railway-prod"
   },
   "expected": {
     "matchers_should_fire": ["deploy"],

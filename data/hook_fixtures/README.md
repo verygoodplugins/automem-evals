@@ -14,7 +14,8 @@ Each `NN_<name>.json` file is one canned Claude Code event. The runner (`runners
   "stdin": {
     "tool_input": {"command": "..."},
     "tool_response": {"exit_code": 0, "...": "..."},
-    "cwd": "..."
+    "cwd": "...",
+    "session_id": "optional Claude Code session id, used by fix-v3 field-presence variants"
   },
   "cwd_sentinel": "git_significant | git_trivial | <unset>",
   "expected": {
@@ -30,6 +31,7 @@ Each `NN_<name>.json` file is one canned Claude Code event. The runner (`runners
 
 - **`tool_name`**: production Claude Code sends this field with every PostToolUse event; the runner uses it to filter against matcher patterns (e.g., `"Bash"` matcher only fires on `tool_name: "Bash"`).
 - **`stdin.tool_response`**: per `capture-build-result.sh:48-54`, this can be either an object `{exit_code: int, ...}` OR a string. Object form is preferred for most fixtures.
+- **`stdin.session_id`**: optional; field-presence variants copy this into `metadata.originSessionId`.
 - **`cwd_sentinel`**: only relevant for `Stop` fixtures. The runner replaces these with real synthetic git directories at runtime:
   - `git_significant`: a temp git repo with 6 commits, varied file changes, branch matching a "significant" pattern → expected to score ≥12 in `process-session-memory.py`.
   - `git_trivial`: a temp git repo with `git init` only, no commits, no changes → expected to score <12.

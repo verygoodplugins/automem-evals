@@ -229,6 +229,8 @@ def compute_metrics(snapshot: dict) -> dict:
         "field_presence": {
             "with_confidence_pct": pct_with_field(queue, "confidence"),
             "with_origin_session_id_pct": pct_with_metadata_field(queue, "originSessionId"),
+            "with_t_valid_pct": pct_with_field(queue, "t_valid"),
+            "with_t_invalid_pct": pct_with_field(queue, "t_invalid"),
             "deploys_with_t_valid_pct": pct_deploys_with_t_valid(queue),
         },
         "content_shape": {

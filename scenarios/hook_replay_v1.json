@@ -19,6 +19,14 @@
       "expected_hit_tags": ["03_build_fail_short"]
     },
     {
+      "id": "HR-BUILD-FAILURE-SESSION",
+      "phase": 2,
+      "description": "Recall the failed build record through its propagated hook origin session id.",
+      "query": "fixture-03-build-fail-short originSessionId build failure automem-evals",
+      "project_slug": "automem-evals",
+      "expected_hit_tags": ["03_build_fail_short"]
+    },
+    {
       "id": "HR-TEST-FAILURE",
       "phase": 2,
       "description": "Recall the useful failed test record without heredoc commit-paste leakage.",
@@ -31,6 +39,14 @@
       "phase": 2,
       "description": "Recall the useful Railway production deploy record.",
       "query": "Deployed automem-evals to production on railway deployment URL",
+      "project_slug": "automem-evals",
+      "expected_hit_tags": ["05_deploy_railway_prod"]
+    },
+    {
+      "id": "HR-DEPLOY-RAILWAY-SESSION",
+      "phase": 2,
+      "description": "Recall the Railway production deploy record through its propagated hook origin session id.",
+      "query": "fixture-05-deploy-railway-prod originSessionId railway production deploy automem-evals",
       "project_slug": "automem-evals",
       "expected_hit_tags": ["05_deploy_railway_prod"]
     }

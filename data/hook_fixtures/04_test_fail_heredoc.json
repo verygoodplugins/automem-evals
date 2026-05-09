@@ -12,7 +12,8 @@
       "exit_code": 1,
       "stdout": " RUN  v1.2.0\n\n FAIL  src/server.test.ts > server > handles auth\nAssertionError: expected 200 to be 401\n  - Expected\n  + Received\n\n  - 401\n  + 200\n\n at src/server.test.ts:42:25\n\nFAIL: 1 of 12 tests failed\n\nTests:  1 failed | 11 passed\n\nWhile fixing: ran git commit -m \"$(cat <<'EOF'\nfix(server): tighten auth check on /api/admin\n\n- Reject requests without bearer token\n- Decision: prefer 401 over 403 for missing auth (matches existing /api/users behavior)\n- Affected files: src/server.ts, src/auth.ts\n- Context for future: this upgrades the Claude Code session policy\nEOF\n)\"\nthen ran tests again — still failing.\n"
     },
-    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals"
+    "cwd": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+    "session_id": "fixture-04-test-fail-heredoc"
   },
   "expected": {
     "matchers_should_fire": ["test"],
