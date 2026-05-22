@@ -56,42 +56,62 @@ Reports land in `data/results/writ/<timestamp>-<scenarios>[-<label>]/`:
 - `<adapter>/writ-<adapter>-<ms>.md`  — rendered scorecard
 - `comparison-<a>-vs-<b>.md`            — side-by-side diff (only with `--compare`)
 
-## Adapter mapping (Phase 1, drift only)
+## Adapter mapping
 
 | writ method | AutoMem implementation |
 | --- | --- |
 | `init()` | `GET /health` smoke |
-| `processSession()` | Per user message: regex-extract canonical fact values (employer, base_salary, relationship_status, …); `POST /memory` with the run tag, fact tags, and `metadata.writ_fact_values` map. |
-| `probe()` | `GET /recall?tags=<runTag>&limit=50&sort=recent`. Sort recalled items by session timestamp; `answer` concatenates raw content + `[facts: factId=value]` so structured-recall scoring catches canonical strings the user never typed verbatim ("independent consultant"). |
-| `getHistory(factId)` | Walk the in-memory `factHistory` populated during `processSession`. |
-| `getStateAsOf(factId, ts)` | Linear scan of the same history; returns the latest value with `as_of <= ts`. |
-| `getProvenance()` | Returns `null` — Phase 3. |
+| `processSession()` | Stores every user message under the unique run tag. Metadata preserves session id, message index, role, timestamp, source-authority hint, raw content, extracted fact ids, extracted values, and observation records. |
+| `probe()` | Queries AutoMem with prompt + run tag, then answers from the local observation index when it can resolve current, history, temporal, or provenance intent. History prompts can fall back to run-tag chronological recall. Unresolved or sensitive prompts abstain. |
+| `getHistory(factId)` | Resolves `factId` by normalized token overlap against the observation index and returns chronological values. |
+| `getStateAsOf(factId, ts)` | Replays the resolved fact history by timestamp and returns the latest value with `as_of <= ts`. |
+| `getProvenance(factId)` | Returns source session/message and an update chain when the resolver identifies the fact source. This is partial local support, not full provenance modeling. |
 | `reset()` | `DELETE /memory/<id>` for every memory we stored under this run, then rotate the run tag. **Cheap** (no `docker compose down`); writ calls `reset()` before every scenario. |
 | `teardown()` | Same as `reset()`. |
 
-### Why tag-only recall
+### PR scope
 
-writ's drift probes are meta-questions ("Can you remind me of my employment
-history this year?"). AutoMem's vector ranker drops sessions below a similarity
-threshold even when the tag gate matches, so semantic-mode recall returned 0
-sessions on 2 of 5 drift scenarios. The adapter uses `tags: [runTag]` with
-`sort: "recent"` and re-sorts by writ's `session_id` client-side — the run tag
-is already a unique partition.
+The adapter should be a fair wrapper around AutoMem behavior, not a WRIT answer
+key. It must not use `scenario_id`, `ground_truth.current_value`,
+`ground_truth.value_history`, or rubric strings to generate answers. The allowed
+inputs are WRIT's adapter contract: session messages, timestamps, roles, probe
+prompt, `factId` parameters, and AutoMem-returned memory metadata.
 
-### Why fact extraction lives in the adapter
+This PR improves local diagnostics by broadening ingestion and adding a general
+in-memory observation index. It also makes comparison reports easier to read by
+separating raw WRIT metrics from local interpretation labels. It does not change
+upstream WRIT, the raw WRIT JSON schema, or AutoMem core behavior.
 
-writ's `MemoryAdapter` is told the value of a fact via `getHistory(factId)`.
-Without explicit fact extraction the only option is to dump raw user messages,
-which scores well for `recall_correct` (substring match against
-`required_elements`) but fails `drift_detected` (`matchesCurrentValue` needs the
-*current* value, not the message that set it). The drift-only `FACT_EXTRACTORS`
-table covers the five drift scenarios: employer, title, base_salary,
-bonus_target, signing_bonus, relationship_status, partner_name,
-living_arrangement, home_city, neighborhood, blood_pressure_medication,
-diabetes_medication, health_conditions, lisinopril_side_effect.
+Remaining lifecycle/provenance/category failures are not automatically AutoMem
+core bugs. They are follow-up signals for adapter capability layers unless they
+persist after the adapter implements the corresponding behavior generally and
+declares that capability honestly.
 
-Other categories will need their own extractors (or, eventually, an LLM
-extraction stage — out of scope for Phase 1).
+### Why the observation index exists
+
+writ's `MemoryAdapter` methods ask for structured behavior (`getHistory`,
+`getStateAsOf`, `getProvenance`) even though AutoMem stores memories through a
+general HTTP API. The adapter therefore keeps a local observation index while it
+stores each user message. Extraction is intentionally generic: drift facts are
+one extractor family, alongside broader observations for money amounts,
+addresses, dates, people, organizations, task states, preferences,
+constraints, lifecycle words, retractions, contacts, travel, and raw messages.
+
+`factId` resolution uses normalized token overlap between the requested fact,
+observation labels, extracted values, and message terms. This is still a local
+adapter policy, but it is not keyed to WRIT scenario ids or expected answers.
+
+### Why reports have interpretation overlays
+
+The comparison markdown preserves raw WRIT aggregate scores. Local sections add
+human-readable interpretation for this repo's diagnostic use:
+
+- `drift_rate` and `hallucination_rate` are labeled lower-is-better.
+- Metrics with no applicable per-scenario score are labeled not exercised in
+  that run, instead of being treated as product failures.
+- Drift history prompts get a history-aware stale-memory overlay: raw
+  `update_fidelity` is unchanged, but stale failures on history-preservation
+  probes are counted separately when recall and drift detection both passed.
 
 ## Current results — drift category
 
@@ -116,14 +136,18 @@ Closing the gap requires an LLM-style narrative answer, which is out of scope.
 
 ## Known gaps
 
-- **Drift-only fact extractors.** Other categories (temporal, update, lifecycle)
-  will need additional extractors or an LLM extraction pass.
-- **Provenance.** `getProvenance()` returns `null`. Provenance category will
-  always score 0 until we model `metadata.source` + association chains.
-- **`update_fidelity` ceiling.** Limited by writ's narrative-string matching;
-  not an AutoMem failure.
+- **Partial provenance.** The adapter can return source session/message for
+  resolved observations, but it does not yet model full source authority,
+  association chains, or conflict resolution.
+- **Lifecycle and policy categories.** Lifecycle, source authority, trust
+  hierarchy, certification, and constraint categories need explicit generalized
+  adapter policy before their failures should be read as AutoMem core behavior.
+- **`update_fidelity` in history prompts.** Some drift probes ask for history.
+  Old values are expected in those answers, so the local comparison report adds
+  a history-aware stale-memory overlay while leaving raw WRIT scores unchanged.
 - **Server consistency.** Vector indexing for newly-stored memories is
-  occasionally slow; `probe()` uses a tag-only fallback to avoid empty results.
+  occasionally slow; `probe()` uses run-tag recall fallbacks to avoid empty
+  results when direct prompt recall misses fresh writes.
 
 ## Files of interest
 

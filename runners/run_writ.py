@@ -50,6 +50,43 @@ DEFAULT_TOKEN = "test-token"
 
 VALID_ADAPTERS = {"automem", "baseline", "neotoma"}
 
+METRIC_KEYS = [
+    "recall_accuracy",
+    "update_fidelity",
+    "drift_rate",
+    "detectability",
+    "temporal_accuracy",
+    "provenance_completeness",
+    "constraint_consistency",
+    "hallucination_rate",
+    "abstention_quality",
+    "source_authority_integrity",
+    "dedup_accuracy",
+    "failure_resilience",
+    "lifecycle_accuracy",
+    "pre_delivery_detection",
+    "scenarios_evaluated",
+]
+
+METRIC_SCORE_FIELDS = {
+    "recall_accuracy": "recall_correct",
+    "update_fidelity": "update_fidelity",
+    "drift_rate": "drift_detected",
+    "detectability": "drift_detected",
+    "temporal_accuracy": "temporal_correct",
+    "provenance_completeness": "provenance_complete",
+    "constraint_consistency": "constraint_respected",
+    "hallucination_rate": "hallucination_detected",
+    "abstention_quality": "abstention_correct",
+    "source_authority_integrity": "source_authority_intact",
+    "dedup_accuracy": "dedup_correct",
+    "failure_resilience": "failure_resilient",
+    "lifecycle_accuracy": "lifecycle_current_correct",
+    "pre_delivery_detection": "pre_delivery_flagged",
+}
+
+LOWER_IS_BETTER_METRICS = {"drift_rate", "hallucination_rate"}
+
 
 def _load_dotenv() -> None:
     env_file = REPO / ".env"
@@ -87,7 +124,7 @@ def _check_automem(endpoint: str, token: str) -> None:
     except (urllib.error.URLError, ConnectionError) as exc:
         raise SystemExit(f"AutoMem at {endpoint} not reachable: {exc}") from exc
     status = body.get("status", "unknown")
-    if status not in {"ok", "degraded"}:
+    if status not in {"ok", "healthy", "degraded"}:
         raise SystemExit(f"AutoMem health says: {status}")
 
 
@@ -155,29 +192,195 @@ def _find_latest_report(output_dir: pathlib.Path) -> pathlib.Path | None:
     return candidates[-1] if candidates else None
 
 
+def _load_writ_scenarios(
+    scenarios_dir: pathlib.Path = WRIT_DIR / "scenarios",
+) -> dict[str, dict]:
+    scenarios: dict[str, dict] = {}
+    for path in sorted(scenarios_dir.glob("*.json")):
+        scenario = json.loads(path.read_text())
+        scenario_id = scenario.get("scenario_id")
+        if isinstance(scenario_id, str) and scenario_id:
+            scenarios[scenario_id] = scenario
+    return scenarios
+
+
+def _is_history_query_stale_false_positive(
+    result: dict,
+    scenario: dict | None,
+) -> bool:
+    if not scenario:
+        return False
+
+    probe = scenario.get("probe")
+    required_capabilities = []
+    if isinstance(probe, dict):
+        capabilities = probe.get("required_capabilities", [])
+        if isinstance(capabilities, list):
+            required_capabilities = capabilities
+
+    scores = result.get("scores", {})
+    detected_failures = result.get("detected_failures", [])
+    return (
+        "history_preservation" in required_capabilities
+        and scores.get("recall_correct") is True
+        and scores.get("drift_detected") is True
+        and "stale_memory" in detected_failures
+    )
+
+
+def _summarize_history_aware_stale_failures(
+    report: dict,
+    scenarios_by_id: dict[str, dict],
+) -> dict[str, int]:
+    raw_stale = 0
+    history_false_positives = 0
+
+    for result in report.get("scenario_results", []):
+        detected_failures = result.get("detected_failures", [])
+        if "stale_memory" not in detected_failures:
+            continue
+        raw_stale += 1
+        scenario = scenarios_by_id.get(result.get("scenario_id"))
+        if _is_history_query_stale_false_positive(result, scenario):
+            history_false_positives += 1
+
+    return {
+        "raw_stale_memory_failures": raw_stale,
+        "history_query_stale_false_positives": history_false_positives,
+        "remaining_stale_memory_failures": raw_stale - history_false_positives,
+    }
+
+
+def _classify_aggregate_metric(report: dict, metric: str) -> dict[str, object]:
+    score_field = METRIC_SCORE_FIELDS.get(metric)
+    raw_value = report.get("aggregate", {}).get(metric, 0)
+    direction = (
+        "lower_is_better"
+        if metric in LOWER_IS_BETTER_METRICS
+        else "higher_is_better"
+    )
+    applicable_count = 0
+    if score_field:
+        applicable_count = sum(
+            1
+            for result in report.get("scenario_results", [])
+            if result.get("scores", {}).get(score_field) is not None
+        )
+
+    if score_field and applicable_count == 0:
+        return {
+            "status": "not_exercised",
+            "direction": direction,
+            "applicable_count": applicable_count,
+            "raw_value": raw_value,
+        }
+
+    if direction == "lower_is_better":
+        status = "pass" if raw_value == 0 else "fail"
+    else:
+        status = "pass" if raw_value == 1 else "fail"
+
+    return {
+        "status": status,
+        "direction": direction,
+        "applicable_count": applicable_count,
+        "raw_value": raw_value,
+    }
+
+
+def _format_metric_value(metric: str, value: float | int) -> str:
+    if metric == "scenarios_evaluated":
+        return str(value)
+    return f"{value * 100:.1f}%"
+
+
+def _format_metric_interpretation(interpretation: dict[str, object]) -> str:
+    status = interpretation["status"]
+    if status == "not_exercised":
+        return "not exercised in this run"
+
+    direction = interpretation["direction"]
+    if direction == "lower_is_better":
+        return f"{status}; lower is better"
+    return f"measured {status}"
+
+
+def _is_drift_only_report(report: dict) -> bool:
+    categories = {
+        result.get("category")
+        for result in report.get("scenario_results", [])
+        if result.get("category")
+    }
+    return categories == {"drift"}
+
+
+def _append_interpretation_guide(lines: list[str], reports: list[dict]) -> None:
+    lines.append("## Interpretation guide")
+    lines.append("")
+    lines.append(
+        "Raw WRIT aggregate numbers are preserved above. Local labels below "
+        "separate measured signals from metrics this scenario set did not exercise."
+    )
+    for report in reports:
+        lines.append("")
+        lines.append(f"### {report['adapter_name']}")
+        lines.append("")
+        lines.append("| metric | raw score | applicable scenarios | local interpretation |")
+        lines.append("| --- | ---: | ---: | --- |")
+        for metric in METRIC_KEYS:
+            if metric == "scenarios_evaluated":
+                continue
+            interpretation = _classify_aggregate_metric(report, metric)
+            lines.append(
+                f"| {metric} | "
+                f"{_format_metric_value(metric, interpretation['raw_value'])} | "
+                f"{interpretation['applicable_count']} | "
+                f"{_format_metric_interpretation(interpretation)} |"
+            )
+    lines.append("")
+
+
+def _append_actionable_signals(lines: list[str], reports: list[dict]) -> None:
+    automem = next((r for r in reports if r.get("adapter_name") == "automem"), None)
+    if not automem or not _is_drift_only_report(automem):
+        return
+
+    aggregate = automem.get("aggregate", {})
+    lines.append("## Actionable signals")
+    lines.append("")
+    if (
+        aggregate.get("recall_accuracy") == 1
+        and aggregate.get("detectability") == 1
+        and aggregate.get("drift_rate") == 0
+    ):
+        lines.append(
+            "- AutoMem passed recall/history tracking in this local drift run: "
+            "`recall_accuracy=100%`, `detectability=100%`, and `drift_rate=0%`."
+        )
+    lines.append(
+        "- Raw `update_fidelity` is not a benchmark claim when the prompt asks "
+        "for history; use the history-aware interpretation below for these "
+        "drift prompts."
+    )
+    lines.append(
+        "- Capability columns like provenance, source authority, dedup, "
+        "lifecycle, failure resilience, and pre-delivery detection need their "
+        "own WRIT scenario categories before treating them as AutoMem behavior."
+    )
+    lines.append(
+        "- Nothing in this drift smoke points directly to an AutoMem core bug; "
+        "near-term work belongs in the local WRIT adapter/reporting layer."
+    )
+    lines.append("")
+
+
 def _diff_reports(
     a_path: pathlib.Path, b_path: pathlib.Path, dest: pathlib.Path
 ) -> None:
     a = json.loads(a_path.read_text())
     b = json.loads(b_path.read_text())
-
-    metric_keys = [
-        "recall_accuracy",
-        "update_fidelity",
-        "drift_rate",
-        "detectability",
-        "temporal_accuracy",
-        "provenance_completeness",
-        "constraint_consistency",
-        "hallucination_rate",
-        "abstention_quality",
-        "source_authority_integrity",
-        "dedup_accuracy",
-        "failure_resilience",
-        "lifecycle_accuracy",
-        "pre_delivery_detection",
-        "scenarios_evaluated",
-    ]
+    scenarios_by_id = _load_writ_scenarios()
+    reports = [a, b]
 
     lines: list[str] = []
     lines.append(f"# WRIT comparison — {a['adapter_name']} vs {b['adapter_name']}")
@@ -193,7 +396,7 @@ def _diff_reports(
         f"| metric | {a['adapter_name']} | {b['adapter_name']} | delta |"
     )
     lines.append("| --- | ---: | ---: | ---: |")
-    for k in metric_keys:
+    for k in METRIC_KEYS:
         av = a["aggregate"].get(k, 0)
         bv = b["aggregate"].get(k, 0)
         if k == "scenarios_evaluated":
@@ -221,6 +424,29 @@ def _diff_reports(
             "✅" if br and br["scores"]["recall_correct"] else ("❌" if br else "—")
         )
         lines.append(f"| {sid} | {a_mark} | {b_mark} |")
+    lines.append("")
+    _append_interpretation_guide(lines, reports)
+    _append_actionable_signals(lines, reports)
+    lines.append("## History-aware interpretation")
+    lines.append("")
+    lines.append(
+        "raw WRIT `update_fidelity` is unchanged; this local overlay only "
+        "distinguishes historical recall from stale-current presentation."
+    )
+    lines.append("")
+    lines.append(
+        "| adapter | raw stale_memory failures | likely history-query stale "
+        "false positives | remaining raw stale_memory failures |"
+    )
+    lines.append("| --- | ---: | ---: | ---: |")
+    for report in (a, b):
+        summary = _summarize_history_aware_stale_failures(report, scenarios_by_id)
+        lines.append(
+            f"| {report['adapter_name']} | "
+            f"{summary['raw_stale_memory_failures']} | "
+            f"{summary['history_query_stale_false_positives']} | "
+            f"{summary['remaining_stale_memory_failures']} |"
+        )
     lines.append("")
     lines.append("Generated by `runners/run_writ.py`. See "
                  "`docs/writ_integration.md` for what these metrics mean.")
