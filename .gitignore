@@ -82,3 +82,9 @@ output/
 tmp/
 # BEAM per-run shim.log is the audit trail — keep these even though *.log is ignored
 !data/results/beam/*/shim.log
+
+# writ — adapter + entry point are copied into the submodule at run time
+third_party/writ/run_automem.ts
+third_party/writ/src/adapters/automem.ts
+# writ run outputs (regenerable; commit only curated SUMMARY-*.md if needed)
+data/results/writ/*/
