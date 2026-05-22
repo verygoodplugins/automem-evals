@@ -3,7 +3,7 @@
 Date: 2026-05-22
 
 Base: `922d23b` (`origin/main` at PR base)
-PR behavior commit under test: `c032ea6` (`fix/recall-current-state`)
+PR behavior commit under test: `c0ec99d` (`fix/recall-current-state`)
 
 This is a PR-specific regression/acceptance experiment, not an official benchmark result.
 
@@ -20,6 +20,7 @@ The targeted runner seeds an isolated set of current/stale/future/superseded mem
 | `pr170-default-current` | PR | default | current | 6/6 pass | `data/results/20260522T181942Z-current-state-pr170-default-current.md` |
 | `pr170-default-current` | PR | default | current | 6/6 pass | `data/results/20260522T231750Z-current-state-pr170-default-current.md` |
 | `pr170-default-current-c032ea6` | PR | default | current | 6/6 pass | `data/results/20260522T233256Z-current-state-pr170-default-current-c032ea6.md` |
+| `pr170-default-current-c0ec99d` | PR | default | current | 6/6 pass | `data/results/20260522T233620Z-current-state-pr170-default-current-c0ec99d.md` |
 
 PR default behavior suppressed the intended stale/future/superseded hits:
 
@@ -38,7 +39,7 @@ Final focused server test command:
 pytest tests/test_api_endpoints.py -k 'current_only or temporal_validity or invalidated or evolved or contradictions' -q
 ```
 
-Result on 2026-05-23 local time: `14 passed, 84 deselected`.
+Result on 2026-05-23 local time: `15 passed, 84 deselected`.
 
 The PR test coverage now includes:
 
