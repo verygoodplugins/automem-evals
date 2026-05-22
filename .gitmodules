@@ -1,3 +1,6 @@
 [submodule "third_party/memory-benchmarks"]
 	path = third_party/memory-benchmarks
 	url = https://github.com/mem0ai/memory-benchmarks.git
+[submodule "third_party/writ"]
+	path = third_party/writ
+	url = https://github.com/markmhendrickson/writ.git
