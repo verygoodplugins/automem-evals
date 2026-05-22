@@ -202,9 +202,18 @@ PROBES: list[Probe] = [
 ]
 
 
-def is_local_endpoint(endpoint: str) -> bool:
+def _parse_http_endpoint(endpoint: str) -> urllib.parse.ParseResult:
     parsed = urllib.parse.urlparse(endpoint)
-    return parsed.scheme in {"http", "https"} and parsed.hostname in {
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise SystemExit(
+            f"invalid endpoint; expected absolute http(s) URL: {endpoint}"
+        )
+    return parsed
+
+
+def is_local_endpoint(endpoint: str) -> bool:
+    parsed = _parse_http_endpoint(endpoint)
+    return parsed.hostname in {
         "localhost",
         "127.0.0.1",
         "::1",
@@ -212,7 +221,8 @@ def is_local_endpoint(endpoint: str) -> bool:
 
 
 def assert_endpoint_allowed(endpoint: str, allow_non_local: bool) -> None:
-    if allow_non_local or is_local_endpoint(endpoint):
+    is_local = is_local_endpoint(endpoint)
+    if allow_non_local or is_local:
         return
     raise SystemExit(f"refusing non-local endpoint without --allow-non-local: {endpoint}")
 
@@ -258,7 +268,16 @@ def _json_request(
         },
     )
     with urllib.request.urlopen(req, timeout=timeout) as response:
-        return json.loads(response.read())
+        raw = response.read()
+        if not raw:
+            return {}
+        if isinstance(raw, bytes):
+            text = raw.decode("utf-8", errors="replace")
+        else:
+            text = str(raw)
+        if not text.strip():
+            return {}
+        return json.loads(text)
 
 
 def build_recall_params(
@@ -286,7 +305,12 @@ def build_recall_params(
 
 def _result_id(result: dict[str, Any]) -> str | None:
     memory = result.get("memory") or {}
-    return result.get("id") or memory.get("id")
+    return (
+        result.get("id")
+        or result.get("memory_id")
+        or memory.get("id")
+        or memory.get("memory_id")
+    )
 
 
 def _result_content(result: dict[str, Any]) -> str:
@@ -378,7 +402,10 @@ def seed_fixtures(
             body["t_invalid"] = t_invalid
 
         response = _json_request(endpoint, token, "POST", "/memory", body=body)
-        memory_ids[fixture.key] = response["memory_id"]
+        memory_id = response.get("memory_id") or response.get("id")
+        if not memory_id:
+            raise RuntimeError(f"store response missing memory id for fixture {fixture.key}")
+        memory_ids[fixture.key] = memory_id
 
     for relation in RELATIONS:
         _json_request(
@@ -398,14 +425,30 @@ def seed_fixtures(
 
 
 def cleanup_run_tag(endpoint: str, token: str, run_tag: str) -> dict[str, Any]:
-    return _json_request(
+    snapshot = _json_request(
         endpoint,
         token,
-        "DELETE",
-        "/memory/by-tag",
-        params={"tags": run_tag},
+        "GET",
+        "/recall",
+        params={"tags": [run_tag], "limit": 200, "current_only": False},
         timeout=60,
     )
+    ids = []
+    for result in snapshot.get("results", []):
+        memory_id = _result_id(result)
+        if memory_id and memory_id not in ids:
+            ids.append(memory_id)
+
+    deleted = 0
+    for memory_id in ids:
+        _json_request(endpoint, token, "DELETE", f"/memory/{memory_id}", timeout=60)
+        deleted += 1
+
+    return {
+        "strategy": "per-id",
+        "candidate_count": len(ids),
+        "deleted_count": deleted,
+    }
 
 
 def run_probes(
