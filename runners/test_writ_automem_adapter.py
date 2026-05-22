@@ -15,6 +15,8 @@ class WritAutoMemAdapterTypeScriptTests(unittest.TestCase):
             self.skipTest("npx is not available")
         if not (WRIT_DIR / "package.json").exists():
             self.skipTest("third_party/writ is not initialized")
+        if not (WRIT_DIR / "node_modules" / ".bin" / "tsx").exists():
+            self.skipTest("third_party/writ dependencies are not installed")
 
         result = subprocess.run(
             ["npx", "--no-install", "tsx", str(ADAPTER_TEST)],

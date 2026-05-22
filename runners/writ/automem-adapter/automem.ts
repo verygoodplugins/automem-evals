@@ -579,9 +579,8 @@ export class AutoMemAdapter implements MemoryAdapter {
       /\b(?:I|we)\s+(?:avoid|can't eat|cannot eat|do not eat|don't eat|am allergic to|need to avoid)\s+([^.!?;]+)/i
     );
     if (avoidance) {
-      const value = normalizeWhitespace(avoidance[0]!);
       const object = normalizeWhitespace(avoidance[1]!);
-      add(`avoid ${object}`, value, "constraint", `avoid ${object}`, ["preference", "constraint"]);
+      add(`avoid ${object}`, object, "constraint", "constraint", ["preference", "constraint"]);
     }
 
     const preference = content.match(
@@ -596,7 +595,7 @@ export class AutoMemAdapter implements MemoryAdapter {
       /\b(?:I|we)\s+(?:prefer|like|need|require)\s+([^.!?;]+)/i
     );
     if (simplePreference) {
-      const value = normalizeWhitespace(simplePreference[0]!);
+      const value = normalizeWhitespace(simplePreference[1]!);
       add(`preference ${normalizeWhitespace(simplePreference[1]!)}`, value, "preference", "preference", ["constraint"]);
     }
   }
@@ -863,11 +862,11 @@ export class AutoMemAdapter implements MemoryAdapter {
   }
 
   private detectSourceAuthority(content: string): SourceAuthorityHint {
-    if (/\b(?:confirmed|verified|agreed|we agreed)\b/i.test(content)) {
-      return "user_confirmed";
-    }
     if (/\b(?:we decided|agreed upon)\b/i.test(content)) {
       return "agreed_upon";
+    }
+    if (/\b(?:confirmed|verified|agreed|we agreed)\b/i.test(content)) {
+      return "user_confirmed";
     }
     if (/\b(?:assistant|agent|ai)\s+(?:said|extracted|summarized|claimed)\b/i.test(content)) {
       return "agent_extracted";
@@ -1127,7 +1126,7 @@ export class AutoMemAdapter implements MemoryAdapter {
       if (msg.role !== "user") continue;
       const facts = this.extractFacts(msg.content);
 
-      const factIds = facts.map((f) => f.factId);
+      const factIds = uniq(facts.map((f) => f.factId));
       const tags = [
         this.runTag,
         `writ-session-${session.session_id}`,

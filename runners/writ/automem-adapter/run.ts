@@ -36,7 +36,10 @@ async function main() {
   const outputFormat = String(values["output-format"] ?? "both");
 
   const adapter = new AutoMemAdapter({ endpoint, token });
-  const modes = modesStr.split(",") as EvaluationMode[];
+  const modes = modesStr
+    .split(",")
+    .map((mode) => mode.trim())
+    .filter(Boolean) as EvaluationMode[];
 
   console.log(`WRIT Benchmark v${WRIT_VERSION}`);
   console.log(`Adapter: ${adapter.name}`);
