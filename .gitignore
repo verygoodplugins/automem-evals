@@ -86,5 +86,11 @@ tmp/
 # writ — adapter + entry point are copied into the submodule at run time
 third_party/writ/run_automem.ts
 third_party/writ/src/adapters/automem.ts
-# writ run outputs (regenerable; commit only curated SUMMARY-*.md if needed)
-data/results/writ/*/
+# writ generated run outputs. Commit curated summaries at the root instead;
+# add a targeted ! exception only if a specific run must become source material.
+data/results/writ/[0-9]*-*/
+data/results/writ/runs/
+data/results/writ/*-smoke/
+data/results/writ/**/*-smoke/
+!data/results/writ/README.md
+!data/results/writ/SUMMARY-*.md
