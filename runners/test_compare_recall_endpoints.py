@@ -39,9 +39,9 @@ class HttpTests(unittest.TestCase):
                 raise TimeoutError("timed out")
             return FakeResponse()
 
-        with mock.patch.object(cre.urllib.request, "urlopen", side_effect=fake_urlopen), mock.patch.object(
-            cre.time, "sleep"
-        ) as sleep:
+        with mock.patch.object(
+            cre.urllib.request, "urlopen", side_effect=fake_urlopen
+        ), mock.patch.object(cre.time, "sleep") as sleep:
             payload = cre.http_get_json(
                 "http://localhost:8011",
                 "token",
@@ -170,7 +170,7 @@ class DiffTests(unittest.TestCase):
         self.assertFalse(diff["top_swap_near_tie"])
         self.assertEqual(cre.classify_status("preserve", diff), "REGRESSION")
 
-    def test_preserve_top_five_churn_is_review(self):
+    def test_preserve_top_five_churn_is_regression(self):
         diff = {
             "count_delta": 0,
             "returned_delta": 0,
@@ -178,7 +178,7 @@ class DiffTests(unittest.TestCase):
             "lost_top5": ["a"],
             "gained_top5": ["b"],
         }
-        self.assertEqual(cre.classify_status("preserve", diff), "review")
+        self.assertEqual(cre.classify_status("preserve", diff), "REGRESSION")
 
     def test_preserve_count_drop_is_regression(self):
         diff = {
@@ -250,7 +250,9 @@ class DiffTests(unittest.TestCase):
             return {
                 "memory": {
                     "id": memory_id,
-                    "tags": ["automem", "locomo"] if memory_id == "lost" else ["automem"],
+                    "tags": (
+                        ["automem", "locomo"] if memory_id == "lost" else ["automem"]
+                    ),
                     "metadata": {"entities": {"tools": ["Qdrant"]}},
                 }
             }
@@ -278,7 +280,9 @@ class DiffTests(unittest.TestCase):
         self.assertEqual(data["lost"][0]["id"], "lost")
         self.assertTrue(data["lost"][0]["baseline"]["passes_tag_filter"])
         self.assertFalse(data["gained"][0]["candidate"]["passes_tag_filter"])
-        self.assertEqual(data["lost"][0]["baseline"]["qdrant_payload"]["tags"], ["automem", "locomo"])
+        self.assertEqual(
+            data["lost"][0]["baseline"]["qdrant_payload"]["tags"], ["automem", "locomo"]
+        )
 
     def test_diagnostics_include_scores_components_and_payload_filter_status(self):
         row = {
@@ -341,7 +345,9 @@ class DiffTests(unittest.TestCase):
         candidate_gained = data["gained"][0]["candidate"]
         self.assertEqual(baseline_lost["score"], 0.91)
         self.assertEqual(baseline_lost["original_score"], 0.97)
-        self.assertEqual(baseline_lost["score_components"], {"vector": 0.88, "tag": 0.5})
+        self.assertEqual(
+            baseline_lost["score_components"], {"vector": 0.88, "tag": 0.5}
+        )
         self.assertTrue(baseline_lost["graph_passes_tag_filter"])
         self.assertTrue(baseline_lost["qdrant_passes_tag_filter"])
         self.assertTrue(candidate_gained["graph_passes_tag_filter"])
@@ -353,14 +359,30 @@ class DiffTests(unittest.TestCase):
             "params": {"tags": ["automem"], "tag_mode": "any"},
             "baseline": {
                 "top": [
-                    {"id": "a", "score_components": {"vector": 0.9}, "tags": ["automem"]},
-                    {"id": "b", "score_components": {"vector": 0.8}, "tags": ["automem"]},
+                    {
+                        "id": "a",
+                        "score_components": {"vector": 0.9},
+                        "tags": ["automem"],
+                    },
+                    {
+                        "id": "b",
+                        "score_components": {"vector": 0.8},
+                        "tags": ["automem"],
+                    },
                 ]
             },
             "candidate": {
                 "top": [
-                    {"id": "b", "score_components": {"vector": 0.91}, "tags": ["automem"]},
-                    {"id": "a", "score_components": {"vector": 0.79}, "tags": ["automem"]},
+                    {
+                        "id": "b",
+                        "score_components": {"vector": 0.91},
+                        "tags": ["automem"],
+                    },
+                    {
+                        "id": "a",
+                        "score_components": {"vector": 0.79},
+                        "tags": ["automem"],
+                    },
                 ]
             },
             "diff": {"top_changed": True, "lost_top5": [], "gained_top5": []},
@@ -388,8 +410,12 @@ class DiffTests(unittest.TestCase):
             data = json.loads(path.read_text())
 
         self.assertEqual([entry["id"] for entry in data["changed_top"]], ["a", "b"])
-        self.assertEqual(data["changed_top"][0]["baseline"]["score_components"], {"vector": 0.9})
-        self.assertEqual(data["changed_top"][1]["candidate"]["score_components"], {"vector": 0.91})
+        self.assertEqual(
+            data["changed_top"][0]["baseline"]["score_components"], {"vector": 0.9}
+        )
+        self.assertEqual(
+            data["changed_top"][1]["candidate"]["score_components"], {"vector": 0.91}
+        )
 
 
 class PreflightTests(unittest.TestCase):
@@ -540,7 +566,8 @@ class PreflightTests(unittest.TestCase):
         self.assertFalse(result["ok"])
         self.assertTrue(
             any(
-                "candidate had no warm-up probe with a positive vector component" in error
+                "candidate had no warm-up probe with a positive vector component"
+                in error
                 for error in result["errors"]
             )
         )
@@ -566,7 +593,10 @@ class PreflightTests(unittest.TestCase):
 
         self.assertFalse(result["ok"])
         self.assertTrue(
-            any("candidate warm-up probe empty returned no results" in error for error in result["errors"])
+            any(
+                "candidate warm-up probe empty returned no results" in error
+                for error in result["errors"]
+            )
         )
 
 
@@ -612,7 +642,9 @@ class MainGateTests(unittest.TestCase):
 
             def fake_diagnostics(**kwargs):
                 diagnostics_rows.append(kwargs["row"])
-                diagnostics_path = run_dir / "diagnostics" / f"{kwargs['row']['id']}.json"
+                diagnostics_path = (
+                    run_dir / "diagnostics" / f"{kwargs['row']['id']}.json"
+                )
                 diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
                 diagnostics_path.write_text("{}")
                 return diagnostics_path
@@ -655,11 +687,20 @@ class MainGateTests(unittest.TestCase):
         }
         baseline_summary = {
             "candidate_endpoint": "saved baseline",
-            "candidate_health": {"status": "healthy", "memory_count": 1, "vector_count": 1},
+            "candidate_health": {
+                "status": "healthy",
+                "memory_count": 1,
+                "vector_count": 1,
+            },
             "rows": [
                 {
                     "id": "Q-TIMEOUT",
-                    "candidate": {"count": 1, "returned": 1, "top_ids": ["m1"], "top": []},
+                    "candidate": {
+                        "count": 1,
+                        "returned": 1,
+                        "top_ids": ["m1"],
+                        "top": [],
+                    },
                 }
             ],
         }
@@ -696,14 +737,14 @@ class MainGateTests(unittest.TestCase):
         self.assertEqual(failure["error_type"], "TimeoutError")
         self.assertEqual(failure["rows_completed"], 0)
 
-    def test_fail_on_preserve_review_exits_nonzero_for_review_status(self):
+    def test_fail_on_preserve_regression_exits_nonzero_for_top_five_churn(self):
         scenario = {
-            "description": "strict preserve review fixture",
+            "description": "preserve top five churn fixture",
             "queries": [
                 {
-                    "id": "PRESERVE-REVIEW",
+                    "id": "PRESERVE-REGRESSION",
                     "group": "preserve",
-                    "description": "review should fail strict gate",
+                    "description": "top five churn should fail default regression gate",
                     "query": "what changed",
                     "params": {},
                 }
@@ -735,7 +776,124 @@ class MainGateTests(unittest.TestCase):
             run_dir = Path(tmp) / "run"
 
             def fake_diagnostics(**kwargs):
-                diagnostics_path = run_dir / "diagnostics" / f"{kwargs['row']['id']}.json"
+                diagnostics_path = (
+                    run_dir / "diagnostics" / f"{kwargs['row']['id']}.json"
+                )
+                diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+                diagnostics_path.write_text("{}")
+                return diagnostics_path
+
+            argv = [
+                "compare_recall_endpoints.py",
+                "--scenario",
+                str(scenario_path),
+                "--baseline-endpoint",
+                "http://localhost:8011",
+                "--candidate-endpoint",
+                "http://localhost:8012",
+                "--run-dir",
+                str(run_dir),
+                "--report",
+                str(Path(tmp) / "report.md"),
+                "--fail-on-preserve-regression",
+            ]
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(
+                cre, "http_get_json", side_effect=fake_get
+            ), mock.patch.object(
+                cre, "write_regression_diagnostics", side_effect=fake_diagnostics
+            ):
+                exit_code = cre.main()
+
+        self.assertEqual(exit_code, 1)
+
+    def test_fail_on_preserve_review_exits_nonzero_for_review_status(self):
+        scenario = {
+            "description": "strict preserve review fixture",
+            "queries": [
+                {
+                    "id": "PRESERVE-REVIEW",
+                    "group": "preserve",
+                    "description": "review should fail strict gate",
+                    "query": "what changed",
+                    "params": {},
+                }
+            ],
+        }
+
+        def fake_get(endpoint, token, path, params=None):
+            if path == "/health":
+                return {"status": "healthy", "memory_count": 5, "vector_count": 5}
+            if endpoint.endswith("1"):
+                return {
+                    "count": 5,
+                    "results": [
+                        {
+                            "id": "a",
+                            "final_score": 0.6315270934615385,
+                            "score_components": {"vector": 0.9},
+                        },
+                        {
+                            "id": "b",
+                            "final_score": 0.6315239246153846,
+                            "score_components": {"vector": 0.8},
+                        },
+                        {
+                            "id": "c",
+                            "final_score": 0.59,
+                            "score_components": {"vector": 0.7},
+                        },
+                        {
+                            "id": "d",
+                            "final_score": 0.58,
+                            "score_components": {"vector": 0.6},
+                        },
+                        {
+                            "id": "e",
+                            "final_score": 0.57,
+                            "score_components": {"vector": 0.5},
+                        },
+                    ],
+                }
+            return {
+                "count": 5,
+                "results": [
+                    {
+                        "id": "b",
+                        "final_score": 0.6317135896153846,
+                        "score_components": {"vector": 0.9},
+                    },
+                    {
+                        "id": "a",
+                        "final_score": 0.6316897734615384,
+                        "score_components": {"vector": 0.8},
+                    },
+                    {
+                        "id": "c",
+                        "final_score": 0.59,
+                        "score_components": {"vector": 0.7},
+                    },
+                    {
+                        "id": "d",
+                        "final_score": 0.58,
+                        "score_components": {"vector": 0.6},
+                    },
+                    {
+                        "id": "e",
+                        "final_score": 0.57,
+                        "score_components": {"vector": 0.5},
+                    },
+                ],
+            }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            scenario_path = Path(tmp) / "scenario.json"
+            scenario_path.write_text(json.dumps(scenario))
+            run_dir = Path(tmp) / "run"
+
+            def fake_diagnostics(**kwargs):
+                diagnostics_path = (
+                    run_dir / "diagnostics" / f"{kwargs['row']['id']}.json"
+                )
                 diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
                 diagnostics_path.write_text("{}")
                 return diagnostics_path

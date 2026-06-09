@@ -24,7 +24,9 @@ import urllib.request
 from typing import Any, Callable
 
 HERE = pathlib.Path(__file__).resolve().parent.parent
-DEFAULT_HTTP_TIMEOUT_SECONDS = float(os.environ.get("RECALL_COMPARE_HTTP_TIMEOUT_SECONDS", "60"))
+DEFAULT_HTTP_TIMEOUT_SECONDS = float(
+    os.environ.get("RECALL_COMPARE_HTTP_TIMEOUT_SECONDS", "60")
+)
 DEFAULT_HTTP_RETRIES = int(os.environ.get("RECALL_COMPARE_HTTP_RETRIES", "1"))
 DEFAULT_HTTP_RETRY_DELAY_SECONDS = float(
     os.environ.get("RECALL_COMPARE_HTTP_RETRY_DELAY_SECONDS", "1")
@@ -126,7 +128,7 @@ def qdrant_get_payload(
     )
     with urllib.request.urlopen(req, timeout=30) as response:
         payload = json.loads(response.read())
-    points = (payload.get("result") or [])
+    points = payload.get("result") or []
     if not points:
         return {}
     return points[0].get("payload") or {}
@@ -141,8 +143,7 @@ def qdrant_count_points(
     retry_delay_seconds: float = DEFAULT_HTTP_RETRY_DELAY_SECONDS,
 ) -> int | None:
     endpoint = (
-        f"{qdrant_url.rstrip('/')}/collections/"
-        f"{urllib.parse.quote(collection)}"
+        f"{qdrant_url.rstrip('/')}/collections/" f"{urllib.parse.quote(collection)}"
     )
     req = urllib.request.Request(endpoint)
     attempt = 0
@@ -178,7 +179,10 @@ def recall(endpoint: str, token: str, query_spec: dict) -> dict:
 
 def validate_health_pair(baseline_health: dict, candidate_health: dict) -> list[str]:
     errors = []
-    for label, health in (("baseline", baseline_health), ("candidate", candidate_health)):
+    for label, health in (
+        ("baseline", baseline_health),
+        ("candidate", candidate_health),
+    ):
         status = health.get("status")
         if status not in {"healthy", "ok"}:
             errors.append(f"{label} health status is not healthy: {status}")
@@ -261,7 +265,10 @@ def run_preflight(
         params = dict(probe.get("params") or {})
         params["query"] = probe["query"]
         probe_result = {"id": probe.get("id", "warmup"), "endpoints": {}}
-        for label, endpoint in (("baseline", baseline_endpoint), ("candidate", candidate_endpoint)):
+        for label, endpoint in (
+            ("baseline", baseline_endpoint),
+            ("candidate", candidate_endpoint),
+        ):
             response = http_get(endpoint, token, "/recall", params)
             ok, diagnostic = recall_has_positive_vector_component(response)
             probe_result["endpoints"][label] = diagnostic
@@ -331,11 +338,7 @@ def passes_tag_filter(tags: list[str], params: dict) -> bool:
 
 
 def _top_result_by_id(summary: dict) -> dict[str, dict]:
-    return {
-        item["id"]: item
-        for item in summary.get("top", [])
-        if item.get("id")
-    }
+    return {item["id"]: item for item in summary.get("top", []) if item.get("id")}
 
 
 def _first_top_id(summary: dict) -> str | None:
@@ -470,21 +473,27 @@ def write_regression_diagnostics(
         "query_id": row["id"],
         "params": params,
         "diff": row.get("diff") or {},
-        "changed_top": [
-            build_entry(memory_id)
-            for memory_id in dict.fromkeys(
-                memory_id
-                for memory_id in (
-                    _first_top_id(row.get("baseline") or {}),
-                    _first_top_id(row.get("candidate") or {}),
+        "changed_top": (
+            [
+                build_entry(memory_id)
+                for memory_id in dict.fromkeys(
+                    memory_id
+                    for memory_id in (
+                        _first_top_id(row.get("baseline") or {}),
+                        _first_top_id(row.get("candidate") or {}),
+                    )
+                    if memory_id
                 )
-                if memory_id
-            )
-        ]
-        if (row.get("diff") or {}).get("top_changed")
-        else [],
-        "lost": [build_entry(memory_id) for memory_id in row["diff"].get("lost_top5", [])],
-        "gained": [build_entry(memory_id) for memory_id in row["diff"].get("gained_top5", [])],
+            ]
+            if (row.get("diff") or {}).get("top_changed")
+            else []
+        ),
+        "lost": [
+            build_entry(memory_id) for memory_id in row["diff"].get("lost_top5", [])
+        ],
+        "gained": [
+            build_entry(memory_id) for memory_id in row["diff"].get("gained_top5", [])
+        ],
     }
     out_path = out_dir / f"{row['id']}.json"
     out_path.write_text(json.dumps(diagnostic, indent=2, sort_keys=True) + "\n")
@@ -582,9 +591,11 @@ def classify_status(group: str, diff: dict) -> str:
     if group == "preserve":
         if diff["count_delta"] < 0:
             return "REGRESSION"
+        if diff["lost_top5"]:
+            return "REGRESSION"
         if diff["top_changed"] and not diff.get("top_swap_near_tie"):
             return "REGRESSION"
-        if diff["top_changed"] or diff["lost_top5"]:
+        if diff["top_changed"]:
             return "review"
         return "ok"
     if group == "mixed":
@@ -664,23 +675,17 @@ def write_markdown_report(
         lines.append(f"Query: `{row['query']}`")
         lines.append(f"Params: `{json.dumps(row['params'], separators=(',', ':'))}`")
         lines.append("")
-        lines.append(
-            f"Diff: `{json.dumps(row['diff'], separators=(',', ':'))}`"
-        )
+        lines.append(f"Diff: `{json.dumps(row['diff'], separators=(',', ':'))}`")
         if row.get("diagnostics"):
             lines.append(f"Diagnostics: `{row['diagnostics']}`")
         lines.append("")
         lines.append("Baseline top:")
         for index, item in enumerate(row["baseline"]["top"][:3], start=1):
-            lines.append(
-                f"{index}. `{item['id']}` [{item['score']}] {item['content']}"
-            )
+            lines.append(f"{index}. `{item['id']}` [{item['score']}] {item['content']}")
         lines.append("")
         lines.append("Candidate top:")
         for index, item in enumerate(row["candidate"]["top"][:3], start=1):
-            lines.append(
-                f"{index}. `{item['id']}` [{item['score']}] {item['content']}"
-            )
+            lines.append(f"{index}. `{item['id']}` [{item['score']}] {item['content']}")
         lines.append("")
     out_path.write_text("\n".join(lines))
 
@@ -743,7 +748,9 @@ def main() -> int:
     saved_baseline_endpoint = args.baseline_endpoint or "saved baseline"
     if args.baseline_summary:
         saved = json.loads(pathlib.Path(args.baseline_summary).read_text())
-        baseline_health = saved.get("baseline_health") or saved.get("candidate_health") or {}
+        baseline_health = (
+            saved.get("baseline_health") or saved.get("candidate_health") or {}
+        )
         saved_baseline_endpoint = (
             saved.get("baseline_endpoint")
             or saved.get("candidate_endpoint")
@@ -754,7 +761,9 @@ def main() -> int:
         baseline_health = http_get_json(args.baseline_endpoint, args.token, "/health")
     candidate_health = http_get_json(args.candidate_endpoint, args.token, "/health")
     (run_dir / "baseline-health.json").write_text(json.dumps(baseline_health, indent=2))
-    (run_dir / "candidate-health.json").write_text(json.dumps(candidate_health, indent=2))
+    (run_dir / "candidate-health.json").write_text(
+        json.dumps(candidate_health, indent=2)
+    )
 
     if args.baseline_endpoint and not args.skip_vector_preflight:
         preflight = run_preflight(
@@ -768,7 +777,9 @@ def main() -> int:
         )
         (run_dir / "preflight.json").write_text(json.dumps(preflight, indent=2))
         if not preflight["ok"]:
-            (run_dir / "preflight-failed.json").write_text(json.dumps(preflight, indent=2))
+            (run_dir / "preflight-failed.json").write_text(
+                json.dumps(preflight, indent=2)
+            )
             print(f"preflight failed: {run_dir / 'preflight-failed.json'}")
             return 2
 
@@ -780,9 +791,13 @@ def main() -> int:
                 saved_row = saved_rows_by_id.get(qid)
                 if not saved_row:
                     raise SystemExit(f"baseline summary missing query id: {qid}")
-                baseline_summary = saved_row.get("candidate") or saved_row.get("baseline")
+                baseline_summary = saved_row.get("candidate") or saved_row.get(
+                    "baseline"
+                )
                 if not baseline_summary:
-                    raise SystemExit(f"baseline summary has no saved result for query id: {qid}")
+                    raise SystemExit(
+                        f"baseline summary has no saved result for query id: {qid}"
+                    )
                 baseline_response = None
             else:
                 baseline_response = recall(args.baseline_endpoint, args.token, spec)
@@ -879,8 +894,12 @@ def main() -> int:
         rows,
         raw_dir.relative_to(HERE) if raw_dir.is_relative_to(HERE) else raw_dir,
     )
-    print(f"summary: {run_dir.relative_to(HERE) if run_dir.is_relative_to(HERE) else run_dir}/summary.json")
-    print(f"report: {report_path.relative_to(HERE) if report_path.is_relative_to(HERE) else report_path}")
+    print(
+        f"summary: {run_dir.relative_to(HERE) if run_dir.is_relative_to(HERE) else run_dir}/summary.json"
+    )
+    print(
+        f"report: {report_path.relative_to(HERE) if report_path.is_relative_to(HERE) else report_path}"
+    )
 
     preserve_failures = [
         row for row in rows if row["group"] == "preserve" and row["status"] != "ok"

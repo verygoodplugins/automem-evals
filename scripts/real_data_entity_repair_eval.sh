@@ -169,9 +169,6 @@ cleanup_existing_lab_stacks() {
         if [ -z "$project" ]; then
             continue
         fi
-        if [ "$project" = "$BASELINE_COMPOSE_PROJECT" ] || [ "$project" = "$CANDIDATE_COMPOSE_PROJECT" ]; then
-            continue
-        fi
         case "$project" in
             automem-real-*|automem-loop-*|automem-strict-*|automem-fresh-*|automem-snapshot-download)
                 echo "cleanup_lab_stack: $project"
@@ -393,7 +390,6 @@ stage_command_args() {
     local run_migration="${3:-false}"
     local args=(
         "$SCRIPT_PATH"
-        --snapshot "$SNAPSHOT"
         --automem-repo "$AUTOMEM_REPO"
         --run-id "$RUN_ID-$suffix"
         --scenario "$SCENARIO"
@@ -416,6 +412,9 @@ stage_command_args() {
         --graph-update-timeout-seconds "$GRAPH_UPDATE_TIMEOUT_SECONDS"
         --qdrant-ready-timeout-seconds "$QDRANT_READY_TIMEOUT_SECONDS"
     )
+    if [ -n "$SNAPSHOT" ]; then
+        args+=(--snapshot "$SNAPSHOT")
+    fi
     if [ "$STAGED_LOOP" = true ] || [ "$mode" != "sync-only" ]; then
         args+=(--sync-baseline-first)
     fi
@@ -461,8 +460,8 @@ run_stage_command() {
 }
 
 if [ "$STAGED_LOOP" = true ]; then
-    if [ -z "$SNAPSHOT" ]; then
-        echo "ERROR: --snapshot is required for --staged-loop." >&2
+    if [ -z "$SNAPSHOT" ] && [ "$SKIP_RESTORE" = false ]; then
+        echo "ERROR: --snapshot is required for --staged-loop unless --skip-restore is set." >&2
         exit 2
     fi
     run_stage_command sync-only sync-only false

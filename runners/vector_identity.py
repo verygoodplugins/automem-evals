@@ -32,7 +32,8 @@ def compare_vector_maps(
     changed = [
         point_id
         for point_id in shared
-        if _vector_fingerprint(baseline[point_id]) != _vector_fingerprint(candidate[point_id])
+        if _vector_fingerprint(baseline[point_id])
+        != _vector_fingerprint(candidate[point_id])
     ]
     return {
         "ok": not missing_in_candidate and not missing_in_baseline and not changed,
@@ -130,11 +131,13 @@ def fetch_qdrant_vectors(
             if limit and len(vectors) >= limit:
                 return vectors
         offset = result.get("next_page_offset")
-        if not offset or not points:
+        if offset is None or not points:
             return vectors
 
 
-def write_failure_summary(path: pathlib.Path | str | None, exc: BaseException) -> dict[str, Any]:
+def write_failure_summary(
+    path: pathlib.Path | str | None, exc: BaseException
+) -> dict[str, Any]:
     summary = {
         "ok": False,
         "error": str(exc) or exc.__class__.__name__,

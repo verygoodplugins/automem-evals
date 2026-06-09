@@ -38,7 +38,9 @@ class VectorIdentityTests(unittest.TestCase):
         calls: list[dict[str, object]] = []
         original = vi._request_json
 
-        def fake_request(url: str, body: dict[str, object], api_key=None, timeout_seconds=60):
+        def fake_request(
+            url: str, body: dict[str, object], api_key=None, timeout_seconds=60
+        ):
             calls.append({"url": url, "body": body, "timeout_seconds": timeout_seconds})
             if len(calls) == 1:
                 raise TimeoutError("timed out")
@@ -65,6 +67,40 @@ class VectorIdentityTests(unittest.TestCase):
         self.assertEqual(vectors, {"m1": [0.1, 0.2]})
         self.assertEqual(len(calls), 2)
         self.assertEqual(calls[0]["timeout_seconds"], 2)
+
+    def test_fetch_qdrant_vectors_continues_with_falsy_offset(self) -> None:
+        calls: list[dict[str, object]] = []
+        original = vi._request_json
+
+        def fake_request(
+            url: str, body: dict[str, object], api_key=None, timeout_seconds=60
+        ):
+            calls.append({"url": url, "body": body, "timeout_seconds": timeout_seconds})
+            if len(calls) == 1:
+                return {
+                    "result": {
+                        "points": [{"id": "m1", "vector": [0.1]}],
+                        "next_page_offset": 0,
+                    }
+                }
+            return {
+                "result": {
+                    "points": [{"id": "m2", "vector": [0.2]}],
+                    "next_page_offset": None,
+                }
+            }
+
+        try:
+            vi._request_json = fake_request
+            vectors = vi.fetch_qdrant_vectors(
+                "http://qdrant", "memories", batch_size=64
+            )
+        finally:
+            vi._request_json = original
+
+        self.assertEqual(vectors, {"m1": [0.1], "m2": [0.2]})
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(calls[1]["body"]["offset"], 0)
 
     def test_write_failure_summary_records_vector_fetch_errors(self) -> None:
         with TemporaryDirectory() as tmp:

@@ -190,7 +190,7 @@ class RealDataEntityRepairEvalWrapperTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertGreaterEqual(result.stdout.count("--strict-preserve-review"), 4)
 
-    def test_staged_loop_forwards_skip_restore_to_each_stage(self) -> None:
+    def test_staged_loop_skip_restore_does_not_require_snapshot(self) -> None:
         result = subprocess.run(
             [
                 "bash",
@@ -198,8 +198,6 @@ class RealDataEntityRepairEvalWrapperTests(unittest.TestCase):
                 "--staged-loop",
                 "--print-staged-loop",
                 "--skip-restore",
-                "--snapshot",
-                "prod-api-test",
                 "--run-id",
                 "unit-staged-skip-restore",
                 "--baseline-endpoint",
@@ -215,6 +213,7 @@ class RealDataEntityRepairEvalWrapperTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertGreaterEqual(result.stdout.count("--skip-restore"), 4)
+        self.assertNotIn("--snapshot", result.stdout)
 
     def test_staged_loop_forwards_graph_update_timeout_to_each_stage(self) -> None:
         result = subprocess.run(
@@ -241,7 +240,9 @@ class RealDataEntityRepairEvalWrapperTests(unittest.TestCase):
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertGreaterEqual(result.stdout.count("--graph-update-timeout-seconds 12"), 4)
+        self.assertGreaterEqual(
+            result.stdout.count("--graph-update-timeout-seconds 12"), 4
+        )
 
     def test_staged_loop_forwards_qdrant_ready_timeout_to_each_stage(self) -> None:
         result = subprocess.run(
@@ -268,7 +269,9 @@ class RealDataEntityRepairEvalWrapperTests(unittest.TestCase):
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertGreaterEqual(result.stdout.count("--qdrant-ready-timeout-seconds 77"), 4)
+        self.assertGreaterEqual(
+            result.stdout.count("--qdrant-ready-timeout-seconds 77"), 4
+        )
 
     def test_staged_loop_forwards_cleanup_existing_lab_stacks(self) -> None:
         result = subprocess.run(
@@ -352,15 +355,17 @@ class RealDataEntityRepairEvalWrapperTests(unittest.TestCase):
     def test_wrapper_restores_db_only_and_starts_local_api_processes(self) -> None:
         script = SCRIPT.read_text()
 
-        self.assertIn("--qdrant-grpc-port \"$BASELINE_QDRANT_GRPC_PORT\"", script)
-        self.assertIn("--qdrant-grpc-port \"$CANDIDATE_QDRANT_GRPC_PORT\"", script)
+        self.assertIn('--qdrant-grpc-port "$BASELINE_QDRANT_GRPC_PORT"', script)
+        self.assertIn('--qdrant-grpc-port "$CANDIDATE_QDRANT_GRPC_PORT"', script)
         self.assertGreaterEqual(script.count("--skip-api"), 2)
         self.assertIn("start_local_api baseline", script)
         self.assertIn("start_local_api candidate", script)
         self.assertIn("trap cleanup_local_apis EXIT", script)
         self.assertIn("cleanup_existing_lab_stacks", script)
+        self.assertNotIn('[ "$project" = "$BASELINE_COMPOSE_PROJECT" ]', script)
+        self.assertNotIn('[ "$project" = "$CANDIDATE_COMPOSE_PROJECT" ]', script)
         self.assertIn("QDRANT_ENSURE_PAYLOAD_INDEXES=false", script)
-        self.assertIn("QDRANT_TIMEOUT_SECONDS=\"${QDRANT_TIMEOUT_SECONDS:-60}\"", script)
+        self.assertIn('QDRANT_TIMEOUT_SECONDS="${QDRANT_TIMEOUT_SECONDS:-60}"', script)
 
     def test_entity_migration_output_is_saved_as_artifact_log(self) -> None:
         script = SCRIPT.read_text()
