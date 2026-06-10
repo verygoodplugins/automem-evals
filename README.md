@@ -28,6 +28,7 @@ The current implementation is a focused recall-quality harness against a locally
 - Seed synthetic corpora into AutoMem with stable scenario-to-memory mappings
 - Generate timestamped markdown reports for quick A/B analysis
 - Prototype retrieval behavior such as client-side graph expansion without changing `automem`
+- A/B two AutoMem endpoints with `runners/compare_recall_endpoints.py` using `preserve`/`mixed`/`noise` probes (`scenarios/recall_cleanup_v1.json`); `scenarios/recall_cleanup_v2.json` adds `negative` controls whose correct answer is "nothing relevant", so over-retrieval and false-positive regressions (e.g. automem#130) show up as `REGRESSION`
 
 It is intentionally narrower than a full benchmark platform. Today it is primarily about answering:
 
