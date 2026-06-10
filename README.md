@@ -84,7 +84,9 @@ AutoMem checkout; server-code variants can point baseline and candidate at
 different AutoMem checkouts.
 
 Create a per-worktree env file such as `.env.metadata-<worktree>`. Files matching
-`.env.*` are ignored by git.
+`.env.*` are ignored by git. To share embedding-provider config with both stacks,
+set `AUTOMEM_RUNTIME_ENV_FILE` to an AutoMem `.env` file (the eval script only loads
+an allowlist of embedding-related keys).
 
 ```bash
 export AUTOMEM_DIR=/path/to/automem
