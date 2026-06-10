@@ -75,6 +75,80 @@ Defaults assume:
 
 If the AutoMem volumes were reset, reseed before scoring so the manifest matches the memory IDs currently in the server.
 
+## Real-Data Metadata Evals In Worktrees
+
+For production-snapshot experiments, use one canonical AutoMem checkout as the
+Docker/runtime source and give each `automem-evals` worktree unique Compose
+project names and host ports. Keep snapshots outside eval worktrees and pass
+them by absolute path.
+
+Create a per-worktree env file such as `.env.metadata-<worktree>`. Files matching
+`.env.*` are ignored by git.
+
+```bash
+export AUTOMEM_DIR=/path/to/automem
+export AUTOMEM_PYTHON="$AUTOMEM_DIR/.venv/bin/python"
+export LOCAL_AUTOMEM_API_TOKEN=test-token
+
+export BASELINE_COMPOSE_PROJECT=automem_metadata_<worktree>_baseline
+export CANDIDATE_COMPOSE_PROJECT=automem_metadata_<worktree>_candidate
+
+export BASELINE_API_PORT=8111
+export BASELINE_QDRANT_PORT=6443
+export BASELINE_QDRANT_GRPC_PORT=6445
+export BASELINE_FALKOR_PORT=6489
+export BASELINE_FALKOR_UI_PORT=3110
+
+export CANDIDATE_API_PORT=8112
+export CANDIDATE_QDRANT_PORT=6444
+export CANDIDATE_QDRANT_GRPC_PORT=6446
+export CANDIDATE_FALKOR_PORT=6490
+export CANDIDATE_FALKOR_UI_PORT=3111
+```
+
+For `metadata-embedding` or `combined`, use the same embedding family and
+dimension as the restored production corpus:
+
+```bash
+export EMBEDDING_PROVIDER=voyage
+export VOYAGE_API_KEY=...
+export VOYAGE_MODEL=voyage-4
+export VECTOR_SIZE=1024
+```
+
+Run from the eval worktree:
+
+```bash
+cd /path/to/automem-evals-worktree
+set -a; source .env.metadata-<worktree>; set +a
+export SNAPSHOT=/path/to/automem/lab/snapshots/<name>/snapshot.tar.gz
+
+# Offline smoke test.
+bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadata-tags --write-probes-only
+
+# Check the worktree-specific restore commands without touching Docker.
+bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadata-tags --restore-plan-only
+
+# Full A/B run.
+bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadata-tags
+```
+
+Use `--skip-restore` only to rerun reports against the same already-restored
+baseline/candidate stacks. Do not use it when switching variants, because the
+candidate stack may already be transformed.
+
+Operational checks:
+
+```bash
+docker ps --filter name=automem_metadata_<worktree>
+curl -H "X-Api-Key: $LOCAL_AUTOMEM_API_TOKEN" "http://localhost:$BASELINE_API_PORT/health"
+curl -H "X-Api-Key: $LOCAL_AUTOMEM_API_TOKEN" "http://localhost:$CANDIDATE_API_PORT/health"
+
+cd "$AUTOMEM_DIR"
+docker compose -p "$BASELINE_COMPOSE_PROJECT" down -v
+docker compose -p "$CANDIDATE_COMPOSE_PROJECT" down -v
+```
+
 ## Experimental: BEAM via shim
 
 `runners/run_beam.py` drives mem0's upstream BEAM runner (vendored at
