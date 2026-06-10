@@ -120,6 +120,51 @@ class RealDataMetadataEvalShellTests(unittest.TestCase):
             if run_dir.exists():
                 shutil.rmtree(run_dir)
 
+    def test_runtime_env_file_records_embedding_config_without_secrets(self):
+        sweep_root = HERE / "data" / "sweep_runs"
+        sweep_root.mkdir(parents=True, exist_ok=True)
+        run_dir = Path(tempfile.mkdtemp(prefix="test-metadata-runtime-env-", dir=sweep_root))
+        snapshot = write_synthetic_snapshot(run_dir)
+        runtime_env = run_dir / "automem.env"
+        runtime_env.write_text(
+            "EMBEDDING_PROVIDER=voyage\n"
+            "VOYAGE_API_KEY=secret-value\n"
+            "VECTOR_SIZE=1024\n"
+            "QDRANT_URL=https://prod.example.invalid\n"
+        )
+
+        try:
+            result = subprocess.run(
+                [
+                    "bash",
+                    str(HERE / "scripts" / "real_data_metadata_eval.sh"),
+                    "--snapshot",
+                    str(snapshot),
+                    "--variant",
+                    "metadata-tags",
+                    "--write-probes-only",
+                    "--run-dir",
+                    str(run_dir),
+                ],
+                cwd=HERE,
+                env=metadata_env(AUTOMEM_RUNTIME_ENV_FILE=str(runtime_env)),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=30,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            readme = (run_dir / "README.md").read_text()
+            self.assertIn(f"runtime env file: `{runtime_env}`", readme)
+            self.assertIn("embedding provider: `voyage`", readme)
+            self.assertIn("vector size: `1024`", readme)
+            self.assertNotIn("secret-value", readme + result.stdout + result.stderr)
+            self.assertNotIn("prod.example.invalid", readme + result.stdout + result.stderr)
+        finally:
+            if run_dir.exists():
+                shutil.rmtree(run_dir)
+
     def test_restore_plan_only_prints_configured_compose_projects(self):
         sweep_root = HERE / "data" / "sweep_runs"
         sweep_root.mkdir(parents=True, exist_ok=True)
@@ -206,6 +251,67 @@ class RealDataMetadataEvalShellTests(unittest.TestCase):
             self.assertIn(str(snapshot), argv)
             self.assertIn("automem metadata baseline", argv)
             self.assertIn(str(automem_python), argv)
+        finally:
+            if run_dir.exists():
+                shutil.rmtree(run_dir)
+
+    def test_restore_plan_server_variant_uses_separate_automem_dirs(self):
+        sweep_root = HERE / "data" / "sweep_runs"
+        sweep_root.mkdir(parents=True, exist_ok=True)
+        run_dir = Path(tempfile.mkdtemp(prefix="test-metadata-server-plan-", dir=sweep_root))
+        snapshot = write_synthetic_snapshot(run_dir)
+        baseline_dir = run_dir / "automem-baseline"
+        candidate_dir = run_dir / "automem-candidate"
+        baseline_python = baseline_dir / ".venv" / "bin" / "python"
+        candidate_python = candidate_dir / ".venv" / "bin" / "python"
+
+        try:
+            result = subprocess.run(
+                [
+                    "bash",
+                    str(HERE / "scripts" / "real_data_metadata_eval.sh"),
+                    "--snapshot",
+                    str(snapshot),
+                    "--variant",
+                    "server-metadata-search",
+                    "--restore-plan-only",
+                    "--run-dir",
+                    str(run_dir),
+                ],
+                cwd=HERE,
+                env=metadata_env(
+                    AUTOMEM_DIR=str(baseline_dir),
+                    BASELINE_AUTOMEM_DIR=str(baseline_dir),
+                    CANDIDATE_AUTOMEM_DIR=str(candidate_dir),
+                    BASELINE_AUTOMEM_PYTHON=str(baseline_python),
+                    CANDIDATE_AUTOMEM_PYTHON=str(candidate_python),
+                    BASELINE_COMPOSE_PROJECT="automem_metadata_server_baseline",
+                    CANDIDATE_COMPOSE_PROJECT="automem_metadata_server_candidate",
+                ),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=30,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            lines = result.stdout.splitlines()
+            baseline_line = next(line for line in lines if line.startswith("baseline restore: "))
+            candidate_line = next(line for line in lines if line.startswith("candidate restore: "))
+            baseline_argv = shlex.split(baseline_line.removeprefix("baseline restore: "))
+            candidate_argv = shlex.split(candidate_line.removeprefix("candidate restore: "))
+            self.assertEqual(
+                baseline_argv[1], str(baseline_dir / "scripts" / "lab" / "clone_production.sh")
+            )
+            self.assertEqual(
+                candidate_argv[1], str(candidate_dir / "scripts" / "lab" / "clone_production.sh")
+            )
+            self.assertIn(str(baseline_python), baseline_argv)
+            self.assertIn(str(candidate_python), candidate_argv)
+            readme = (run_dir / "README.md").read_text()
+            self.assertIn(f"baseline automem dir: `{baseline_dir}`", readme)
+            self.assertIn(f"candidate automem dir: `{candidate_dir}`", readme)
+            self.assertIn("run label: `metadata-sidecar-enabled`", readme)
         finally:
             if run_dir.exists():
                 shutil.rmtree(run_dir)

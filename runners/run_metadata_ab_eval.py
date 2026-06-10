@@ -227,6 +227,7 @@ def write_markdown_report(
     *,
     baseline_endpoint: str,
     candidate_endpoint: str,
+    run_label: str = "",
     aggregate: dict[str, Any],
     rows: list[dict[str, Any]],
     vector_preflight: dict[str, Any],
@@ -239,12 +240,18 @@ def write_markdown_report(
         "",
         f"Baseline endpoint: `{baseline_endpoint}`",
         f"Candidate endpoint: `{candidate_endpoint}`",
-        "",
-        "## Vector Preflight",
-        "",
-        "| Endpoint | status | checked | nonzero results |",
-        "|---|---|---:|---:|",
     ]
+    if run_label:
+        lines.append(f"Run label: `{run_label}`")
+    lines.extend(
+        [
+            "",
+            "## Vector Preflight",
+            "",
+            "| Endpoint | status | checked | nonzero results |",
+            "|---|---|---:|---:|",
+        ]
+    )
     for label in ("baseline", "candidate"):
         item = recall_warmup.get(label) or {}
         lines.append(
@@ -305,6 +312,7 @@ def main() -> int:
     parser.add_argument("--run-dir", type=pathlib.Path, default=None)
     parser.add_argument("--report", type=pathlib.Path, default=None)
     parser.add_argument("--metrics-output", type=pathlib.Path, default=None)
+    parser.add_argument("--run-label", default="")
     args = parser.parse_args()
 
     assert_local_endpoint(args.baseline_endpoint)
@@ -348,6 +356,7 @@ def main() -> int:
     preflight_path = run_dir / "vector_preflight.json"
     vector_preflight = merge_vector_preflight(preflight_path, recall_warmup)
     metrics = {
+        "run_label": args.run_label,
         "baseline_endpoint": args.baseline_endpoint,
         "candidate_endpoint": args.candidate_endpoint,
         "baseline_health": baseline_health,
@@ -366,6 +375,7 @@ def main() -> int:
         report_path,
         baseline_endpoint=args.baseline_endpoint,
         candidate_endpoint=args.candidate_endpoint,
+        run_label=args.run_label,
         aggregate=aggregate,
         rows=rows,
         vector_preflight=vector_preflight,
