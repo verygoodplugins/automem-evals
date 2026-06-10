@@ -77,17 +77,24 @@ If the AutoMem volumes were reset, reseed before scoring so the manifest matches
 
 ## Real-Data Metadata Evals In Worktrees
 
-For production-snapshot experiments, use one canonical AutoMem checkout as the
-Docker/runtime source and give each `automem-evals` worktree unique Compose
-project names and host ports. Keep snapshots outside eval worktrees and pass
-them by absolute path.
+For production-snapshot experiments, give each `automem-evals` worktree unique
+Compose project names and host ports. Keep snapshots outside eval worktrees and
+pass them by absolute path. Transform-based variants can use one canonical
+AutoMem checkout; server-code variants can point baseline and candidate at
+different AutoMem checkouts.
 
 Create a per-worktree env file such as `.env.metadata-<worktree>`. Files matching
-`.env.*` are ignored by git.
+`.env.*` are ignored by git. To share embedding-provider config with both stacks,
+set `AUTOMEM_RUNTIME_ENV_FILE` to an AutoMem `.env` file (the eval script only loads
+an allowlist of embedding-related keys).
 
 ```bash
 export AUTOMEM_DIR=/path/to/automem
 export AUTOMEM_PYTHON="$AUTOMEM_DIR/.venv/bin/python"
+export BASELINE_AUTOMEM_DIR="$AUTOMEM_DIR"
+export BASELINE_AUTOMEM_PYTHON="$AUTOMEM_PYTHON"
+export CANDIDATE_AUTOMEM_DIR=/path/to/automem-metadata-sidecar
+export CANDIDATE_AUTOMEM_PYTHON="$CANDIDATE_AUTOMEM_DIR/.venv/bin/python"
 export LOCAL_AUTOMEM_API_TOKEN=test-token
 
 export BASELINE_COMPOSE_PROJECT=automem_metadata_<worktree>_baseline
@@ -129,8 +136,11 @@ bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadat
 # Check the worktree-specific restore commands without touching Docker.
 bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadata-tags --restore-plan-only
 
-# Full A/B run.
+# Full transform-based A/B run.
 bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadata-tags
+
+# Full server-code A/B run. This skips corpus transforms and verifies vector identity.
+bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant server-metadata-search
 ```
 
 Use `--skip-restore` only to rerun reports against the same already-restored
@@ -144,8 +154,9 @@ docker ps --filter name=automem_metadata_<worktree>
 curl -H "X-Api-Key: $LOCAL_AUTOMEM_API_TOKEN" "http://localhost:$BASELINE_API_PORT/health"
 curl -H "X-Api-Key: $LOCAL_AUTOMEM_API_TOKEN" "http://localhost:$CANDIDATE_API_PORT/health"
 
-cd "$AUTOMEM_DIR"
+cd "$BASELINE_AUTOMEM_DIR"
 docker compose -p "$BASELINE_COMPOSE_PROJECT" down -v
+cd "$CANDIDATE_AUTOMEM_DIR"
 docker compose -p "$CANDIDATE_COMPOSE_PROJECT" down -v
 ```
 

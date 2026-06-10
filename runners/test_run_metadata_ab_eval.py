@@ -113,6 +113,7 @@ class MetadataEvaluatorTests(unittest.TestCase):
                 path,
                 baseline_endpoint="http://localhost:8011",
                 candidate_endpoint="http://localhost:8012",
+                run_label="metadata-sidecar-enabled",
                 aggregate={
                     "baseline": {"hit_at_5": 0.0, "mrr": 0.0, "mean_target_rank": 0.0},
                     "candidate": {"hit_at_5": 1.0, "mrr": 1.0, "mean_target_rank": 1.0},
@@ -131,6 +132,7 @@ class MetadataEvaluatorTests(unittest.TestCase):
 
             report = path.read_text()
 
+        self.assertIn("Run label: `metadata-sidecar-enabled`", report)
         self.assertIn("| baseline | ok | 2 | 5 |", report)
         self.assertIn("| candidate | ok | 2 | 6 |", report)
 
