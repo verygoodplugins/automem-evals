@@ -82,16 +82,16 @@ Docker/runtime source and give each `automem-evals` worktree unique Compose
 project names and host ports. Keep snapshots outside eval worktrees and pass
 them by absolute path.
 
-Create a per-worktree env file such as `.env.metadata-502e`. Files matching
+Create a per-worktree env file such as `.env.metadata-<worktree>`. Files matching
 `.env.*` are ignored by git.
 
 ```bash
-export AUTOMEM_DIR=/Users/jgarturo/Projects/OpenAI/automem
-export AUTOMEM_PYTHON=/Users/jgarturo/Projects/OpenAI/automem/.venv/bin/python
+export AUTOMEM_DIR=/path/to/automem
+export AUTOMEM_PYTHON="$AUTOMEM_DIR/.venv/bin/python"
 export LOCAL_AUTOMEM_API_TOKEN=test-token
 
-export BASELINE_COMPOSE_PROJECT=automem_metadata_502e_baseline
-export CANDIDATE_COMPOSE_PROJECT=automem_metadata_502e_candidate
+export BASELINE_COMPOSE_PROJECT=automem_metadata_<worktree>_baseline
+export CANDIDATE_COMPOSE_PROJECT=automem_metadata_<worktree>_candidate
 
 export BASELINE_API_PORT=8111
 export BASELINE_QDRANT_PORT=6443
@@ -119,9 +119,9 @@ export VECTOR_SIZE=1024
 Run from the eval worktree:
 
 ```bash
-cd /Users/jgarturo/.codex/worktrees/502e/automem-evals
-set -a; source .env.metadata-502e; set +a
-export SNAPSHOT=/Users/jgarturo/Projects/OpenAI/automem/lab/snapshots/<name>/snapshot.tar.gz
+cd /path/to/automem-evals-worktree
+set -a; source .env.metadata-<worktree>; set +a
+export SNAPSHOT=/path/to/automem/lab/snapshots/<name>/snapshot.tar.gz
 
 # Offline smoke test.
 bash scripts/real_data_metadata_eval.sh --snapshot "$SNAPSHOT" --variant metadata-tags --write-probes-only
@@ -140,11 +140,11 @@ candidate stack may already be transformed.
 Operational checks:
 
 ```bash
-docker ps --filter name=automem_metadata_502e
+docker ps --filter name=automem_metadata_<worktree>
 curl -H "X-Api-Key: $LOCAL_AUTOMEM_API_TOKEN" "http://localhost:$BASELINE_API_PORT/health"
 curl -H "X-Api-Key: $LOCAL_AUTOMEM_API_TOKEN" "http://localhost:$CANDIDATE_API_PORT/health"
 
-cd /Users/jgarturo/Projects/OpenAI/automem
+cd "$AUTOMEM_DIR"
 docker compose -p "$BASELINE_COMPOSE_PROJECT" down -v
 docker compose -p "$CANDIDATE_COMPOSE_PROJECT" down -v
 ```

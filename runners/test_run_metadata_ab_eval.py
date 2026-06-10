@@ -106,6 +106,34 @@ class MetadataEvaluatorTests(unittest.TestCase):
         self.assertTrue(merged["transform"]["vectors_identical"])
         self.assertEqual(merged["recall_warmup"]["baseline"]["status"], "ok")
 
+    def test_write_markdown_report_accepts_merged_vector_preflight(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "report.md"
+            evaluator.write_markdown_report(
+                path,
+                baseline_endpoint="http://localhost:8011",
+                candidate_endpoint="http://localhost:8012",
+                aggregate={
+                    "baseline": {"hit_at_5": 0.0, "mrr": 0.0, "mean_target_rank": 0.0},
+                    "candidate": {"hit_at_5": 1.0, "mrr": 1.0, "mean_target_rank": 1.0},
+                    "hit_at_5_delta": 1.0,
+                    "mrr_delta": 1.0,
+                },
+                rows=[],
+                vector_preflight={
+                    "transform": {"vectors_identical": True},
+                    "recall_warmup": {
+                        "baseline": {"status": "ok", "checked": 2, "nonzero_results": 5},
+                        "candidate": {"status": "ok", "checked": 2, "nonzero_results": 6},
+                    },
+                },
+            )
+
+            report = path.read_text()
+
+        self.assertIn("| baseline | ok | 2 | 5 |", report)
+        self.assertIn("| candidate | ok | 2 | 6 |", report)
+
 
 if __name__ == "__main__":
     unittest.main()

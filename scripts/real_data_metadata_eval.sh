@@ -162,8 +162,33 @@ write_readme() {
 }
 
 print_restore_plan() {
-  printf '%s\n' "baseline restore: bash $AUTOMEM_DIR/scripts/lab/clone_production.sh --restore-only $SNAPSHOT --compose-project $BASELINE_COMPOSE_PROJECT --api-port $BASELINE_API_PORT --qdrant-port $BASELINE_QDRANT_PORT --qdrant-grpc-port $BASELINE_QDRANT_GRPC_PORT --falkordb-port $BASELINE_FALKOR_PORT --falkordb-browser-port $BASELINE_FALKOR_UI_PORT --python $AUTOMEM_PYTHON"
-  printf '%s\n' "candidate restore: bash $AUTOMEM_DIR/scripts/lab/clone_production.sh --restore-only $SNAPSHOT --compose-project $CANDIDATE_COMPOSE_PROJECT --api-port $CANDIDATE_API_PORT --qdrant-port $CANDIDATE_QDRANT_PORT --qdrant-grpc-port $CANDIDATE_QDRANT_GRPC_PORT --falkordb-port $CANDIDATE_FALKOR_PORT --falkordb-browser-port $CANDIDATE_FALKOR_UI_PORT --python $AUTOMEM_PYTHON"
+  printf '%s' "baseline restore: "
+  printf '%q ' \
+    bash \
+    "$AUTOMEM_DIR/scripts/lab/clone_production.sh" \
+    --restore-only "$SNAPSHOT" \
+    --compose-project "$BASELINE_COMPOSE_PROJECT" \
+    --api-port "$BASELINE_API_PORT" \
+    --qdrant-port "$BASELINE_QDRANT_PORT" \
+    --qdrant-grpc-port "$BASELINE_QDRANT_GRPC_PORT" \
+    --falkordb-port "$BASELINE_FALKOR_PORT" \
+    --falkordb-browser-port "$BASELINE_FALKOR_UI_PORT" \
+    --python "$AUTOMEM_PYTHON"
+  printf '\n'
+
+  printf '%s' "candidate restore: "
+  printf '%q ' \
+    bash \
+    "$AUTOMEM_DIR/scripts/lab/clone_production.sh" \
+    --restore-only "$SNAPSHOT" \
+    --compose-project "$CANDIDATE_COMPOSE_PROJECT" \
+    --api-port "$CANDIDATE_API_PORT" \
+    --qdrant-port "$CANDIDATE_QDRANT_PORT" \
+    --qdrant-grpc-port "$CANDIDATE_QDRANT_GRPC_PORT" \
+    --falkordb-port "$CANDIDATE_FALKOR_PORT" \
+    --falkordb-browser-port "$CANDIDATE_FALKOR_UI_PORT" \
+    --python "$AUTOMEM_PYTHON"
+  printf '\n'
 }
 
 echo "[1/6] Generating metadata probes"

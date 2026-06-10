@@ -1,6 +1,7 @@
 import gzip
 import json
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -157,6 +158,54 @@ class RealDataMetadataEvalShellTests(unittest.TestCase):
             self.assertIn("--qdrant-grpc-port 6445", result.stdout)
             self.assertIn("--qdrant-grpc-port 6446", result.stdout)
             self.assertNotIn("[2/6] Restoring baseline stack", result.stdout)
+        finally:
+            if run_dir.exists():
+                shutil.rmtree(run_dir)
+
+    def test_restore_plan_quotes_paths_and_arguments(self):
+        sweep_root = HERE / "data" / "sweep_runs"
+        sweep_root.mkdir(parents=True, exist_ok=True)
+        run_dir = Path(tempfile.mkdtemp(prefix="test metadata restore plan ", dir=sweep_root))
+        snapshot = write_synthetic_snapshot(run_dir)
+        automem_dir = run_dir / "automem path; touch nope"
+        automem_python = automem_dir / ".venv" / "bin" / "python"
+
+        try:
+            result = subprocess.run(
+                [
+                    "bash",
+                    str(HERE / "scripts" / "real_data_metadata_eval.sh"),
+                    "--snapshot",
+                    str(snapshot),
+                    "--variant",
+                    "metadata-tags",
+                    "--restore-plan-only",
+                    "--run-dir",
+                    str(run_dir),
+                ],
+                cwd=HERE,
+                env=metadata_env(
+                    AUTOMEM_DIR=str(automem_dir),
+                    AUTOMEM_PYTHON=str(automem_python),
+                    BASELINE_COMPOSE_PROJECT="automem metadata baseline",
+                    CANDIDATE_COMPOSE_PROJECT="automem metadata candidate",
+                ),
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=30,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            line = next(
+                item for item in result.stdout.splitlines() if item.startswith("baseline restore: ")
+            )
+            argv = shlex.split(line.removeprefix("baseline restore: "))
+            self.assertEqual(argv[0], "bash")
+            self.assertEqual(argv[1], str(automem_dir / "scripts" / "lab" / "clone_production.sh"))
+            self.assertIn(str(snapshot), argv)
+            self.assertIn("automem metadata baseline", argv)
+            self.assertIn(str(automem_python), argv)
         finally:
             if run_dir.exists():
                 shutil.rmtree(run_dir)

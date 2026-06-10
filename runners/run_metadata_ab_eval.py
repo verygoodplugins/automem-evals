@@ -231,6 +231,9 @@ def write_markdown_report(
     rows: list[dict[str, Any]],
     vector_preflight: dict[str, Any],
 ) -> None:
+    recall_warmup = vector_preflight.get("recall_warmup")
+    if not isinstance(recall_warmup, dict):
+        recall_warmup = vector_preflight
     lines = [
         f"# Metadata A/B report - {dt.datetime.now().isoformat(timespec='seconds')}",
         "",
@@ -243,7 +246,7 @@ def write_markdown_report(
         "|---|---|---:|---:|",
     ]
     for label in ("baseline", "candidate"):
-        item = vector_preflight.get(label) or {}
+        item = recall_warmup.get(label) or {}
         lines.append(
             f"| {label} | {item.get('status')} | {item.get('checked', 0)} | {item.get('nonzero_results', 0)} |"
         )
@@ -365,7 +368,7 @@ def main() -> int:
         candidate_endpoint=args.candidate_endpoint,
         aggregate=aggregate,
         rows=rows,
-        vector_preflight=recall_warmup,
+        vector_preflight=vector_preflight,
     )
     print(f"metrics: {metrics_path}")
     print(f"report: {report_path}")
