@@ -344,7 +344,10 @@ class DiffTests(unittest.TestCase):
         self.assertEqual(cre.classify_status("negative", diff), "REGRESSION")
 
     def test_negative_without_top1_scores_in_diff_falls_back_to_counts(self):
-        # Hand-built diffs (e.g. from older saved summaries) may lack top1 keys.
+        # The .get() fallback covers hand-built or external diff dicts that lack
+        # top1 keys. (In --baseline-summary mode diffs are always recomputed by
+        # diff_summary from saved summaries, which carry "top", so this fallback
+        # never serves a real saved-summary path.)
         diff = {
             "count_delta": 0,
             "returned_delta": 0,
