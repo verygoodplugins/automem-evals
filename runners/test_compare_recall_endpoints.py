@@ -200,6 +200,163 @@ class DiffTests(unittest.TestCase):
         }
         self.assertEqual(cre.classify_status("noise", diff), "improved")
 
+    def test_diff_summary_records_top1_scores_for_both_sides(self):
+        baseline = {
+            "count": 2,
+            "returned": 2,
+            "top_ids": ["a", "b"],
+            "top": [{"id": "a", "score": 0.71}, {"id": "b", "score": 0.5}],
+        }
+        candidate = {
+            "count": 2,
+            "returned": 2,
+            "top_ids": ["a", "b"],
+            "top": [{"id": "a", "score": 0.42}, {"id": "b", "score": 0.3}],
+        }
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(diff["top1_score_baseline"], 0.71)
+        self.assertEqual(diff["top1_score_candidate"], 0.42)
+
+    def test_diff_summary_top1_scores_are_none_for_empty_results(self):
+        baseline = {"count": 0, "returned": 0, "top_ids": [], "top": []}
+        candidate = {"count": 0, "returned": 0, "top_ids": [], "top": []}
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertIsNone(diff["top1_score_baseline"])
+        self.assertIsNone(diff["top1_score_candidate"])
+
+    def test_negative_fewer_candidate_results_is_improved(self):
+        baseline = {
+            "count": 3,
+            "returned": 3,
+            "top_ids": ["a", "b", "c"],
+            "top": [
+                {"id": "a", "score": 0.7},
+                {"id": "b", "score": 0.6},
+                {"id": "c", "score": 0.5},
+            ],
+        }
+        candidate = {"count": 0, "returned": 0, "top_ids": [], "top": []}
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "improved")
+
+    def test_negative_more_candidate_results_is_regression(self):
+        baseline = {"count": 0, "returned": 0, "top_ids": [], "top": []}
+        candidate = {
+            "count": 2,
+            "returned": 2,
+            "top_ids": ["a", "b"],
+            "top": [{"id": "a", "score": 0.6}, {"id": "b", "score": 0.5}],
+        }
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "REGRESSION")
+
+    def test_negative_higher_top1_score_same_count_is_regression(self):
+        baseline = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.45}],
+        }
+        candidate = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.62}],
+        }
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "REGRESSION")
+
+    def test_negative_lower_top1_score_same_count_is_improved(self):
+        baseline = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.62}],
+        }
+        candidate = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.45}],
+        }
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "improved")
+
+    def test_negative_identical_results_is_ok(self):
+        baseline = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.45}],
+        }
+        candidate = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.45}],
+        }
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "ok")
+
+    def test_negative_both_empty_is_ok(self):
+        baseline = {"count": 0, "returned": 0, "top_ids": [], "top": []}
+        candidate = {"count": 0, "returned": 0, "top_ids": [], "top": []}
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "ok")
+
+    def test_negative_fewer_results_with_higher_top1_is_regression(self):
+        # Safety-first: a higher-confidence false positive outweighs a count drop.
+        baseline = {
+            "count": 3,
+            "returned": 3,
+            "top_ids": ["a", "b", "c"],
+            "top": [
+                {"id": "a", "score": 0.45},
+                {"id": "b", "score": 0.4},
+                {"id": "c", "score": 0.35},
+            ],
+        }
+        candidate = {
+            "count": 1,
+            "returned": 1,
+            "top_ids": ["a"],
+            "top": [{"id": "a", "score": 0.8}],
+        }
+
+        diff = cre.diff_summary(baseline, candidate)
+
+        self.assertEqual(cre.classify_status("negative", diff), "REGRESSION")
+
+    def test_negative_without_top1_scores_in_diff_falls_back_to_counts(self):
+        # The .get() fallback covers hand-built or external diff dicts that lack
+        # top1 keys. (In --baseline-summary mode diffs are always recomputed by
+        # diff_summary from saved summaries, which carry "top", so this fallback
+        # never serves a real saved-summary path.)
+        diff = {
+            "count_delta": 0,
+            "returned_delta": 0,
+            "top_changed": False,
+            "lost_top5": [],
+            "gained_top5": [],
+        }
+        self.assertEqual(cre.classify_status("negative", diff), "ok")
+
     def test_tag_filter_diagnostic_matches_recall_params(self):
         self.assertTrue(
             cre.passes_tag_filter(
@@ -671,6 +828,84 @@ class MainGateTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         self.assertEqual([row["id"] for row in diagnostics_rows], ["TOP-CHANGED"])
+
+    def test_main_handles_negative_group_scenario_end_to_end(self):
+        scenario = {
+            "description": "negative control fixture",
+            "queries": [
+                {
+                    "id": "NEG-PROBE",
+                    "group": "negative",
+                    "description": "correct answer is nothing relevant",
+                    "query": "topic the corpus cannot contain",
+                    "params": {"limit": 10},
+                }
+            ],
+        }
+
+        def fake_get(endpoint, token, path, params=None):
+            if path == "/health":
+                return {"status": "healthy", "memory_count": 2, "vector_count": 2}
+            if endpoint.endswith("8011"):
+                return {
+                    "count": 2,
+                    "results": [
+                        {
+                            "id": "off-topic-a",
+                            "final_score": 0.7,
+                            "score_components": {"vector": 0.7},
+                        },
+                        {
+                            "id": "off-topic-b",
+                            "final_score": 0.6,
+                            "score_components": {"vector": 0.6},
+                        },
+                    ],
+                }
+            return {"count": 0, "results": []}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            scenario_path = Path(tmp) / "scenario.json"
+            scenario_path.write_text(json.dumps(scenario))
+            run_dir = Path(tmp) / "run"
+
+            def fake_diagnostics(**kwargs):
+                diagnostics_path = (
+                    run_dir / "diagnostics" / f"{kwargs['row']['id']}.json"
+                )
+                diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+                diagnostics_path.write_text("{}")
+                return diagnostics_path
+
+            argv = [
+                "compare_recall_endpoints.py",
+                "--scenario",
+                str(scenario_path),
+                "--baseline-endpoint",
+                "http://localhost:8011",
+                "--candidate-endpoint",
+                "http://localhost:8012",
+                "--run-dir",
+                str(run_dir),
+                "--report",
+                str(Path(tmp) / "report.md"),
+                "--skip-vector-preflight",
+            ]
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(
+                cre, "http_get_json", side_effect=fake_get
+            ), mock.patch.object(
+                cre, "write_regression_diagnostics", side_effect=fake_diagnostics
+            ):
+                exit_code = cre.main()
+
+            summary = json.loads((run_dir / "summary.json").read_text())
+
+        self.assertEqual(exit_code, 0)
+        row = summary["rows"][0]
+        self.assertEqual(row["group"], "negative")
+        self.assertEqual(row["status"], "improved")
+        self.assertEqual(row["diff"]["top1_score_baseline"], 0.7)
+        self.assertIsNone(row["diff"]["top1_score_candidate"])
 
     def test_main_writes_failure_artifact_when_recall_times_out(self):
         scenario = {

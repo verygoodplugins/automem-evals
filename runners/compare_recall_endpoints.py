@@ -569,6 +569,13 @@ def _near_tie_top_swap(
     return max_gap <= epsilon, max_gap
 
 
+def _top1_score(summary: dict) -> float | None:
+    top = summary.get("top") or []
+    if not top:
+        return None
+    return _as_float(top[0].get("score"))
+
+
 def diff_summary(baseline: dict, candidate: dict) -> dict:
     baseline_top = baseline["top_ids"]
     candidate_top = candidate["top_ids"]
@@ -582,6 +589,8 @@ def diff_summary(baseline: dict, candidate: dict) -> dict:
         "top_changed": top_changed,
         "top_swap_near_tie": near_tie if top_changed else False,
         "top_swap_score_gap": near_tie_gap if top_changed else None,
+        "top1_score_baseline": _top1_score(baseline),
+        "top1_score_candidate": _top1_score(candidate),
         "lost_top5": [mid for mid in baseline_top if mid not in candidate_top],
         "gained_top5": [mid for mid in candidate_top if mid not in baseline_top],
     }
@@ -606,6 +615,23 @@ def classify_status(group: str, diff: dict) -> str:
         if diff["count_delta"] < 0:
             return "improved"
         return "observe"
+    if group == "negative":
+        # Negative controls: the correct answer is "nothing relevant", so
+        # MORE results or a HIGHER-confidence top hit is a false-positive
+        # regression. Regression checks come first — a higher-scoring false
+        # positive is worse even when the result count drops.
+        baseline_top1 = _as_float(diff.get("top1_score_baseline"))
+        candidate_top1 = _as_float(diff.get("top1_score_candidate"))
+        have_scores = baseline_top1 is not None and candidate_top1 is not None
+        if diff["count_delta"] > 0:
+            return "REGRESSION"
+        if have_scores and candidate_top1 > baseline_top1:
+            return "REGRESSION"
+        if diff["count_delta"] < 0:
+            return "improved"
+        if have_scores and candidate_top1 < baseline_top1:
+            return "improved"
+        return "ok"
     return "review"
 
 
