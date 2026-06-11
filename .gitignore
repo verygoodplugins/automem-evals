@@ -28,6 +28,10 @@ data/transcripts/*.jsonl
 data/results/*.json
 data/results/*-comparison.md
 data/results/matrix/*.json
+# Endpoint-comparison run dirs (relchain sweeps etc.) — raw per-run trees with
+# health snapshots and raw recall responses. Reproducible from the snapshot +
+# committed runner; add a `!` exception only if a run becomes source material.
+data/results/relchain_*/
 # BEAM artifacts — recursive patterns so deeper run layouts don't leak through.
 data/results/beam/**/beam_results_*.json
 data/results/beam/**/beam-output/
