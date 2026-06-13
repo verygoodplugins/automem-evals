@@ -1280,6 +1280,16 @@ def run_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_cleanup(args: argparse.Namespace) -> int:
+    assert_endpoint_allowed(args.endpoint, args.allow_non_local)
+    manifest_path = pathlib.Path(args.manifest)
+    manifest = json.loads(manifest_path.read_text())
+    client = AutoMemClient(args.endpoint, args.token)
+    deleted = client.cleanup_run(manifest["run_id"])
+    print(f"cleanup: deleted {deleted} memories tagged {manifest['run_tag']}")
+    return 0
+
+
 def _add_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--tier", default="100k", help="100k|128k|500k|1m|10m")
     parser.add_argument("--sample-conversations", type=int, default=None)
@@ -1310,6 +1320,12 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("--input", required=True)
     report.add_argument("--output", default=None)
 
+    cleanup = subcommands.add_parser("cleanup", help="Delete memories for an ingest manifest")
+    cleanup.add_argument("--manifest", required=True)
+    cleanup.add_argument("--endpoint", default=DEFAULT_ENDPOINT)
+    cleanup.add_argument("--token", default=DEFAULT_TOKEN)
+    cleanup.add_argument("--allow-non-local", action="store_true")
+
     return parser
 
 
@@ -1323,6 +1339,8 @@ def main(argv: list[str] | None = None) -> int:
             return run_eval(args)
         if args.command == "report":
             return run_report(args)
+        if args.command == "cleanup":
+            return run_cleanup(args)
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
     raise SystemExit(f"unknown command: {args.command}")

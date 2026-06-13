@@ -36,6 +36,10 @@ python3 scripts/beam_eval.py \
 # Render a report from a saved result JSON.
 python3 scripts/beam_report.py \
   --input data/results/beam-retrieval/<run-id>/results.json
+
+# Remove seeded memories for a saved manifest without rewriting results.
+python3 scripts/beam_cleanup.py \
+  --manifest data/results/beam-retrieval/<run-id>/manifest.json
 ```
 
 The lower-level entry point is equivalent:
@@ -44,6 +48,7 @@ The lower-level entry point is equivalent:
 python3 runners/beam_retrieval_eval.py ingest --tier 100k
 python3 runners/beam_retrieval_eval.py eval --tier 100k
 python3 runners/beam_retrieval_eval.py report --input data/results/beam-retrieval/<run-id>/results.json
+python3 runners/beam_retrieval_eval.py cleanup --manifest data/results/beam-retrieval/<run-id>/manifest.json
 ```
 
 ## Flags
@@ -163,10 +168,8 @@ Use `--cleanup-after` for smoke runs. To remove a run later, rerun against the
 same run ID with cleanup enabled:
 
 ```bash
-python3 scripts/beam_eval.py \
-  --manifest data/results/beam-retrieval/<run-id>/manifest.json \
-  --cleanup-after \
-  --question-limit 0
+python3 scripts/beam_cleanup.py \
+  --manifest data/results/beam-retrieval/<run-id>/manifest.json
 ```
 
 Cleanup recalls by exact `beam-run-<run-id>` tag and deletes the returned memory

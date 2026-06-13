@@ -1,5 +1,6 @@
 import pathlib
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -263,6 +264,51 @@ class ReportTests(unittest.TestCase):
         self.assertTrue((repo / "scripts" / "beam_ingest.py").exists())
         self.assertTrue((repo / "scripts" / "beam_eval.py").exists())
         self.assertTrue((repo / "scripts" / "beam_report.py").exists())
+        self.assertTrue((repo / "scripts" / "beam_cleanup.py").exists())
+
+
+class CleanupCommandTests(unittest.TestCase):
+    def test_cleanup_command_does_not_rewrite_results_or_report(self):
+        with tempfile.TemporaryDirectory() as td:
+            run_dir = pathlib.Path(td)
+            manifest_path = run_dir / "manifest.json"
+            results_path = run_dir / "results.json"
+            report_path = run_dir / "report.md"
+            manifest_path.write_text(
+                '{"run_id":"run-1","run_tag":"beam-run-run-1","conversations":[]}'
+            )
+            results_path.write_text("original results")
+            report_path.write_text("original report")
+            calls = []
+
+            class FakeClient:
+                def __init__(self, endpoint, token):
+                    self.endpoint = endpoint
+                    self.token = token
+
+                def cleanup_run(self, run_id):
+                    calls.append(run_id)
+                    return 3
+
+            original = beam.AutoMemClient
+            try:
+                beam.AutoMemClient = FakeClient
+                rc = beam.main(
+                    [
+                        "cleanup",
+                        "--manifest",
+                        str(manifest_path),
+                        "--endpoint",
+                        "http://localhost:8001",
+                    ]
+                )
+            finally:
+                beam.AutoMemClient = original
+
+            self.assertEqual(rc, 0)
+            self.assertEqual(calls, ["run-1"])
+            self.assertEqual(results_path.read_text(), "original results")
+            self.assertEqual(report_path.read_text(), "original report")
 
 
 if __name__ == "__main__":

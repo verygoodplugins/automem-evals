@@ -35,6 +35,9 @@ data/results/relchain_*/
 # BEAM artifacts — recursive patterns so deeper run layouts don't leak through.
 data/results/beam/**/beam_results_*.json
 data/results/beam/**/beam-output/
+# BEAM retrieval-proxy artifacts are generated per run; commit curated notes
+# under docs/session_*.md instead of raw manifests/results.
+data/results/beam-retrieval/
 
 # Sweep runs — raw per-run artifacts (qdrant dumps, health snapshots, probe diffs,
 # token files). Reproducible from the seeded corpus + the committed runner.
