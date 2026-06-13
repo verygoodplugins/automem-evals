@@ -51,6 +51,28 @@ class DatasetNormalizationTests(unittest.TestCase):
             [12, 24, 58],
         )
 
+    def test_source_chat_ids_match_runner_stored_equals_format(self):
+        # The ingest path stores "chat_id=<n>" (equals) in the memory content
+        # prefix, so the content-fallback extractor must parse that exact shape,
+        # not only the "chat_id: <n>" (colon) form.
+        self.assertEqual(
+            beam.extract_source_chat_ids(
+                {"conversation_references": "[BEAM 100K conv=Conv 1 chat_id=42 role=user] hi"}
+            ),
+            [42],
+        )
+
+    def test_source_ids_fall_back_to_content_when_metadata_absent(self):
+        # Mirrors a recall result whose metadata was stripped: source IDs must
+        # still be recovered from the stored "chat_id=<n>" content prefix.
+        result = {
+            "memory": {
+                "id": "mem-1",
+                "content": "[BEAM 100K conv=Conv 1 chat_id=24 role=user] The app uses Flask.",
+            }
+        }
+        self.assertEqual(beam._source_ids_from_result(result), {24})
+
 
 class ChunkTests(unittest.TestCase):
     def test_chunks_are_small_and_tagged_with_run_tier_and_conversation(self):

@@ -330,7 +330,10 @@ def extract_source_chat_ids(question_data: dict[str, Any]) -> list[int]:
             found.add(value)
             return
         if isinstance(value, str):
-            for match in re.finditer(r"chat_id\s*:\s*(\d+)", value, flags=re.I):
+            # Accept both "chat_id: <n>" (BEAM source labels) and "chat_id=<n>"
+            # (this runner's own stored content prefix) so the content-based
+            # fallback works when recall results lack metadata.
+            for match in re.finditer(r"chat_id\s*[:=]\s*(\d+)", value, flags=re.I):
                 found.add(int(match.group(1)))
             return
         if isinstance(value, dict):
