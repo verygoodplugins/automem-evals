@@ -163,6 +163,29 @@ docker compose -p "$CANDIDATE_COMPOSE_PROJECT" down -v
 
 ## Experimental: BEAM via shim
 
+There are two BEAM paths in this repo:
+
+- `scripts/beam_eval.py` / `runners/beam_retrieval_eval.py` — deterministic
+  AutoMem `/recall` retrieval-proxy harness. No answerer, no judge, no official
+  BEAM score. See [`docs/eval/beam.md`](docs/eval/beam.md).
+- `runners/run_beam.py` — older upstream BEAM runner shim for end-to-end smoke
+  experiments through mem0's BEAM harness.
+
+### Retrieval-proxy runner
+
+```bash
+# Small no-judge smoke: seed, score 10 questions, then remove seeded memories.
+python3 scripts/beam_eval.py \
+  --tier 100k \
+  --sample-conversations 1 \
+  --question-limit 10 \
+  --cleanup-after
+```
+
+Results land under `data/results/beam-retrieval/<run-id>/`.
+
+### Upstream BEAM shim
+
 `runners/run_beam.py` drives mem0's upstream BEAM runner (vendored at
 `third_party/memory-benchmarks/`) against the local AutoMem stack through
 `runners/beam_shim.py`, which translates mem0-OSS REST calls to AutoMem REST.
