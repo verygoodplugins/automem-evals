@@ -24,7 +24,5 @@ def lint_compose(yaml_text: str) -> List[str]:
             )
         for port in svc.get("ports", []) or []:
             if isinstance(port, str) and _FIXED_HOST_PORT.match(port):
-                errors.append(
-                    f"service '{svc_name}' uses fixed host port '{port}'"
-                )
+                errors.append(f"service '{svc_name}' uses fixed host port '{port}'")
     return errors
