@@ -11,6 +11,22 @@ Use this runner to ask a narrower question:
 > When BEAM conversations are loaded into AutoMem, does `/recall` surface
 > evidence that matches the source chats and rubric nuggets?
 
+## Harness variants in this repo
+
+There are three BEAM paths here; pick by what you're measuring:
+
+| Runner | Scorer | AutoMem surface | `official_beam_score` |
+|---|---|---|---|
+| `beam_retrieval_eval.py` (this doc) | deterministic retrieval proxy | native `/recall` | `false` |
+| `run_beam.py` | **official** BEAM answer+judge | mem0-impersonating shim | `true` |
+| `beam_judged_eval.py` | **official** BEAM answer+judge | **native** `/recall` + PR#12 ingest | `true` |
+
+The retrieval proxy is the cheap, deterministic regression detector. `run_beam.py`
+proves AutoMem can pass mem0's wire contract end to end. `beam_judged_eval.py`
+(see [§Judged harness](#judged-harness-native-official-scorer)) is the one that
+produces a leaderboard-comparable score *through AutoMem's own ingest + recall*,
+so server-side ranking changes (e.g. `recency_bias`) can actually move it.
+
 ## Commands
 
 Start the local AutoMem stack first:
@@ -175,6 +191,76 @@ python3 scripts/beam_cleanup.py \
 Cleanup recalls by exact `beam-run-<run-id>` tag and deletes the returned memory
 IDs. If AutoMem volumes are reset, old manifests remain useful as records but
 their memory IDs no longer refer to live server state.
+
+## Judged harness (native, official scorer)
+
+`runners/beam_judged_eval.py` (wrapper: `scripts/beam_judged.py`) runs the **official
+BEAM scorer** — the LLM rubric-nugget judge (0/0.5/1.0 per nugget, question score =
+mean, pass ≥ 0.5) plus Kendall tau-b for `event_ordering` — over answers generated
+from AutoMem's **native** `/recall`. It reuses PR #12 ingest (chunking,
+`OCCURRED_BEFORE`) and additionally maps each turn's `time_anchor` to the memory
+`timestamp`, so the answer prompt and recall see real per-turn dates.
+
+The answer prompt, judge prompt, and `LLMClient` are imported from the vendored
+upstream submodule (`third_party/memory-benchmarks`); the small judge/score
+orchestration helpers are ported into the runner so it does not import the
+upstream mem0/pydantic dependency chain.
+
+### Requirements
+
+- `OPENAI_API_KEY` (loaded from `REPO/.env` if not exported).
+- Upstream deps: `pip install -r third_party/memory-benchmarks/requirements.txt`,
+  or use the existing `.venv-beam` (Python ≥ 3.10 — the runner uses `X | None`).
+- A local AutoMem stack at `http://localhost:8001`.
+
+### Commands
+
+```bash
+# Smoke: one conversation, cheap models (exercises all 10 abilities + tau).
+.venv-beam/bin/python scripts/beam_judged.py \
+  --sample-conversations 1 --answerer-model gpt-5-mini --judge-model gpt-5-mini
+
+# Headline 100K run, official default models (gpt-5 answerer + gpt-5 judge).
+.venv-beam/bin/python scripts/beam_judged.py --tier 100K \
+  --answerer-model gpt-5 --judge-model gpt-5
+
+# Ranking sweep (#194): the judged score IS sensitive to these; the proxy is not.
+.venv-beam/bin/python scripts/beam_judged.py --recency-bias auto      # temporal rescore
+.venv-beam/bin/python scripts/beam_judged.py --min-score 0.4          # relevance gate
+
+# Ablation: ingest WITHOUT the time_anchor->timestamp mapping.
+.venv-beam/bin/python scripts/beam_judged.py --no-timestamps
+```
+
+### Notable flags
+
+- `--top-k N` / `--cutoffs 100`: recall depth and the answer cutoff(s). `top_100`
+  matches the existing `run_beam.py` baseline and the BEAM 100K convention.
+- `--recency-bias off|auto|on` and `--min-score FLOAT`: AutoMem `/recall` ranking
+  knobs passed straight through, for the #194 sweep.
+- `--no-timestamps`: disable the `time_anchor` → `timestamp` mapping (ablation).
+- `--sample-conversations N` / `--question-limit-per-conv N`: smoke sizing.
+- `--keep`: skip cleanup (leave memories for inspection).
+
+### Scoring + comparability
+
+Result JSON is labeled `official_beam_score: true` with the exact scoring method,
+the answerer/judge models, the ranking flags, and `judge_usage` (call counts)
+recorded in `metadata`. `metrics_by_cutoff` matches the official shape (per-ability
++ overall accuracy at the 0.5 pass threshold).
+
+The number is a **BEAM 100K-tier** score — comparable to other systems' published
+100K numbers (Hindsight 100K = 75%), **not** the 10M leaderboard headline. The
+mem0-shim baseline (`run_beam.py`, gpt-5-mini) was 76.25% at this tier; it is
+recorded in the artifact metadata for reference.
+
+### Isolation
+
+Each conversation is ingested under `beam-run-<id>`, evaluated, then cleaned up
+before the next, with a final sweep. `/health` `memory_count`/`vector_count` are
+captured before and after; the runner exits non-zero if `memory_count` does not
+return to baseline. (Qdrant may carry pre-existing orphaned vectors, so vector
+drift is reported but not a hard gate.)
 
 ## Sources
 

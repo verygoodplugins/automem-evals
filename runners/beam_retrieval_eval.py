@@ -163,6 +163,10 @@ class MemoryChunk:
     metadata: dict[str, Any]
     sequence: int
     conversation_id: str
+    # Optional ISO timestamp derived from the turn's BEAM time_anchor. Left None
+    # by the retrieval proxy (server assigns ingestion time); set by the judged
+    # harness so /recall + the BEAM answer prompt see real per-turn dates.
+    timestamp: str | None = None
 
 
 def normalize_tier(value: str) -> str:
@@ -439,16 +443,77 @@ def _split_with_prefix(prefix: str, text: str, max_chars: int) -> list[str]:
     return parts or [prefix.strip()[:max_chars]]
 
 
+# Fallback base for conversations whose turns carry no parseable time_anchor.
+# Only the *ordering* matters in that degenerate case (no real dates exist);
+# a per-turn seconds offset off this base keeps intra-conversation order stable.
+SYNTHETIC_BASE_DATE = dt.datetime(2024, 1, 1, tzinfo=dt.timezone.utc)
+
+_ANCHOR_FORMATS = (
+    "%B-%d-%Y",
+    "%b-%d-%Y",
+    "%B %d %Y",
+    "%b %d %Y",
+    "%B %d, %Y",
+    "%b %d, %Y",
+    "%m-%d-%Y",
+    "%m/%d/%Y",
+    "%Y-%m-%d",
+    "%Y/%m/%d",
+)
+
+
+def parse_time_anchor(anchor: Any) -> dt.datetime | None:
+    """Parse a BEAM turn ``time_anchor`` (e.g. ``"March-15-2024"``) to a UTC datetime.
+
+    Returns ``None`` for missing/unparseable anchors so callers can fall back.
+    """
+    if not isinstance(anchor, str):
+        return None
+    raw = anchor.strip()
+    if not raw:
+        return None
+    for fmt in _ANCHOR_FORMATS:
+        try:
+            return dt.datetime.strptime(raw, fmt).replace(tzinfo=dt.timezone.utc)
+        except ValueError:
+            continue
+    try:
+        parsed = dt.datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        return None
+
+
 def build_memory_chunks(
     conversation: BeamConversation,
     *,
     run_id: str,
     max_chars: int = MAX_MEMORY_CHARS,
+    with_timestamps: bool = False,
 ) -> list[MemoryChunk]:
+    """Chunk a BEAM conversation into <=max_chars memories.
+
+    When ``with_timestamps`` is True, each chunk gets an ISO ``timestamp`` derived
+    from the turn's ``time_anchor`` (carried forward when a turn lacks one), plus a
+    per-chunk seconds offset so intra-conversation order is strictly increasing.
+    The retrieval proxy leaves this off (default), so its behavior is unchanged.
+    """
     chunks: list[MemoryChunk] = []
     sequence = 0
     tags = _memory_tags(run_id, conversation.tier, conversation.conversation_tag)
     fallback_chat_id = 0
+
+    first_anchor: dt.datetime | None = None
+    if with_timestamps:
+        for batch in conversation.chat:
+            for turn in batch:
+                parsed = parse_time_anchor(turn.get("time_anchor"))
+                if parsed is not None:
+                    first_anchor = parsed
+                    break
+            if first_anchor is not None:
+                break
+    last_anchor: dt.datetime | None = None
 
     for batch_idx, batch in enumerate(conversation.chat):
         for turn_idx, turn in enumerate(batch):
@@ -463,6 +528,14 @@ def build_memory_chunks(
                 chat_id = fallback_chat_id
             role = str(turn.get("role") or "user")
             time_anchor = turn.get("time_anchor")
+
+            base_dt: dt.datetime | None = None
+            if with_timestamps:
+                parsed_anchor = parse_time_anchor(time_anchor)
+                if parsed_anchor is not None:
+                    last_anchor = parsed_anchor
+                base_dt = last_anchor or first_anchor or SYNTHETIC_BASE_DATE
+
             prefix = (
                 f"[BEAM {conversation.tier} conv={conversation.conversation_id} "
                 f"chat_id={chat_id} role={role}"
@@ -490,6 +563,9 @@ def build_memory_chunks(
                 }
                 if time_anchor:
                     metadata["time_anchor"] = time_anchor
+                ts_value: str | None = None
+                if base_dt is not None:
+                    ts_value = (base_dt + dt.timedelta(seconds=sequence)).isoformat()
                 chunks.append(
                     MemoryChunk(
                         key=(
@@ -501,6 +577,7 @@ def build_memory_chunks(
                         metadata=metadata,
                         sequence=sequence,
                         conversation_id=conversation.conversation_id,
+                        timestamp=ts_value,
                     )
                 )
                 sequence += 1
@@ -579,6 +656,9 @@ class AutoMemClient:
                         "type": "Context",
                         "confidence": 0.9,
                         "metadata": chunk.metadata,
+                        # /memory/batch maps `timestamp` -> node.timestamp + node.t_valid.
+                        # Omitted (proxy default) => server assigns ingestion time.
+                        **({"timestamp": chunk.timestamp} if chunk.timestamp else {}),
                     }
                     for chunk in batch
                 ]

@@ -38,6 +38,9 @@ data/results/beam/**/beam-output/
 # BEAM retrieval-proxy artifacts are generated per run; commit curated notes
 # under docs/session_*.md instead of raw manifests/results.
 data/results/beam-retrieval/
+# BEAM judged (native, official-scorer) artifacts — same policy: curated note
+# under docs/session_*.md is the committed record, raw results stay local.
+data/results/beam-judged/
 
 # Sweep runs — raw per-run artifacts (qdrant dumps, health snapshots, probe diffs,
 # token files). Reproducible from the seeded corpus + the committed runner.
