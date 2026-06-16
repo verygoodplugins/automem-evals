@@ -92,6 +92,37 @@ separate supervised operation:
 > **Note:** the full-corpus run needs production backup access and is a
 > separate, supervised step. Do not automate it without explicit sign-off.
 
+### Pre-flight fixes before the supervised full-corpus run
+
+The Tier-1 smoke is validated, but four items (surfaced by the Plan B final
+review) must be closed before a *publishable* full-corpus run. They are
+deferred because two of them depend on the production embedding config:
+
+1. **Pin the embedding provider per stack to match production.** `live.py`
+   passes the host environment to the `docker compose` subprocess for port
+   interpolation; with `EMBEDDING_PROVIDER=auto` a stack can silently use a
+   paid API (Voyage/OpenAI) if host keys are set — non-reproducible and
+   costly. Set `EMBEDDING_PROVIDER` (and `VECTOR_SIZE`) **in each config
+   dict** so it is baked into the override and recorded in the manifest. It
+   MUST match what the cloned production corpus was embedded with, or recall
+   queries embed at the wrong dimension. For a self-contained run use
+   `EMBEDDING_PROVIDER=local` + a shared **read-only** FastEmbed model cache
+   mounted into every stack with `HF_HUB_OFFLINE=1` (avoids re-download races
+   and guarantees byte-identical weights).
+2. **Widen `cell_key` provenance.** It currently hashes
+   `(config, automem_commit, seed, snapshot_id)`. Add `image_digest` and the
+   embedding model+version so a changed image or embedding is not wrongly
+   treated as cached (stale-result reuse). Putting `EMBEDDING_PROVIDER` in the
+   config (item 1) already folds the embedding choice into the key.
+3. **Wire `max_concurrency` for wave-parallel execution.** The orchestrator is
+   currently sequential by design; `resources.max_concurrency` is implemented
+   and tested but not yet used. Bound concurrent stacks by measured per-stack
+   peak RSS, with staggered startup, before running the full matrix.
+4. **Doc/key note:** `cell_key` includes `{"_name": name, **config}` so two
+   arms with identical config dicts get distinct keys — the manifest model
+   above describes the pre-`_name` form; both are intentional (the `_name`
+   guard prevents silent cache collisions).
+
 ## Running the unit tests
 
 ```bash
