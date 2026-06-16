@@ -538,6 +538,25 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     run_dir = pathlib.Path(args.output_dir) / f"{run_id}-{args.tier}"
     run_dir.mkdir(parents=True, exist_ok=True)
     partial_path = run_dir / "results.partial.jsonl"
+    # Resume: seed from a prior run's checkpoint and skip its completed
+    # conversations (the killed-overnight-run recovery path).
+    resumed_conv_ids: set[str] = set()
+    if args.resume_from:
+        with open(args.resume_from) as fh, partial_path.open("a") as out:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                ev = json.loads(line)
+                evaluations.append(ev)
+                resumed_conv_ids.add(ev.get("conversation_id"))
+                out.write(line + "\n")
+        logger.info(
+            "resumed %d questions from %d conversations (%s)",
+            len(evaluations),
+            len(resumed_conv_ids),
+            args.resume_from,
+        )
     total_memories = 0
     total_associations = 0
 
@@ -553,6 +572,9 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
 
     try:
         for conv in conversations:
+            if conv.conversation_id in resumed_conv_ids:
+                logger.info("skip %s (resumed from checkpoint)", conv.conversation_id)
+                continue
             chunks = proxy.build_memory_chunks(
                 conv, run_id=run_id, with_timestamps=not args.no_timestamps
             )
@@ -866,6 +888,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dataset-json", default=None, help="Explicit dataset JSON path.")
     parser.add_argument("--no-download", action="store_true", help="Fail if dataset not cached.")
     parser.add_argument("--keep", action="store_true", help="Skip cleanup (leave memories).")
+    parser.add_argument(
+        "--resume-from",
+        default=None,
+        help="Path to a prior run's results.partial.jsonl; skip its completed conversations.",
+    )
     parser.add_argument("--allow-non-local", action="store_true")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR))
     parser.add_argument("--quiet", action="store_true")
