@@ -338,6 +338,31 @@ def to_answer_memories(recall_response: dict[str, Any]) -> list[dict[str, Any]]:
     return formatted
 
 
+def retrieval_diagnostics(
+    recall_response: dict[str, Any], question: "proxy.BeamQuestion", cutoff: int
+) -> dict[str, Any]:
+    """Self-triage: did recall surface the question's ground-truth evidence in the
+    top-`cutoff` the answerer saw? Reuses the proxy's source-id / rubric scorers so
+    every judged run records retrieval quality inline — no separate re-ingest pass
+    needed to attribute a FAIL to recall vs the answerer/judge.
+    """
+    results = (recall_response.get("results") or [])[:cutoff]
+    src = set(question.source_chat_ids)
+    got: set[int] = set()
+    for r in results:
+        got |= proxy._source_ids_from_result(r)
+    return {
+        "source_chat_hit": (bool(src & got) if src else None),
+        "n_source": len(src),
+        "rubric_overlap": round(
+            proxy.score_rubric_overlap(
+                question.rubric, [proxy.result_content(r) for r in results]
+            ),
+            4,
+        ),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Per-question evaluation (mirrors benchmarks/beam/run.py:process_question)
 # ---------------------------------------------------------------------------
@@ -562,6 +587,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                         answer_max_tokens=args.answer_max_tokens,
                     )
                     ev["conversation_id"] = conv.conversation_id
+                    ev["retrieval"].update(retrieval_diagnostics(recall, q, max(cutoffs)))
                     return ev
 
             conv_evals = await asyncio.gather(*(handle(q) for q in questions))
@@ -605,6 +631,14 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         logger.info("AutoMem health after: %s (cleanup deleted=%s)", counts_after, cleanup_deleted)
 
     metrics = compute_beam_metrics(evaluations, cutoffs)
+    # Inline triage summary: of questions with a ground-truth source, what fraction
+    # had the evidence in the answerer's context? (Recall vs answerer/judge split.)
+    with_src = [e for e in evaluations if e["retrieval"].get("n_source")]
+    retrieval_recall = (
+        round(sum(1 for e in with_src if e["retrieval"].get("source_chat_hit")) / len(with_src), 4)
+        if with_src
+        else None
+    )
     # FalkorDB memory_count is the authoritative leak gate. vector_count is reported
     # too, but Qdrant can carry pre-existing orphaned vectors (sync_status), so we
     # don't hard-fail on vector drift — only on memories not returning to baseline.
@@ -653,6 +687,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "association_count": total_associations,
             "judge_usage": dict(_USAGE),
             "empty_answers": empty_answers,
+            "retrieval_recall_at_cutoff": retrieval_recall,
             "upstream_head": _submodule_head(),
             "health_before": counts_before,
             "health_after": counts_after,
@@ -713,6 +748,8 @@ def format_report(results: dict[str, Any]) -> str:
         f"| judge usage | {md['judge_usage']} |",
         f"| empty answers | {md.get('empty_answers', 0)} / {md['total_questions']} "
         f"(answer max_tokens={md.get('answer_max_tokens')}) |",
+        f"| retrieval recall @cutoff | {md.get('retrieval_recall_at_cutoff')} "
+        f"(evidence-in-context for sourced questions) |",
         f"| returned to baseline | {md['returned_to_baseline']} "
         f"({md['health_before']} -> {md['health_after']}) |",
         "",

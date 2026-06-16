@@ -148,6 +148,36 @@ class AdapterTests(unittest.TestCase):
 
 
 @unittest.skipUnless(BJ_AVAILABLE, f"beam_judged_eval import failed: {BJ_ERR}")
+class RetrievalDiagnosticsTests(unittest.TestCase):
+    def _q(self, sources):
+        return beam.BeamQuestion(
+            question_id="q", question_type="information_extraction",
+            question="when?", rubric=["nugget"], source_chat_ids=sources,
+        )
+
+    def test_source_hit_true_within_cutoff(self):
+        resp = {"results": [
+            {"memory": {"content": "[chat_id=42] x", "metadata": {"source_chat_ids": [42]}}, "score": 0.9},
+            {"memory": {"content": "[chat_id=7] y", "metadata": {"source_chat_ids": [7]}}, "score": 0.5},
+        ]}
+        diag = bj.retrieval_diagnostics(resp, self._q([42]), cutoff=10)
+        self.assertTrue(diag["source_chat_hit"])
+        self.assertEqual(diag["n_source"], 1)
+
+    def test_source_miss_and_none_when_no_source(self):
+        resp = {"results": [{"memory": {"content": "[chat_id=7] y", "metadata": {"source_chat_ids": [7]}}, "score": 0.5}]}
+        self.assertFalse(bj.retrieval_diagnostics(resp, self._q([42]), cutoff=10)["source_chat_hit"])
+        self.assertIsNone(bj.retrieval_diagnostics(resp, self._q([]), cutoff=10)["source_chat_hit"])
+
+    def test_cutoff_excludes_deeper_hit(self):
+        resp = {"results": [
+            {"memory": {"content": "[chat_id=1] a"}, "score": 0.9},
+            {"memory": {"content": "[chat_id=42] b", "metadata": {"source_chat_ids": [42]}}, "score": 0.4},
+        ]}
+        self.assertFalse(bj.retrieval_diagnostics(resp, self._q([42]), cutoff=1)["source_chat_hit"])
+
+
+@unittest.skipUnless(BJ_AVAILABLE, f"beam_judged_eval import failed: {BJ_ERR}")
 class ScorerTests(unittest.TestCase):
     def test_cutoff_label_and_clamp(self):
         self.assertEqual(bj.cutoff_label(100), "top_100")
