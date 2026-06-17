@@ -1,7 +1,6 @@
 # Matrix Parallel Harness
 
-This package lives in the `automem-evals` worktree at
-`/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/matrix-harness`
+This package lives in the `automem-evals` repository under `runners/matrix/`,
 on branch `feat/matrix-parallel-harness`.
 
 ## Scoring primitives
@@ -10,7 +9,7 @@ Scoring is **imported, not reimplemented**. `lab_metrics` and `lab_corpus`
 are loaded from the automem repo at runtime. Set the env var:
 
 ```bash
-export AUTOMEM_DIR=/path/to/automem   # default: /Users/jgarturo/Projects/OpenAI/automem
+export AUTOMEM_DIR=/path/to/automem   # default: ../automem sibling checkout
 ```
 
 The harness appends `$AUTOMEM_DIR/scripts/lab` to `sys.path` at import time.
@@ -22,7 +21,7 @@ The smoke test provisions two isolated stacks on a 10-memory synthetic
 corpus, scores them, and prints the winner — no production clone needed.
 
 ```bash
-AUTOMEM_DIR=/Users/jgarturo/Projects/OpenAI/automem \
+AUTOMEM_DIR=/path/to/automem \
   python -m runners.matrix.smoke
 ```
 

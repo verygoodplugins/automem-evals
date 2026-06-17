@@ -15,8 +15,11 @@ from . import override as ov_mod
 from . import resources
 from . import score as score_mod
 
-AUTOMEM_DIR = os.environ.get("AUTOMEM_DIR", "/Users/jgarturo/Projects/OpenAI/automem")
-API_TOKEN = os.environ.get("AUTOMEM_API_TOKEN", "benchmark-token")
+_here = Path(__file__).resolve()
+_candidates = [_here.parents[3] / "automem", Path.home() / "Projects" / "OpenAI" / "automem"]
+_default = next((str(c) for c in _candidates if (c / "automem").is_dir()), str(_candidates[0]))
+AUTOMEM_DIR = os.environ.get("AUTOMEM_DIR", _default)
+API_TOKEN = os.environ.get("AUTOMEM_API_TOKEN", "test-token")
 
 
 def _project(name: str) -> str:
@@ -46,7 +49,7 @@ def compose_down_cmd(project: str) -> List[str]:
 
 
 def _headers() -> Dict[str, str]:
-    return {"Authorization": f"Bearer {API_TOKEN}", "Content-Type": "application/json"}
+    return {"X-Api-Key": API_TOKEN, "Content-Type": "application/json"}
 
 
 class LiveProvider:

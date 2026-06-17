@@ -13,7 +13,10 @@ import os
 
 from . import manifest as mf
 
-_AUTOMEM = os.environ.get("AUTOMEM_DIR", "/Users/jgarturo/Projects/OpenAI/automem")
+_here = Path(__file__).resolve()
+_candidates = [_here.parents[3] / "automem", Path.home() / "Projects" / "OpenAI" / "automem"]
+_default = next((str(c) for c in _candidates if (c / "automem").is_dir()), str(_candidates[0]))
+_AUTOMEM = os.environ.get("AUTOMEM_DIR", _default)
 sys.path.insert(0, str(Path(_AUTOMEM) / "scripts" / "lab"))
 import lab_metrics  # noqa: E402
 
