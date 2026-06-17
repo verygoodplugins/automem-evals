@@ -254,6 +254,22 @@ The number is a **BEAM 100K-tier** score — comparable to other systems' publis
 mem0-shim baseline (`run_beam.py`, gpt-5-mini) was 76.25% at this tier; it is
 recorded in the artifact metadata for reference.
 
+### Efficiency axes (latency + tokens) — report the triplet, not just accuracy
+
+The public BEAM leaderboard is a **triplet**: accuracy **/ recall latency (ms) /
+context tokens**. Accuracy is judge-polluted (±12pts on judge choice); latency and
+tokens are **objective and judge-independent**, so they're the cleaner comparison.
+Every judged run now records, per question, `retrieval.recall_latency_ms` (timed
+around the `/recall` call) and `cutoff_results[*].context_tokens` (real tiktoken
+count of the answer prompt), summarized in `metadata.efficiency`
+(mean/median/p95 + tokenizer).
+
+Preliminary AutoMem @100K: **~1.6 s recall / ~11k context tokens** vs Hindsight's
+published **6.4 s / 17.7k** — i.e. ~4× faster recall and ~35% leaner context. These
+are the axes where AutoMem's fast, compact, graph-native recall plausibly *wins*
+even where the judge-confounded accuracy number is only competitive. Always report
+all three; never quote accuracy alone as a head-to-head.
+
 ### Isolation
 
 Each conversation is ingested under `beam-run-<id>`, evaluated, then cleaned up

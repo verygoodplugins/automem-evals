@@ -179,6 +179,10 @@ class RetrievalDiagnosticsTests(unittest.TestCase):
 
 @unittest.skipUnless(BJ_AVAILABLE, f"beam_judged_eval import failed: {BJ_ERR}")
 class ScorerTests(unittest.TestCase):
+    def test_count_tokens(self):
+        self.assertGreater(bj._count_tokens("hello world this is a test prompt"), 0)
+        self.assertGreater(bj._count_tokens("x " * 2000), bj._count_tokens("short"))
+
     def test_cutoff_label_and_clamp(self):
         self.assertEqual(bj.cutoff_label(100), "top_100")
         self.assertEqual(bj.cutoff_label(None), "all")
@@ -236,6 +240,7 @@ class EvaluateQuestionTests(unittest.TestCase):
         self.assertEqual(cr["judgment"], "PASS")
         self.assertEqual(len(cr["nugget_scores"]), 2)
         self.assertEqual(cr["generated_answer"], "March")  # ANSWER: prefix stripped
+        self.assertGreater(cr["context_tokens"], 0)  # token instrumentation populated
 
     def test_event_ordering_adds_tau(self):
         q = self._question("event_ordering", ["e0", "e1", "e2"])

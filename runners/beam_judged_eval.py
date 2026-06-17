@@ -305,9 +305,13 @@ def recall_judged(
     }
     if ranking:
         params.update(ranking)
-    return client.request_json(
+    t0 = time.perf_counter()
+    resp = client.request_json(
         client.endpoint, client.token, "GET", "/recall", params=params, timeout=60
     )
+    if isinstance(resp, dict):
+        resp["_recall_latency_ms"] = round((time.perf_counter() - t0) * 1000, 1)
+    return resp
 
 
 def _result_timestamp(result: dict[str, Any]) -> str:
@@ -336,6 +340,32 @@ def to_answer_memories(recall_response: dict[str, Any]) -> list[dict[str, Any]]:
         )
     formatted.sort(key=lambda m: m.get("score", 0), reverse=True)
     return formatted
+
+
+_TOKENIZER: Any = None
+
+
+def _count_tokens(text: str) -> int:
+    """Count tokens in `text` with tiktoken (o200k/cl100k), else a ~chars/4 estimate.
+
+    Used to report context-token footprint per answer prompt — one of the two
+    objective, judge-independent axes the public BEAM leaderboard reports
+    (alongside recall latency), and the ones our accuracy-only numbers omitted.
+    """
+    global _TOKENIZER
+    if _TOKENIZER is None:
+        try:
+            import tiktoken
+
+            try:
+                _TOKENIZER = tiktoken.get_encoding("o200k_base")
+            except Exception:  # noqa: BLE001
+                _TOKENIZER = tiktoken.get_encoding("cl100k_base")
+        except Exception:  # noqa: BLE001 — tiktoken absent; fall back to estimate
+            _TOKENIZER = False
+    if _TOKENIZER:
+        return len(_TOKENIZER.encode(text))
+    return max(1, len(text) // 4)
 
 
 def retrieval_diagnostics(
@@ -396,6 +426,7 @@ async def evaluate_question(
         # Top-c by score, then chronological (oldest first) for the answer prompt.
         sliced = sorted(formatted[:c], key=lambda m: m.get("created_at", "") or "")
         gen_prompt = get_beam_answer_generation_prompt(question.question, sliced, top_k=c)
+        ctx_tokens = _count_tokens(gen_prompt)
         _USAGE["answer_calls"] = _USAGE.get("answer_calls", 0) + 1
         answer = await answerer.generate(system="", user=gen_prompt, max_tokens=answer_max_tokens)
         if "ANSWER:" in answer:
@@ -407,6 +438,7 @@ async def evaluate_question(
                 "score": 0.0,
                 "generated_answer": answer,
                 "memories_evaluated": len(sliced),
+                "context_tokens": ctx_tokens,
                 "nugget_scores": [],
                 "error": "No rubric nuggets found",
             }
@@ -430,6 +462,7 @@ async def evaluate_question(
             "score": round(avg_score, 4),
             "generated_answer": answer,
             "memories_evaluated": len(sliced),
+            "context_tokens": ctx_tokens,
             "nugget_scores": nugget_scores,
         }
         if question.question_type == "event_ordering":
@@ -610,6 +643,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                     )
                     ev["conversation_id"] = conv.conversation_id
                     ev["retrieval"].update(retrieval_diagnostics(recall, q, max(cutoffs)))
+                    ev["retrieval"]["recall_latency_ms"] = recall.get("_recall_latency_ms")
                     return ev
 
             conv_evals = await asyncio.gather(*(handle(q) for q in questions))
@@ -661,6 +695,35 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         if with_src
         else None
     )
+    # Objective, judge-independent efficiency axes the public BEAM leaderboard reports
+    # (recall latency + context tokens). Resumed evals predate this instrumentation, so
+    # the summaries cover only questions scored under it (None keys are filtered out).
+    def _pct(vals: list[float], p: float) -> float | None:
+        if not vals:
+            return None
+        s = sorted(vals)
+        return s[min(len(s) - 1, int(round(p * (len(s) - 1))))]
+
+    recall_ms = [
+        e["retrieval"]["recall_latency_ms"]
+        for e in evaluations
+        if e["retrieval"].get("recall_latency_ms") is not None
+    ]
+    ctx_toks = [
+        cr["context_tokens"]
+        for e in evaluations
+        for cr in e["cutoff_results"].values()
+        if cr.get("context_tokens") is not None
+    ]
+    efficiency = {
+        "recall_latency_ms_mean": round(statistics.mean(recall_ms), 1) if recall_ms else None,
+        "recall_latency_ms_median": round(statistics.median(recall_ms), 1) if recall_ms else None,
+        "recall_latency_ms_p95": _pct(recall_ms, 0.95),
+        "context_tokens_mean": round(statistics.mean(ctx_toks)) if ctx_toks else None,
+        "context_tokens_p95": _pct(ctx_toks, 0.95),
+        "tokenizer": ("estimate" if _TOKENIZER is False else "tiktoken"),
+        "measured_n": len(recall_ms),
+    }
     # FalkorDB memory_count is the authoritative leak gate. vector_count is reported
     # too, but Qdrant can carry pre-existing orphaned vectors (sync_status), so we
     # don't hard-fail on vector drift — only on memories not returning to baseline.
@@ -710,6 +773,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "judge_usage": dict(_USAGE),
             "empty_answers": empty_answers,
             "retrieval_recall_at_cutoff": retrieval_recall,
+            "efficiency": efficiency,
             "upstream_head": _submodule_head(),
             "health_before": counts_before,
             "health_after": counts_after,
@@ -772,6 +836,12 @@ def format_report(results: dict[str, Any]) -> str:
         f"(answer max_tokens={md.get('answer_max_tokens')}) |",
         f"| retrieval recall @cutoff | {md.get('retrieval_recall_at_cutoff')} "
         f"(evidence-in-context for sourced questions) |",
+        f"| recall latency (ms) | mean {md.get('efficiency', {}).get('recall_latency_ms_mean')} / "
+        f"median {md.get('efficiency', {}).get('recall_latency_ms_median')} / "
+        f"p95 {md.get('efficiency', {}).get('recall_latency_ms_p95')} |",
+        f"| context tokens | mean {md.get('efficiency', {}).get('context_tokens_mean')} / "
+        f"p95 {md.get('efficiency', {}).get('context_tokens_p95')} "
+        f"({md.get('efficiency', {}).get('tokenizer')}) |",
         f"| returned to baseline | {md['returned_to_baseline']} "
         f"({md['health_before']} -> {md['health_after']}) |",
         "",
