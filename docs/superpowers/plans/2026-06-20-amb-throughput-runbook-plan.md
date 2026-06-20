@@ -487,3 +487,40 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 **Type consistency:** `EvalSummary`/`QueryResult`/`AnswerResult` field names in the test and the `_run_all` partial-save match `models.py`. `_save`/`_load_previous`/`_get_judge` signatures match `runner.py`. CLI flags match `cli.py` (`--split/--dataset/--memory/--mode/--query-limit/--skip-ingested/--name/--description`).
 
 **Note for execution:** Tasks 2–4 are operational (spend + wall-clock), not TDD; their "tests" are the verify steps + stop conditions. Only Task 1 is a code change and is full RED→GREEN→REFACTOR.
+
+---
+
+## Execution addendum — discovered at runtime (2026-06-20)
+
+Three plan assumptions were wrong; corrected live within the autonomy window.
+
+**1. Real full-split sizes (the runner's own "queries loaded" line is authoritative):**
+- locomo/locomo10 = **1,540** queries (NOT 152 — the committed `outputs/locomo/automem/…`
+  file was a smaller partial/filtered run). longmemeval/s = 500. personamem/32k = 589.
+  beam 100k/500k/1m/10m = 400/700/700/200.
+
+**2. One AutoMem stack saturates the whole host.** `docker stats` showed a single active
+stack at **~1781% CPU (~18 cores)** — FastEmbed query-embedding is unbounded-thread. Running
+4 (or even 2) stacks oversubscribes 18 cores and *starves* the others (a stack stuck mid-ingest
+sat at 0.03%). **Concurrency buys no parallelism here**, so the orchestrator runs **serial
+(MAXC=1)**, each run at full CPU, fast→slow with **longmemeval last** (its ~12–25 h solo
+per-question ingest is the long pole; banking everything else first de-risks the window).
+
+**3. Repeat strategy revised ×3→×1 + reproducibility check.** At n=400–1,540 the **within-run
+95% CI** (1.96·sd/√n over per-question scores) is already tighter than run-to-run judge noise,
+and longmemeval ×3 is infeasible. So: **×1 per dataset** with within-run CI, **plus beam-100k ×3**
+(`automem-sub-rep1/2/3`) as an explicit run-to-run reproducibility check. This honors the intent
+(statistical confidence) better than blind ×3 and fits the window.
+
+**Mechanics:**
+- Fresh runs use run_name **`automem-sub`** (and `automem-sub-rep{1,2,3}` for the beam-100k
+  check) to avoid merging into the other agent's committed `automem` outputs.
+- All runs override **`AUTOMEM_IMAGE=ghcr.io/verygoodplugins/automem:amb-local`** (the public
+  `amb-v1` tag is the human-gated publish step and does not exist yet).
+- Config frozen as the committed compose (FastEmbed-local, lean enrichment). `RECALL_RECENCY_BIAS=auto`
+  is NOT applied — it was validated in a different harness; flipping it unattended would risk the
+  headline with no in-harness evidence. Logged as a documented future A/B instead.
+- Orchestrator: `/tmp/amb_orchestrate.py` (serial, resumes any partial via `--skip-ingested`).
+  Long-haul monitor emits per-run completion + hard-quota + final events.
+- Supersedes Task 3 (parallel waves) and the Task 5 aggregator's run-name scheme; aggregator
+  updated to `automem-sub` + within-run CI + the beam-100k repro row.
