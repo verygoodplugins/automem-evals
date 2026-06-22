@@ -293,6 +293,56 @@ class ExperimentIndexTests(unittest.TestCase):
             self.assertEqual(self.mod.extract_scores(root), [])
             self.assertEqual(self.mod.extract_scores(root, amb_outputs=root / "missing"), [])
 
+    def test_amb_repro_is_partial_until_all_runs_present(self):
+        with tempfile.TemporaryDirectory() as tmp_root, tempfile.TemporaryDirectory() as tmp_amb:
+            root = Path(tmp_root)
+            amb = Path(tmp_amb)
+
+            def write_beam(run, acc, n):
+                self.write_json(
+                    amb / "beam" / run / "rag" / "100k.json",
+                    {
+                        "accuracy": acc,
+                        "avg_retrieve_time_ms": 200.0,
+                        "avg_context_tokens": 3000.0,
+                        "results": [{"correct": True} for _ in range(n)],
+                    },
+                )
+
+            # 2 of the 3 declared repro runs present -> partial, not ok.
+            write_beam("automem-sub-rep1", 0.70, 100)
+            write_beam("automem-sub-rep2", 0.74, 100)
+            beam = self._amb_beam(self.mod.extract_scores(root, amb_outputs=amb))
+            self.assertEqual(beam["status"], "partial")
+            self.assertEqual(beam["repeats"], 2)
+            self.assertEqual(beam["expected_repeats"], 3)
+            self.assertIsNotNone(beam["accuracy"])
+
+            # All three present -> ok.
+            write_beam("automem-sub-rep3", 0.72, 100)
+            beam = self._amb_beam(self.mod.extract_scores(root, amb_outputs=amb))
+            self.assertEqual(beam["status"], "ok")
+            self.assertEqual(beam["repeats"], 3)
+
+    def test_build_index_respects_registry_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.write_json(root / "docs" / "experiments" / "registry.json", [])
+            self.write_json(root / "custom" / "reg.json", [self.thread("EXP-CUSTOM", "adopted")])
+
+            index = self.mod.build_index(
+                root, registry_path=Path("custom/reg.json"), worktrees=[], prs=[]
+            )
+
+            self.assertEqual({t["id"] for t in index["threads"]}, {"EXP-CUSTOM"})
+            self.assertEqual(index["status_counts"], {"adopted": 1})
+
+    def _amb_beam(self, scores):
+        return next(
+            s for s in scores
+            if s["benchmark"] == "amb" and s["dataset"] == "beam" and s["split"] == "100k"
+        )
+
     def test_scoreboard_renders_amb_section(self):
         index = {
             "generated_at": "2026-06-22T18:00:00+00:00",

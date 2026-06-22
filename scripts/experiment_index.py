@@ -46,7 +46,10 @@ BEAM_ABILITIES = [
 # are mirrored verbatim from runners/amb_aggregate.py (which lives on the
 # beam-judged branch, not here) so the scoreboard and that markdown aggregator
 # can never report divergent numbers. If you change one, change the other.
-DEFAULT_AMB_OUTPUTS = Path("/Users/jgarturo/Projects/OpenAI/agent-memory-benchmark/outputs")
+# Sibling-repo path, relative to the results checkout (--data-root); main()
+# resolves it so the documented `python3 scripts/experiment_index.py` flow finds
+# AMB outputs on any machine, not just the author's.
+DEFAULT_AMB_OUTPUTS = Path("../agent-memory-benchmark/outputs")
 AMB_RUN = "automem-sub"  # canonical single full-split run name
 AMB_SINGLE = [
     ("locomo", "locomo10"),
@@ -350,6 +353,7 @@ def _amb_repro_record(out: Path, dataset: str, split: str, runs: list[str]) -> d
         "label": _amb_label(dataset, split),
         "run_name": "+".join(runs),
         "repeats": 0,
+        "expected_repeats": len(runs),
         "spread": None,
         "ci": None,
         "accuracy": None,
@@ -366,6 +370,8 @@ def _amb_repro_record(out: Path, dataset: str, split: str, runs: list[str]) -> d
     spread = (max(accs) - min(accs)) if len(accs) > 1 else 0.0
     rets = [d["avg_retrieve_time_ms"] for d in loaded if d.get("avg_retrieve_time_ms")]
     toks = [d["avg_context_tokens"] for d in loaded if d.get("avg_context_tokens")]
+    # A reproducibility result is only "ok" once every declared repeat is on
+    # disk; with fewer the spread is incomplete, so surface it as "partial".
     record.update(
         accuracy=statistics.mean(accs) * 100,
         spread=spread * 100,
@@ -374,7 +380,7 @@ def _amb_repro_record(out: Path, dataset: str, split: str, runs: list[str]) -> d
         avg_retrieve_time_ms=statistics.median(rets) if rets else None,
         avg_context_tokens=statistics.median(toks) if toks else None,
         answer_llm=loaded[0].get("answer_llm"),
-        status="ok",
+        status="ok" if len(loaded) == len(runs) else "partial",
     )
     return record
 
@@ -411,12 +417,13 @@ def build_index(
     *,
     data_root: Path | None = None,
     amb_outputs: Path | None = None,
+    registry_path: Path | None = None,
     worktrees: list[dict[str, Any]] | None = None,
     prs: list[dict[str, Any]] | None = None,
     include_vcs: bool = True,
 ) -> dict[str, Any]:
     data_root = data_root or root
-    registry = load_registry(root)
+    registry = load_registry(root, registry_path)
     artifacts = discover_artifacts(data_root)
     artifacts_by_thread, orphan_artifacts = match_artifacts(registry, artifacts)
     scores = extract_scores(data_root, amb_outputs)
@@ -746,14 +753,19 @@ def _render_score_line(record: dict[str, Any]) -> str:
     if record.get("benchmark") == "amb":
         label = record.get("label") or f"{record.get('dataset')}/{record.get('split')}"
         accuracy = record.get("accuracy")
-        if record.get("status") != "ok" or not isinstance(accuracy, (int, float)):
-            return f"- `amb` {label}: pending (`{record.get('status')}`, n={record.get('n', 0)})."
+        status = record.get("status")
+        if status == "missing" or not isinstance(accuracy, (int, float)):
+            return f"- `amb` {label}: pending (`{status}`, n={record.get('n', 0)})."
         if record.get("spread") is not None:
-            acc_text = f"{accuracy:.1f}% (spread {record['spread']:.1f}pp, ×{record.get('repeats', 1)})"
+            reps = record.get("repeats", 1)
+            exp = record.get("expected_repeats", reps)
+            acc_text = f"{accuracy:.1f}% (spread {record['spread']:.1f}pp, ×{reps}/{exp})"
         elif record.get("ci") is not None:
             acc_text = f"{accuracy:.1f}% ± {record['ci']:.1f}"
         else:
             acc_text = f"{accuracy:.1f}%"
+        if status != "ok":
+            acc_text += f" [{status}]"
         ret = record.get("avg_retrieve_time_ms")
         tok = record.get("avg_context_tokens")
         ret_text = f"{round(ret)} ms" if isinstance(ret, (int, float)) else "?"
@@ -821,8 +833,14 @@ def main() -> int:
     root = args.root.resolve()
     data_root = args.data_root.resolve() if args.data_root else root
     amb_outputs = None if args.no_amb else args.amb_outputs
+    if amb_outputs is not None and not amb_outputs.is_absolute():
+        amb_outputs = (data_root / amb_outputs).resolve()
     index = build_index(
-        root, data_root=data_root, amb_outputs=amb_outputs, include_vcs=not args.no_vcs
+        root,
+        data_root=data_root,
+        amb_outputs=amb_outputs,
+        registry_path=args.registry,
+        include_vcs=not args.no_vcs,
     )
     scoreboard_path = None if args.no_scoreboard else root / args.scoreboard
     write_outputs(index, root / args.status, root / args.index_json, scoreboard_path)
@@ -944,15 +962,15 @@ function abilityBars(abilities, seriesA, seriesB) {
   return svg;
 }
 
-const AMB_ORDER = { ok: 0, low_n: 1, missing: 2 };
+const AMB_ORDER = { ok: 0, partial: 1, low_n: 2, missing: 3 };
 function ambSorted(records) {
   return records.slice().sort((a, b) =>
-    ((AMB_ORDER[a.status] ?? 3) - (AMB_ORDER[b.status] ?? 3)) || ((b.accuracy || 0) - (a.accuracy || 0)));
+    ((AMB_ORDER[a.status] ?? 4) - (AMB_ORDER[b.status] ?? 4)) || ((b.accuracy || 0) - (a.accuracy || 0)));
 }
 
 function ambValueText(r) {
   if (r.status === "missing") return "pending";
-  if (r.spread != null) return fix1(r.accuracy) + "% spread " + fix1(r.spread) + "pp ×" + r.repeats;
+  if (r.spread != null) return fix1(r.accuracy) + "% spread " + fix1(r.spread) + "pp ×" + r.repeats + "/" + (r.expected_repeats || r.repeats);
   let t = fix1(r.accuracy) + "%";
   if (r.ci != null) t += " ±" + fix1(r.ci);
   if (r.status === "low_n") t += " (n=" + r.n + ", low)";
@@ -978,7 +996,7 @@ function benchmarkBars(records) {
   recs.forEach((r, i) => {
     const cy = padT + i * rowH, midY = cy + rowH / 2, bh = 10, barY = midY - bh / 2;
     svg += '<text x="0" y="' + (midY + 4) + '" fill="' + C.muted + '" font-size="11.5">' + esc(r.label) + '</text>';
-    if (r.status === "ok" || r.status === "low_n") {
+    if (r.status === "ok" || r.status === "low_n" || r.status === "partial") {
       const acc = r.accuracy || 0;
       const col = r.status === "ok" ? C.info : C.warn;
       svg += '<rect x="' + labelW + '" y="' + barY + '" width="' + (xAt(acc) - labelW) + '" height="' + bh + '" fill="' + col + '" rx="2"/>';
@@ -1003,7 +1021,7 @@ function ambTable(records) {
   ambSorted(records).forEach(r => {
     let acc;
     if (r.status === "missing") acc = '<span style="color:' + C.faint + '">pending</span>';
-    else if (r.spread != null) acc = fix1(r.accuracy) + '% <span style="color:' + C.muted + '">(spread ' + fix1(r.spread) + 'pp, ×' + r.repeats + ')</span>';
+    else if (r.spread != null) acc = fix1(r.accuracy) + '% <span style="color:' + C.muted + '">(spread ' + fix1(r.spread) + 'pp, ×' + r.repeats + '/' + (r.expected_repeats || r.repeats) + ')</span>' + (r.status === "partial" ? ' <span style="color:' + C.warn + '">partial</span>' : '');
     else if (r.ci != null) acc = fix1(r.accuracy) + '% ± ' + fix1(r.ci) + (r.status === "low_n" ? ' <span style="color:' + C.warn + '">low n</span>' : '');
     else acc = fix1(r.accuracy) + '%';
     const ret = r.avg_retrieve_time_ms != null ? Math.round(r.avg_retrieve_time_ms) + ' ms' : '—';
@@ -1082,7 +1100,7 @@ function render() {
   if (amb.length) {
     html += '<h2>Cross-benchmark accuracy (AMB · Gemini answerer)</h2>';
     html += '<div class="panel">' + benchmarkBars(amb) + '</div>';
-    html += '<div class="legend"><span><i style="background:' + C.info + '"></i>full run</span><span><i style="background:' + C.warn + '"></i>low n (&lt;30)</span><span><i style="background:' + C.faint + '"></i>pending</span><span>whisker = 95% CI</span></div>';
+    html += '<div class="legend"><span><i style="background:' + C.info + '"></i>full run</span><span><i style="background:' + C.warn + '"></i>partial / low n (&lt;30)</span><span><i style="background:' + C.faint + '"></i>pending</span><span>whisker = 95% CI</span></div>';
     html += ambTable(amb);
     html += '<p class="caption">Accuracy (bar) with 95% CI whisker per AMB dataset; the table adds the cost axes (recall latency, context tokens). Source: agent-memory-benchmark/outputs &mdash; neutral Gemini-3.1-Pro answerer + judge. Numbers are in parity with <code>runners/amb_aggregate.py</code>. Internal only.</p>';
   }
