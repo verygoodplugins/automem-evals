@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoMem eval scoreboard</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --stroke: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --faint: #6e7681;
+    --info: #4aa3ff; --success: #3fb950; --danger: #f85149; --warn: #d29922;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 24px 64px; }
+  h1 { font-size: 24px; margin: 0; }
+  h2 { font-size: 16px; margin: 28px 0 6px; }
+  .sub { color: var(--muted); margin: 4px 0 0; }
+  .caption { color: var(--faint); font-size: 12px; margin: 6px 0 0; }
+  .panel { background: var(--panel); border: 1px solid var(--stroke); border-radius: 8px; padding: 14px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-top: 18px; }
+  .stat { background: var(--panel); border: 1px solid var(--stroke); border-radius: 8px; padding: 12px 14px; }
+  .stat .v { font-size: 22px; font-weight: 600; }
+  .stat .l { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--stroke); }
+  th { color: var(--muted); font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px;
+    border: 1px solid var(--stroke); color: var(--muted); }
+  .tag.adopted { color: var(--success); border-color: var(--success); }
+  .tag.in-progress { color: var(--warn); border-color: var(--warn); }
+  .tag.parked { color: var(--info); border-color: var(--info); }
+  .legend { display: flex; gap: 16px; margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  .note { background: var(--panel); border: 1px solid var(--stroke); border-radius: 8px; padding: 14px; color: var(--muted); }
+  code { background: #1f2630; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script id="payload" type="application/json">{"generated_at": "2026-06-22T19:36:49+00:00", "status_counts": {"in-progress": 2, "adopted": 10, "superseded": 1, "parked": 2}, "scores": [{"benchmark": "amb", "dataset": "locomo", "split": "locomo10", "label": "LoCoMo", "run_name": "automem-sub", "repeats": 1, "spread": null, "ci": 1.7770272071541817, "accuracy": 85.12987012987013, "n": 1540, "avg_retrieve_time_ms": 132.0, "avg_context_tokens": 4768.2, "answer_llm": "gemini:gemini-3.1-pro-preview", "status": "ok"}, {"benchmark": "amb", "dataset": "longmemeval", "split": "s", "label": "LongMemEval", "run_name": "automem-sub", "repeats": 1, "spread": null, "ci": null, "accuracy": null, "n": 0, "avg_retrieve_time_ms": null, "avg_context_tokens": null, "answer_llm": null, "status": "missing"}, {"benchmark": "amb", "dataset": "personamem", "split": "32k", "label": "PersonaMem", "run_name": "automem-sub", "repeats": 1, "spread": null, "ci": 3.4461302855363813, "accuracy": 76.06112054329371, "n": 589, "avg_retrieve_time_ms": 202.2, "avg_context_tokens": 2588.2, "answer_llm": "gemini:gemini-3.1-pro-preview", "status": "ok"}, {"benchmark": "amb", "dataset": "beam", "split": "500k", "label": "BEAM-500K", "run_name": "automem-sub", "repeats": 1, "spread": null, "ci": null, "accuracy": null, "n": 0, "avg_retrieve_time_ms": null, "avg_context_tokens": null, "answer_llm": null, "status": "missing"}, {"benchmark": "amb", "dataset": "beam", "split": "1m", "label": "BEAM-1M", "run_name": "automem-sub", "repeats": 1, "spread": null, "ci": null, "accuracy": null, "n": 0, "avg_retrieve_time_ms": null, "avg_context_tokens": null, "answer_llm": null, "status": "missing"}, {"benchmark": "amb", "dataset": "beam", "split": "10m", "label": "BEAM-10M", "run_name": "automem-sub", "repeats": 1, "spread": null, "ci": null, "accuracy": null, "n": 0, "avg_retrieve_time_ms": null, "avg_context_tokens": null, "answer_llm": null, "status": "missing"}, {"benchmark": "amb", "dataset": "beam", "split": "100k", "label": "BEAM-100K", "run_name": "automem-sub-rep1+automem-sub-rep2+automem-sub-rep3", "repeats": 3, "spread": 17.403652539651617, "ci": null, "accuracy": 72.65599383302724, "n": 840, "avg_retrieve_time_ms": 226.8, "avg_context_tokens": 3843.4, "answer_llm": "gemini:gemini-3.1-pro-preview", "status": "ok"}, {"benchmark": "beam-judged", "run_id": "20260615-223139-a478c915", "created_at": "2026-06-15T22:34:56.597734+00:00", "tier": "100K", "answerer_model": "gpt-5-mini", "judge_model": "gpt-5-mini", "total_questions": 20, "cutoff": "top_100", "accuracy": 70.0, "avg_score": 0.639165, "by_ability": {"abstention": 0.0, "contradiction_resolution": 100.0, "event_ordering": 50.0, "information_extraction": 100.0, "instruction_following": 50.0, "knowledge_update": 100.0, "multi_session_reasoning": 100.0, "preference_following": 100.0, "summarization": 50.0, "temporal_reasoning": 50.0}}, {"benchmark": "beam-judged", "run_id": "20260615-224220-e29f5f07", "created_at": "2026-06-15T23:53:27.541406+00:00", "tier": "100K", "answerer_model": "gpt-5", "judge_model": "gpt-5", "total_questions": 400, "cutoff": "top_100", "accuracy": 67.5, "avg_score": 0.6150325, "by_ability": {"abstention": 55.00000000000001, "contradiction_resolution": 62.5, "event_ordering": 45.0, "information_extraction": 85.0, "instruction_following": 87.5, "knowledge_update": 52.5, "multi_session_reasoning": 67.5, "preference_following": 92.5, "summarization": 50.0, "temporal_reasoning": 77.5}}, {"benchmark": "beam-judged", "run_id": "20260615-235650-b67e9716", "created_at": "2026-06-16T01:11:31.453758+00:00", "tier": "100K", "answerer_model": "gpt-5", "judge_model": "gpt-5", "total_questions": 400, "cutoff": "top_100", "accuracy": 43.5, "avg_score": 0.405204, "by_ability": {"abstention": 35.0, "contradiction_resolution": 32.5, "event_ordering": 37.5, "information_extraction": 55.00000000000001, "instruction_following": 55.00000000000001, "knowledge_update": 40.0, "multi_session_reasoning": 37.5, "preference_following": 60.0, "summarization": 45.0, "temporal_reasoning": 37.5}}, {"benchmark": "beam-judged", "run_id": "20260616-042452-1d46f08a", "created_at": "2026-06-16T05:34:15.319399+00:00", "tier": "100K", "answerer_model": "gpt-5", "judge_model": "gpt-5", "total_questions": 400, "cutoff": "top_100", "accuracy": 70.25, "avg_score": 0.649078, "by_ability": {"abstention": 52.5, "contradiction_resolution": 52.5, "event_ordering": 62.5, "information_extraction": 90.0, "instruction_following": 80.0, "knowledge_update": 57.49999999999999, "multi_session_reasoning": 75.0, "preference_following": 95.0, "summarization": 62.5, "temporal_reasoning": 75.0}}, {"benchmark": "beam-judged", "run_id": "20260616-053544-94fad569", "created_at": "2026-06-16T06:31:24.482783+00:00", "tier": "100K", "answerer_model": "gpt-5-mini", "judge_model": "gpt-5-mini", "total_questions": 400, "cutoff": "top_100", "accuracy": 82.0, "avg_score": 0.7277765, "by_ability": {"abstention": 45.0, "contradiction_resolution": 97.5, "event_ordering": 77.5, "information_extraction": 95.0, "instruction_following": 85.0, "knowledge_update": 70.0, "multi_session_reasoning": 80.0, "preference_following": 97.5, "summarization": 90.0, "temporal_reasoning": 82.5}}, {"benchmark": "beam-judged", "run_id": "20260616-063125-155316a0", "created_at": "2026-06-16T07:25:19.747450+00:00", "tier": "100K", "answerer_model": "gpt-5-mini", "judge_model": "gpt-5-mini", "total_questions": 400, "cutoff": "top_100", "accuracy": 82.25, "avg_score": 0.7480905, "by_ability": {"abstention": 52.5, "contradiction_resolution": 100.0, "event_ordering": 65.0, "information_extraction": 95.0, "instruction_following": 82.5, "knowledge_update": 72.5, "multi_session_reasoning": 82.5, "preference_following": 100.0, "summarization": 90.0, "temporal_reasoning": 82.5}}, {"benchmark": "beam-judged", "run_id": "20260616-072521-cee12a39", "created_at": "2026-06-16T08:22:33.496973+00:00", "tier": "100K", "answerer_model": "gpt-5-mini", "judge_model": "gpt-5-mini", "total_questions": 400, "cutoff": "top_100", "accuracy": 81.5, "avg_score": 0.735379, "by_ability": {"abstention": 55.00000000000001, "contradiction_resolution": 90.0, "event_ordering": 72.5, "information_extraction": 95.0, "instruction_following": 87.5, "knowledge_update": 72.5, "multi_session_reasoning": 80.0, "preference_following": 97.5, "summarization": 82.5, "temporal_reasoning": 82.5}}, {"benchmark": "beam-judged", "run_id": "20260616-221846-26f5f74b", "created_at": "2026-06-16T22:26:13.509351+00:00", "tier": "1M", "answerer_model": "gpt-5-mini", "judge_model": "gpt-5-mini", "total_questions": 20, "cutoff": "top_100", "accuracy": 70.0, "avg_score": 0.673265, "by_ability": {"abstention": 50.0, "contradiction_resolution": 50.0, "event_ordering": 0.0, "information_extraction": 100.0, "instruction_following": 100.0, "knowledge_update": 100.0, "multi_session_reasoning": 100.0, "preference_following": 50.0, "summarization": 50.0, "temporal_reasoning": 100.0}}, {"benchmark": "beam-judged", "run_id": "20260617-121558-6099fa33", "created_at": "2026-06-17T12:17:04.114283+00:00", "tier": "100K", "answerer_model": "gpt-5-mini", "judge_model": "gpt-5-mini", "total_questions": 2, "cutoff": "top_100", "accuracy": 0.0, "avg_score": 0.0, "by_ability": {"abstention": 0.0}}], "abilities": ["abstention", "contradiction_resolution", "event_ordering", "information_extraction", "instruction_following", "knowledge_update", "multi_session_reasoning", "preference_following", "summarization", "temporal_reasoning"], "threads": [{"id": "EXP-AMB", "status": "in-progress", "decision": "Keep in progress until the active AMB run finishes, aggregate its outputs, and decide whether to PR the amb-adapter worktree.", "updated": "2026-06-22", "artifact_count": 0}, {"id": "EXP-MATRIX", "status": "adopted", "decision": "Adopted as infrastructure; no active worktree remains.", "updated": "2026-06-17", "artifact_count": 12}, {"id": "EXP-BEAM-JUDGED", "status": "in-progress", "decision": "Park promotion decisions until the active judged/AMB runs complete and the branch lands.", "updated": "2026-06-22", "artifact_count": 29}, {"id": "EXP-BEAM-RETRIEVAL", "status": "adopted", "decision": "Use as a cheap preflight, not as the final benchmark claim.", "updated": "2026-06-13", "artifact_count": 4}, {"id": "EXP-BEAM-SHIM", "status": "superseded", "decision": "Superseded by EXP-BEAM-RETRIEVAL and EXP-BEAM-JUDGED; keep artifacts for historical comparison.", "updated": "2026-04-24", "artifact_count": 17}, {"id": "EXP-RULESET-ISO", "status": "adopted", "decision": "Adopt bare_tag_1m_v2 as the recommended local default; treat server-side expand_relations under tag gating as ineffective.", "updated": "2026-04-18", "artifact_count": 30}, {"id": "EXP-PROD-CLEANUP", "status": "adopted", "decision": "Adopt staged cleanup workflow for raw corpus pruning.", "updated": "2026-05-01", "artifact_count": 56}, {"id": "EXP-HOOK-REPLAY", "status": "adopted", "decision": "Adopt as layer-1 regression coverage for ingestion hooks.", "updated": "2026-05-03", "artifact_count": 1}, {"id": "EXP-CURRENT-STATE", "status": "adopted", "decision": "Use as a targeted regression harness for temporal validity.", "updated": "2026-05-22", "artifact_count": 18}, {"id": "EXP-ENTITY-REPAIR", "status": "adopted", "decision": "Adopt staged repair evaluation before metadata migrations.", "updated": "2026-06-10", "artifact_count": 21}, {"id": "EXP-METADATA", "status": "adopted", "decision": "Adopt metadata A/B and vector identity checks as part of server-side recall diagnostics.", "updated": "2026-06-11", "artifact_count": 37}, {"id": "EXP-NEG-CONTROL", "status": "adopted", "decision": "Adopt as guardrail coverage for recall regression testing.", "updated": "2026-06-11", "artifact_count": 1}, {"id": "EXP-WRIT", "status": "adopted", "decision": "Keep as a supplemental benchmark harness, separate from official AutoMem benchmark claims.", "updated": "2026-05-22", "artifact_count": 42}, {"id": "EXP-MATURATION", "status": "parked", "decision": "Parked until a concrete maturation runner is prioritized.", "updated": "2026-06-17", "artifact_count": 1}, {"id": "EXP-ORPHAN-FAMA-MEMORA-RELCHAIN", "status": "parked", "decision": "Keep parked until someone reviews the raw outputs and either backfills records or deletes the artifacts.", "updated": "2026-06-22", "artifact_count": 6}]}</script>
+<script>
+const data = JSON.parse(document.getElementById("payload").textContent);
+const C = { info:"#4aa3ff", success:"#3fb950", danger:"#f85149", warn:"#d29922", muted:"#8b949e", stroke:"#30363d", faint:"#6e7681", text:"#e6edf3" };
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const rnd = (v) => v == null ? v : Math.round(v * 100) / 100;
+const fix1 = (v) => v == null ? v : Number(v).toFixed(1);  // 1-decimal display, matches runners/amb_aggregate.py
+
+function lineChart(records, refValue) {
+  const w = 820, h = 300, padL = 44, padR = 86, padT = 18, padB = 58;
+  const ys = records.map(r => r.accuracy);
+  let ymin = Math.min(40, Math.floor(Math.min(...ys) / 10) * 10);
+  const ymax = 100;
+  const plotW = w - padL - padR, plotH = h - padT - padB;
+  const n = records.length;
+  const xAt = (i) => n === 1 ? padL + plotW / 2 : padL + (plotW * i) / (n - 1);
+  const yAt = (v) => padT + plotH * (1 - (v - ymin) / (ymax - ymin));
+  let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" role="img">';
+  for (let t = ymin; t <= ymax; t += 10) {
+    const y = yAt(t);
+    svg += '<line x1="' + padL + '" y1="' + y + '" x2="' + (w - padR) + '" y2="' + y + '" stroke="' + C.stroke + '" stroke-width="1"/>';
+    svg += '<text x="' + (padL - 8) + '" y="' + (y + 4) + '" fill="' + C.faint + '" font-size="11" text-anchor="end">' + t + '</text>';
+  }
+  if (refValue != null && refValue >= ymin && refValue <= ymax) {
+    const y = yAt(refValue);
+    svg += '<line x1="' + padL + '" y1="' + y + '" x2="' + (w - padR) + '" y2="' + y + '" stroke="' + C.warn + '" stroke-width="1.5" stroke-dasharray="5 4"/>';
+    svg += '<text x="' + (w - padR + 6) + '" y="' + (y + 4) + '" fill="' + C.warn + '" font-size="11">Hindsight ' + refValue + '%</text>';
+  }
+  let pts = "";
+  records.forEach((r, i) => { pts += xAt(i) + "," + yAt(r.accuracy) + " "; });
+  svg += '<polyline points="' + pts.trim() + '" fill="none" stroke="' + C.info + '" stroke-width="2"/>';
+  records.forEach((r, i) => {
+    const x = xAt(i), y = yAt(r.accuracy);
+    const col = r.answerer_model && r.answerer_model.indexOf("mini") >= 0 ? C.success : C.info;
+    svg += '<circle cx="' + x + '" cy="' + y + '" r="4" fill="' + col + '"/>';
+    svg += '<text x="' + x + '" y="' + (y - 10) + '" fill="' + C.muted + '" font-size="11" text-anchor="middle">' + rnd(r.accuracy) + '%</text>';
+    const label = (r.answerer_model || "?").replace("gpt-5-mini", "mini").replace("gpt-5", "g5");
+    svg += '<text x="' + x + '" y="' + (h - padB + 18) + '" fill="' + C.faint + '" font-size="10.5" text-anchor="middle">' + esc(label) + '</text>';
+    svg += '<text x="' + x + '" y="' + (h - padB + 32) + '" fill="' + C.faint + '" font-size="9.5" text-anchor="middle">' + esc((r.run_id || "").slice(-8)) + '</text>';
+  });
+  svg += '<text x="' + (padL - 30) + '" y="' + (padT + plotH / 2) + '" fill="' + C.faint + '" font-size="11" transform="rotate(-90 ' + (padL - 30) + ' ' + (padT + plotH / 2) + ')" text-anchor="middle">accuracy (%)</text>';
+  svg += '</svg>';
+  return svg;
+}
+
+function abilityBars(abilities, seriesA, seriesB) {
+  const rowH = 30, padL = 4, padR = 8, padT = 8, labelW = 190, barArea = 540, valW = 44;
+  const h = padT * 2 + abilities.length * rowH;
+  const w = labelW + barArea + valW;
+  const xAt = (v) => labelW + (barArea * v) / 100;
+  let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" role="img">';
+  abilities.forEach((ab, i) => {
+    const cy = padT + i * rowH;
+    svg += '<text x="' + padL + '" y="' + (cy + rowH / 2 + 4) + '" fill="' + C.muted + '" font-size="11.5">' + esc(ab) + '</text>';
+    const bh = 9;
+    const a = seriesA.data[i], b = seriesB ? seriesB.data[i] : null;
+    if (a != null) {
+      svg += '<rect x="' + labelW + '" y="' + (cy + 4) + '" width="' + (xAt(a) - labelW) + '" height="' + bh + '" fill="' + C.info + '" rx="2"/>';
+      svg += '<text x="' + (xAt(a) + 5) + '" y="' + (cy + 4 + bh) + '" fill="' + C.faint + '" font-size="10">' + rnd(a) + '</text>';
+    }
+    if (b != null) {
+      svg += '<rect x="' + labelW + '" y="' + (cy + 4 + bh + 2) + '" width="' + (xAt(b) - labelW) + '" height="' + bh + '" fill="' + C.success + '" rx="2"/>';
+      svg += '<text x="' + (xAt(b) + 5) + '" y="' + (cy + 4 + bh + 2 + bh) + '" fill="' + C.faint + '" font-size="10">' + rnd(b) + '</text>';
+    }
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+const AMB_ORDER = { ok: 0, low_n: 1, missing: 2 };
+function ambSorted(records) {
+  return records.slice().sort((a, b) =>
+    ((AMB_ORDER[a.status] ?? 3) - (AMB_ORDER[b.status] ?? 3)) || ((b.accuracy || 0) - (a.accuracy || 0)));
+}
+
+function ambValueText(r) {
+  if (r.status === "missing") return "pending";
+  if (r.spread != null) return fix1(r.accuracy) + "% spread " + fix1(r.spread) + "pp ×" + r.repeats;
+  let t = fix1(r.accuracy) + "%";
+  if (r.ci != null) t += " ±" + fix1(r.ci);
+  if (r.status === "low_n") t += " (n=" + r.n + ", low)";
+  return t;
+}
+
+// Horizontal accuracy bars with a 95% CI whisker per dataset. Datasets with no
+// canonical run (or too few samples) render as a faint dashed track so coverage
+// gaps read as information rather than absence.
+function benchmarkBars(records) {
+  const recs = ambSorted(records);
+  const rowH = 34, padT = 10, padB = 18, labelW = 140, barArea = 430, valW = 170;
+  const w = labelW + barArea + valW;
+  const plotBottom = padT + recs.length * rowH;
+  const h = plotBottom + padB;
+  const xAt = (v) => labelW + (barArea * Math.max(0, Math.min(100, v))) / 100;
+  let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="100%" role="img">';
+  for (let t = 0; t <= 100; t += 25) {
+    const x = xAt(t);
+    svg += '<line x1="' + x + '" y1="' + padT + '" x2="' + x + '" y2="' + plotBottom + '" stroke="' + C.stroke + '" stroke-width="1"/>';
+    svg += '<text x="' + x + '" y="' + (plotBottom + 13) + '" fill="' + C.faint + '" font-size="9.5" text-anchor="middle">' + t + '</text>';
+  }
+  recs.forEach((r, i) => {
+    const cy = padT + i * rowH, midY = cy + rowH / 2, bh = 10, barY = midY - bh / 2;
+    svg += '<text x="0" y="' + (midY + 4) + '" fill="' + C.muted + '" font-size="11.5">' + esc(r.label) + '</text>';
+    if (r.status === "ok" || r.status === "low_n") {
+      const acc = r.accuracy || 0;
+      const col = r.status === "ok" ? C.info : C.warn;
+      svg += '<rect x="' + labelW + '" y="' + barY + '" width="' + (xAt(acc) - labelW) + '" height="' + bh + '" fill="' + col + '" rx="2"/>';
+      if (r.ci != null && r.ci > 0) {
+        const lo = xAt(acc - r.ci), hi = xAt(acc + r.ci), wy = midY;
+        svg += '<line x1="' + lo + '" y1="' + wy + '" x2="' + hi + '" y2="' + wy + '" stroke="' + C.text + '" stroke-width="1.5"/>';
+        svg += '<line x1="' + lo + '" y1="' + (wy - 4) + '" x2="' + lo + '" y2="' + (wy + 4) + '" stroke="' + C.text + '" stroke-width="1.5"/>';
+        svg += '<line x1="' + hi + '" y1="' + (wy - 4) + '" x2="' + hi + '" y2="' + (wy + 4) + '" stroke="' + C.text + '" stroke-width="1.5"/>';
+      }
+    } else {
+      svg += '<rect x="' + labelW + '" y="' + barY + '" width="' + barArea + '" height="' + bh + '" fill="none" stroke="' + C.faint + '" stroke-width="1" stroke-dasharray="4 4" rx="2"/>';
+    }
+    const vcol = r.status === "missing" ? C.faint : C.muted;
+    svg += '<text x="' + (labelW + barArea + 8) + '" y="' + (midY + 4) + '" fill="' + vcol + '" font-size="10.5">' + esc(ambValueText(r)) + '</text>';
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+function ambTable(records) {
+  let rows = "";
+  ambSorted(records).forEach(r => {
+    let acc;
+    if (r.status === "missing") acc = '<span style="color:' + C.faint + '">pending</span>';
+    else if (r.spread != null) acc = fix1(r.accuracy) + '% <span style="color:' + C.muted + '">(spread ' + fix1(r.spread) + 'pp, ×' + r.repeats + ')</span>';
+    else if (r.ci != null) acc = fix1(r.accuracy) + '% ± ' + fix1(r.ci) + (r.status === "low_n" ? ' <span style="color:' + C.warn + '">low n</span>' : '');
+    else acc = fix1(r.accuracy) + '%';
+    const ret = r.avg_retrieve_time_ms != null ? Math.round(r.avg_retrieve_time_ms) + ' ms' : '—';
+    const tok = r.avg_context_tokens != null ? Math.round(r.avg_context_tokens) : '—';
+    const n = r.n ? r.n : '—';
+    rows += '<tr><td>' + esc(r.label) + '</td><td class="num">' + acc + '</td><td class="num">' + ret + '</td><td class="num">' + tok + '</td><td class="num">' + n + '</td></tr>';
+  });
+  return '<table><thead><tr><th>Benchmark</th><th class="num">Accuracy (95% CI)</th><th class="num">Recall latency (median)</th><th class="num">Context tokens (median)</th><th class="num">n</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function bestByAnswerer(beam, key) {
+  const runs = beam.filter(r => (r.answerer_model || "").indexOf(key) >= 0);
+  if (!runs.length) return null;
+  return runs.reduce((best, r) => (r.accuracy > best.accuracy ? r : best));
+}
+
+function el(html) { const d = document.createElement("div"); d.innerHTML = html; return d.firstElementChild; }
+
+function render() {
+  const app = document.getElementById("app");
+  const scores = data.scores || [];
+  const beam = scores.filter(r => r.benchmark === "beam-judged");
+  const amb = scores.filter(r => r.benchmark === "amb");
+  const sc = data.status_counts || {};
+  const best = beam.length ? rnd(Math.max(...beam.map(r => r.accuracy))) : null;
+  const loco = amb.find(r => r.dataset === "locomo" && r.status === "ok");
+
+  let html = "";
+  html += '<h1>AutoMem eval scoreboard</h1>';
+  html += '<p class="sub">Internal experiment tracker view. Generated ' + esc(data.generated_at || "") + ' by <code>scripts/experiment_index.py</code>. Not for publication.</p>';
+
+  const total = (data.threads || []).length;
+  html += '<div class="stats">';
+  html += '<div class="stat"><div class="v">' + total + '</div><div class="l">Threads tracked</div></div>';
+  html += '<div class="stat"><div class="v" style="color:' + C.success + '">' + (sc.adopted || 0) + '</div><div class="l">Adopted</div></div>';
+  html += '<div class="stat"><div class="v" style="color:' + C.warn + '">' + (sc["in-progress"] || 0) + '</div><div class="l">In progress</div></div>';
+  html += '<div class="stat"><div class="v" style="color:' + C.info + '">' + (best != null ? best + "%" : "n/a") + '</div><div class="l">Best BEAM judged</div></div>';
+  if (loco) html += '<div class="stat"><div class="v" style="color:' + C.success + '">' + fix1(loco.accuracy) + '%</div><div class="l">LoCoMo (AMB)</div></div>';
+  html += '</div>';
+
+  if (!beam.length && !amb.length) {
+    html += '<div class="note" style="margin-top:20px">No benchmark score artifacts were reachable from the scanned data root. Regenerate with <code>--data-root</code> pointing at the checkout that holds <code>data/results/beam-judged/</code>, and <code>--amb-outputs</code> at the AMB harness outputs.</div>';
+    app.innerHTML = html;
+    return;
+  }
+
+  if (beam.length) {
+  const full = beam.filter(r => (r.total_questions || 0) >= 100).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+  const traj = full.length ? full : beam.slice().sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+  html += '<h2>BEAM judged accuracy across runs</h2>';
+  html += '<div class="panel">' + lineChart(traj, 75) + '</div>';
+  html += '<div class="legend"><span><i style="background:' + C.info + '"></i>gpt-5 answerer</span><span><i style="background:' + C.success + '"></i>gpt-5-mini answerer</span><span><i style="background:' + C.warn + '"></i>Hindsight 100K = 75%</span></div>';
+  html += '<p class="caption">Y: overall accuracy (%). X: chronological runs with ' + (full.length ? "&ge;100" : "all") + ' questions. Source: data/results/beam-judged. The answerer-model swap (g5 &rarr; mini) is the main driver across the 75% line.</p>';
+
+  const g5 = bestByAnswerer(beam, "gpt-5") && !bestByAnswerer(beam, "mini") ? bestByAnswerer(beam, "gpt-5") : beam.filter(r => (r.answerer_model || "") === "gpt-5").reduce((b, r) => (!b || r.accuracy > b.accuracy ? r : b), null);
+  const mini = bestByAnswerer(beam, "mini");
+  const abilities = data.abilities || [];
+  const present = (run) => run && run.by_ability && abilities.some(a => run.by_ability[a] != null);
+  if (present(g5) || present(mini)) {
+    const seriesA = { name: g5 ? "gpt-5 (" + (g5.run_id || "").slice(-8) + " · " + g5.accuracy + "%)" : "gpt-5", data: abilities.map(a => g5 && g5.by_ability ? g5.by_ability[a] : null) };
+    const seriesB = mini ? { name: "gpt-5-mini (" + (mini.run_id || "").slice(-8) + " · " + mini.accuracy + "%)", data: abilities.map(a => mini.by_ability ? mini.by_ability[a] : null) } : null;
+    html += '<h2>Per-ability accuracy</h2>';
+    html += '<div class="panel">' + abilityBars(abilities, seriesA, seriesB) + '</div>';
+    html += '<div class="legend"><span><i style="background:' + C.info + '"></i>' + esc(seriesA.name) + '</span>' + (seriesB ? '<span><i style="background:' + C.success + '"></i>' + esc(seriesB.name) + '</span>' : "") + '</div>';
+    html += '<p class="caption">X: accuracy (%) per BEAM ability bucket. Best run per answerer model. Source: data/results/beam-judged.</p>';
+  }
+
+  html += '<h2>Run provenance</h2>';
+  let rows = "";
+  beam.slice().sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).forEach(r => {
+    rows += '<tr><td><code>' + esc((r.run_id || "").slice(-8)) + '</code></td><td>' + esc((r.created_at || "").slice(0, 16).replace("T", " ")) + '</td><td>' + esc(r.tier || "") + '</td><td>' + esc(r.answerer_model || "") + '</td><td class="num">' + esc(r.total_questions || "") + '</td><td class="num">' + esc(rnd(r.accuracy)) + '%</td></tr>';
+  });
+  html += '<table><thead><tr><th>Run</th><th>When</th><th>Tier</th><th>Answerer</th><th class="num">Q</th><th class="num">Accuracy</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  if (amb.length) {
+    html += '<h2>Cross-benchmark accuracy (AMB · Gemini answerer)</h2>';
+    html += '<div class="panel">' + benchmarkBars(amb) + '</div>';
+    html += '<div class="legend"><span><i style="background:' + C.info + '"></i>full run</span><span><i style="background:' + C.warn + '"></i>low n (&lt;30)</span><span><i style="background:' + C.faint + '"></i>pending</span><span>whisker = 95% CI</span></div>';
+    html += ambTable(amb);
+    html += '<p class="caption">Accuracy (bar) with 95% CI whisker per AMB dataset; the table adds the cost axes (recall latency, context tokens). Source: agent-memory-benchmark/outputs &mdash; neutral Gemini-3.1-Pro answerer + judge. Numbers are in parity with <code>runners/amb_aggregate.py</code>. Internal only.</p>';
+  }
+
+  html += '<h2>Experiment threads</h2>';
+  let trows = "";
+  (data.threads || []).forEach(t => {
+    trows += '<tr><td><code>' + esc(t.id) + '</code></td><td><span class="tag ' + esc(t.status) + '">' + esc(t.status) + '</span></td><td>' + esc(t.decision || "") + '</td><td class="num">' + esc(t.artifact_count || 0) + '</td><td>' + esc(t.updated || "") + '</td></tr>';
+  });
+  html += '<table><thead><tr><th>Thread</th><th>Status</th><th>Decision</th><th class="num">Artifacts</th><th>Updated</th></tr></thead><tbody>' + trows + '</tbody></table>';
+
+  app.innerHTML = html;
+}
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,2912 @@
+{
+  "artifacts": [
+    {
+      "created_at": "2026-04-17T23:09:40",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-230940-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:09:40"
+    },
+    {
+      "created_at": "2026-04-17T23:26:15",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-232615-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:26:15"
+    },
+    {
+      "created_at": "2026-04-17T23:28:04",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-232804-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:28:04"
+    },
+    {
+      "created_at": "2026-04-17T23:29:44",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-232944-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:29:44"
+    },
+    {
+      "created_at": "2026-04-17T23:33:14",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-233314-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:33:14"
+    },
+    {
+      "created_at": "2026-04-17T23:34:11",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-233411-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:34:11"
+    },
+    {
+      "created_at": "2026-04-17T23:38:46",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260417-233846-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-17T23:38:46"
+    },
+    {
+      "created_at": "2026-04-18T01:40:41",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260418-014041-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-18T01:40:41"
+    },
+    {
+      "created_at": "2026-04-24T05:48:20",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260424-054820-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-04-24T05:48:20"
+    },
+    {
+      "created_at": "2026-05-01T06:20:19",
+      "kind": "artifact",
+      "path": "data/results/20260501-062019-mirror8011-cleanup.md",
+      "title": "Local AutoMem cleanup evaluation - mirror 8011"
+    },
+    {
+      "created_at": "2026-05-01T06:54:53",
+      "kind": "artifact",
+      "path": "data/results/20260501-065453-mirror8011-cleanup-plan.md",
+      "title": "Local AutoMem cleanup plan from mirror inventory"
+    },
+    {
+      "created_at": "2026-05-01T09:37:34",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260501-093734-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-05-01T09:37:49"
+    },
+    {
+      "created_at": "2026-05-01T09:38:27",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260501-093827-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-05-01T09:38:41"
+    },
+    {
+      "created_at": "2026-05-01T09:51:53",
+      "kind": "artifact",
+      "path": "data/results/20260501-095153-mirror8011-stage1-cleanup.md",
+      "title": "Local AutoMem Stage 1 cleanup run - mirror 8011"
+    },
+    {
+      "created_at": "2026-05-01T12:21:06",
+      "kind": "artifact",
+      "path": "data/results/20260501-122106-prod-stage1-dry-run.md",
+      "title": "Production Stage 1 Cleanup Dry-Run"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-execute.md",
+      "title": "Production Stage 1 Cleanup Execute"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-BUILD-RESULTS.md",
+      "title": "Recall endpoint comparison - 2026-05-01T12:56:04"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-ENGAGEMENT-WORKFLOW-SUMMARY.md",
+      "title": "Recall endpoint comparison - 2026-05-01T13:05:01"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-LOCOMO-BENCHMARK.md",
+      "title": "Recall endpoint comparison - 2026-05-01T12:53:08"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-MOLTBOOK-ENGAGEMENT-PINGS.md",
+      "title": "Recall endpoint comparison - 2026-05-01T13:00:26"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-STARTED-SESSION.md",
+      "title": "Recall endpoint comparison - 2026-05-01T13:02:30"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-TEST-RESULTS.md",
+      "title": "Recall endpoint comparison - 2026-05-01T12:58:37"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-TWITTER-ENGAGEMENT-PINGS.md",
+      "title": "Recall endpoint comparison - 2026-05-01T13:01:31"
+    },
+    {
+      "created_at": "2026-05-01T12:47:37",
+      "kind": "artifact",
+      "path": "data/results/20260501-124737-prod-stage1-recall-baseline.md",
+      "title": "Recall endpoint comparison - 2026-05-01T12:48:13"
+    },
+    {
+      "created_at": "2026-05-01T17:32:42",
+      "kind": "artifact",
+      "path": "data/results/20260501-173242-graph-diagnostics.md",
+      "title": "Local AutoMem graph diagnostics - 2026-05-01T17:32:42"
+    },
+    {
+      "created_at": "2026-05-22T20:25:07",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260522-202507-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-05-22T20:25:07"
+    },
+    {
+      "created_at": "2026-05-22T20:25:11",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260522-202511-comparison.md",
+      "title": "Ruleset comparison \u2014 2026-05-22T20:25:11"
+    },
+    {
+      "created_at": "2026-05-22T18:17:49",
+      "kind": "current-state",
+      "path": "data/results/20260522T181749Z-current-state-base-922d23b.md",
+      "title": "Current-state recall eval - base-922d23b"
+    },
+    {
+      "created_at": "2026-05-22T18:19:37",
+      "kind": "current-state",
+      "path": "data/results/20260522T181937Z-current-state-pr170-current-only-false.md",
+      "title": "Current-state recall eval - pr170-current-only-false"
+    },
+    {
+      "created_at": "2026-05-22T18:19:42",
+      "kind": "current-state",
+      "path": "data/results/20260522T181942Z-current-state-pr170-default-current.md",
+      "title": "Current-state recall eval - pr170-default-current"
+    },
+    {
+      "created_at": "2026-05-22T23:17:50",
+      "kind": "current-state",
+      "path": "data/results/20260522T231750Z-current-state-pr170-default-current.md",
+      "title": "Current-state recall eval - pr170-default-current"
+    },
+    {
+      "created_at": "2026-05-22T23:32:56",
+      "kind": "current-state",
+      "path": "data/results/20260522T233256Z-current-state-pr170-default-current-c032ea6.md",
+      "title": "Current-state recall eval - pr170-default-current-c032ea6"
+    },
+    {
+      "created_at": "2026-05-22T23:36:20",
+      "kind": "current-state",
+      "path": "data/results/20260522T233620Z-current-state-pr170-default-current-c0ec99d.md",
+      "title": "Current-state recall eval - pr170-default-current-c0ec99d"
+    },
+    {
+      "created_at": "2026-05-22T23:38:34",
+      "kind": "current-state",
+      "path": "data/results/20260522T233834Z-current-state-pr170-default-current-c0ec99d-cleanup-fix.md",
+      "title": "Current-state recall eval - pr170-default-current-c0ec99d-cleanup-fix"
+    },
+    {
+      "created_at": "2026-05-22T23:40:46",
+      "kind": "current-state",
+      "path": "data/results/20260522T234046Z-current-state-pr170-default-current-bca114a.md",
+      "title": "Current-state recall eval - pr170-default-current-bca114a"
+    },
+    {
+      "created_at": "2026-06-10T22:24:35",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260610-222435-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-10T22:25:19"
+    },
+    {
+      "created_at": "2026-06-11T00:03:54",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-000354-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T00:04:28"
+    },
+    {
+      "created_at": "2026-06-11T04:05:48",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-040548-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T04:06:14"
+    },
+    {
+      "created_at": "2026-06-11T04:07:07",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-040707-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T04:07:27"
+    },
+    {
+      "created_at": "2026-06-11T04:26:53",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-042653-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T04:27:15"
+    },
+    {
+      "created_at": "2026-06-11T04:33:43",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-043343-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T04:34:05"
+    },
+    {
+      "created_at": "2026-06-11T04:35:07",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-043507-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T04:35:31"
+    },
+    {
+      "created_at": "2026-06-11T04:35:57",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-043557-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T04:36:18"
+    },
+    {
+      "created_at": "2026-06-11T21:17:03",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-211703-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T21:17:30"
+    },
+    {
+      "created_at": "2026-06-11T21:20:35",
+      "kind": "ruleset-comparison",
+      "path": "data/results/20260611-212035-recall-endpoint-comparison.md",
+      "title": "Recall endpoint comparison - 2026-06-11T21:21:02"
+    },
+    {
+      "created_at": null,
+      "kind": "curated-summary",
+      "path": "data/results/SUMMARY-20260417.md",
+      "title": "AutoMem recall-strategy evaluation \u2014 2026-04-17"
+    },
+    {
+      "created_at": null,
+      "kind": "curated-summary",
+      "path": "data/results/SUMMARY-20260418-v2.md",
+      "title": "Corpus v2 evaluation \u2014 370 memories, Voyage voyage-4"
+    },
+    {
+      "created_at": null,
+      "kind": "curated-summary",
+      "path": "data/results/SUMMARY-20260522-pr170-current-state.md",
+      "title": "PR #170 current-state recall eval"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-051827-100K-0_1/MANIFEST.json"
+    },
+    {
+      "created_at": "2026-04-21T05:18:27",
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-051827-100K-0_1/beam_results_20260421_055555.rejudge-qwen3.6-35b-a3b-32k.md",
+      "title": "Judge-agreement study \u2014 qwen3.6:35b-a3b-32k"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-174617-100K-0_1/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-195900-100K-0_1/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-222043-100K-0_1/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-232332-100K-0_1/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-234701-100K-0_1/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260421-234814-100K-0_19/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260422-042745-100K-0_1-v2/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260422-051836-100K-0_19-v2/MANIFEST.json"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/beam/20260424-055025-100K-0_0-v2/MANIFEST.json"
+    },
+    {
+      "created_at": null,
+      "kind": "artifact",
+      "path": "data/results/beam/README.md",
+      "title": "BEAM runs \u2014 experimental, not a benchmark claim"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-15T22:34:56.597734+00:00",
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 1240,
+      "path": "data/results/beam-judged/20260615-223139-a478c915-100K/MANIFEST.json",
+      "run_id": "20260615-223139-a478c915",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 20
+    },
+    {
+      "created_at": "2026-06-15T22:31:39",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260615-223139-a478c915-100K/report.md",
+      "title": "BEAM judged report \u2014 20260615-223139-a478c915"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-15T22:34:56.597734+00:00",
+      "headline_metric": {
+        "accuracy": 70.0,
+        "avg_score": 0.639165,
+        "correct": 14,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 20
+      },
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 1240,
+      "path": "data/results/beam-judged/20260615-223139-a478c915-100K/results.json",
+      "run_id": "20260615-223139-a478c915",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 20
+    },
+    {
+      "answerer_model": "gpt-5",
+      "created_at": "2026-06-15T23:53:27.541406+00:00",
+      "judge_model": "gpt-5",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260615-224220-e29f5f07-100K/MANIFEST.json",
+      "run_id": "20260615-224220-e29f5f07",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "created_at": "2026-06-15T22:42:20",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260615-224220-e29f5f07-100K/report.md",
+      "title": "BEAM judged report \u2014 20260615-224220-e29f5f07"
+    },
+    {
+      "answerer_model": "gpt-5",
+      "created_at": "2026-06-15T23:53:27.541406+00:00",
+      "headline_metric": {
+        "accuracy": 67.5,
+        "avg_score": 0.6150325,
+        "correct": 270,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 400
+      },
+      "judge_model": "gpt-5",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260615-224220-e29f5f07-100K/results.json",
+      "run_id": "20260615-224220-e29f5f07",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "answerer_model": "gpt-5",
+      "created_at": "2026-06-16T01:11:31.453758+00:00",
+      "judge_model": "gpt-5",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260615-235650-b67e9716-100K/MANIFEST.json",
+      "run_id": "20260615-235650-b67e9716",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "created_at": "2026-06-15T23:56:50",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260615-235650-b67e9716-100K/report.md",
+      "title": "BEAM judged report \u2014 20260615-235650-b67e9716"
+    },
+    {
+      "answerer_model": "gpt-5",
+      "created_at": "2026-06-16T01:11:31.453758+00:00",
+      "headline_metric": {
+        "accuracy": 43.5,
+        "avg_score": 0.405204,
+        "correct": 174,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 400
+      },
+      "judge_model": "gpt-5",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260615-235650-b67e9716-100K/results.json",
+      "run_id": "20260615-235650-b67e9716",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "answerer_model": "gpt-5",
+      "created_at": "2026-06-16T05:34:15.319399+00:00",
+      "judge_model": "gpt-5",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-042452-1d46f08a-100K/MANIFEST.json",
+      "run_id": "20260616-042452-1d46f08a",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "created_at": "2026-06-16T04:24:52",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260616-042452-1d46f08a-100K/report.md",
+      "title": "BEAM judged report \u2014 20260616-042452-1d46f08a"
+    },
+    {
+      "answerer_model": "gpt-5",
+      "created_at": "2026-06-16T05:34:15.319399+00:00",
+      "headline_metric": {
+        "accuracy": 70.25,
+        "avg_score": 0.649078,
+        "correct": 281,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 400
+      },
+      "judge_model": "gpt-5",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-042452-1d46f08a-100K/results.json",
+      "run_id": "20260616-042452-1d46f08a",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T06:31:24.482783+00:00",
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-053544-94fad569-100K/MANIFEST.json",
+      "run_id": "20260616-053544-94fad569",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "created_at": "2026-06-16T05:35:44",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260616-053544-94fad569-100K/report.md",
+      "title": "BEAM judged report \u2014 20260616-053544-94fad569"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T06:31:24.482783+00:00",
+      "headline_metric": {
+        "accuracy": 82.0,
+        "avg_score": 0.7277765,
+        "correct": 328,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 400
+      },
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-053544-94fad569-100K/results.json",
+      "run_id": "20260616-053544-94fad569",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T07:25:19.747450+00:00",
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-063125-155316a0-100K/MANIFEST.json",
+      "run_id": "20260616-063125-155316a0",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "created_at": "2026-06-16T06:31:25",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260616-063125-155316a0-100K/report.md",
+      "title": "BEAM judged report \u2014 20260616-063125-155316a0"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T07:25:19.747450+00:00",
+      "headline_metric": {
+        "accuracy": 82.25,
+        "avg_score": 0.7480905,
+        "correct": 329,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 400
+      },
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-063125-155316a0-100K/results.json",
+      "run_id": "20260616-063125-155316a0",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T08:22:33.496973+00:00",
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-072521-cee12a39-100K/MANIFEST.json",
+      "run_id": "20260616-072521-cee12a39",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "created_at": "2026-06-16T07:25:21",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260616-072521-cee12a39-100K/report.md",
+      "title": "BEAM judged report \u2014 20260616-072521-cee12a39"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T08:22:33.496973+00:00",
+      "headline_metric": {
+        "accuracy": 81.5,
+        "avg_score": 0.735379,
+        "correct": 326,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 400
+      },
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 29902,
+      "path": "data/results/beam-judged/20260616-072521-cee12a39-100K/results.json",
+      "run_id": "20260616-072521-cee12a39",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T22:26:13.509351+00:00",
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 10214,
+      "path": "data/results/beam-judged/20260616-221846-26f5f74b-1M/MANIFEST.json",
+      "run_id": "20260616-221846-26f5f74b",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "1M",
+      "total_questions": 20
+    },
+    {
+      "created_at": "2026-06-16T22:18:46",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260616-221846-26f5f74b-1M/report.md",
+      "title": "BEAM judged report \u2014 20260616-221846-26f5f74b"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-16T22:26:13.509351+00:00",
+      "headline_metric": {
+        "accuracy": 70.0,
+        "avg_score": 0.673265,
+        "correct": 14,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 20
+      },
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 10214,
+      "path": "data/results/beam-judged/20260616-221846-26f5f74b-1M/results.json",
+      "run_id": "20260616-221846-26f5f74b",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "1M",
+      "total_questions": 20
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-17T12:17:04.114283+00:00",
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 1240,
+      "path": "data/results/beam-judged/20260617-121558-6099fa33-100K/MANIFEST.json",
+      "run_id": "20260617-121558-6099fa33",
+      "schema": "automem-evals.beam-judged-manifest.v1",
+      "tier": "100K",
+      "total_questions": 2
+    },
+    {
+      "created_at": "2026-06-17T12:15:58",
+      "kind": "beam-judged",
+      "path": "data/results/beam-judged/20260617-121558-6099fa33-100K/report.md",
+      "title": "BEAM judged report \u2014 20260617-121558-6099fa33"
+    },
+    {
+      "answerer_model": "gpt-5-mini",
+      "created_at": "2026-06-17T12:17:04.114283+00:00",
+      "headline_metric": {
+        "accuracy": 0.0,
+        "avg_score": 0.0,
+        "correct": 0,
+        "cutoff": "top_100",
+        "errors": 0,
+        "total": 2
+      },
+      "judge_model": "gpt-5-mini",
+      "kind": "beam-judged",
+      "memory_count": 1240,
+      "path": "data/results/beam-judged/20260617-121558-6099fa33-100K/results.json",
+      "run_id": "20260617-121558-6099fa33",
+      "schema": "automem-evals.beam-judged-results.v1",
+      "tier": "100K",
+      "total_questions": 2
+    },
+    {
+      "created_at": "2026-06-13T11:44:47.486737+00:00",
+      "kind": "beam-retrieval",
+      "path": "data/results/beam-retrieval/20260613-100k-full-retrieval-proxy/manifest.json",
+      "run_id": "20260613-100k-full-retrieval-proxy",
+      "schema": "automem-evals.beam-retrieval-manifest.v1"
+    },
+    {
+      "created_at": null,
+      "kind": "beam-retrieval",
+      "path": "data/results/beam-retrieval/20260613-100k-full-retrieval-proxy/report.md",
+      "title": "BEAM retrieval-proxy report - 20260613-100k-full-retrieval-proxy"
+    },
+    {
+      "created_at": "2026-06-13T11:47:23.343775+00:00",
+      "kind": "beam-retrieval",
+      "path": "data/results/beam-retrieval/20260613-100k-full-retrieval-proxy/results.json",
+      "run_id": "20260613-100k-full-retrieval-proxy",
+      "schema": "automem-evals.beam-retrieval-results.v1"
+    },
+    {
+      "created_at": "2026-05-01T00:43:13",
+      "kind": "ruleset-comparison",
+      "path": "data/results/hook-replay/20260501T004313Z-baseline-vs-fix-v1-comparison.md",
+      "title": "Hook-replay comparison: `baseline` vs `fix-v1-no-session`"
+    },
+    {
+      "created_at": "2026-05-02T15:32:00",
+      "kind": "ruleset-comparison",
+      "path": "data/results/hook-replay/20260502T153200Z-fix-v1-vs-fix-v2-sanitize-content-comparison.md",
+      "title": "Hook-replay comparison: `fix-v1-no-session` vs `fix-v2-sanitize-content`"
+    },
+    {
+      "created_at": "2026-05-02T16:44:24",
+      "kind": "ruleset-comparison",
+      "path": "data/results/hook-replay/20260502T164424Z-fix-v1-vs-fix-v2-sanitize-content-reviewfix-comparison.md",
+      "title": "Hook-replay comparison: `fix-v1-no-session` vs `fix-v2-sanitize-content`"
+    },
+    {
+      "created_at": "2026-05-03T01:18:38",
+      "kind": "ruleset-comparison",
+      "path": "data/results/hook-replay/20260503T011838Z-fix-v2-vs-fix-v3-add-fields-comparison.md",
+      "title": "Hook-replay comparison: `fix-v2-sanitize-content` vs `fix-v3-add-fields`"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T135037Z-matrix.json",
+      "row_count": 40
+    },
+    {
+      "created_at": "2026-05-02T13:50:37",
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T135037Z-matrix.md",
+      "title": "Recall matrix - 2026-05-02T13:50:37+00:00"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T153224Z-matrix.json",
+      "row_count": 16
+    },
+    {
+      "created_at": "2026-05-02T15:32:24",
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T153224Z-matrix.md",
+      "title": "Recall matrix - 2026-05-02T15:32:24+00:00"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T153236Z-matrix.json",
+      "row_count": 40
+    },
+    {
+      "created_at": "2026-05-02T15:32:36",
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T153236Z-matrix.md",
+      "title": "Recall matrix - 2026-05-02T15:32:36+00:00"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T164518Z-matrix.json",
+      "row_count": 16
+    },
+    {
+      "created_at": "2026-05-02T16:45:18",
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T164518Z-matrix.md",
+      "title": "Recall matrix - 2026-05-02T16:45:18+00:00"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T164530Z-matrix.json",
+      "row_count": 40
+    },
+    {
+      "created_at": "2026-05-02T16:45:30",
+      "kind": "artifact",
+      "path": "data/results/matrix/20260502T164530Z-matrix.md",
+      "title": "Recall matrix - 2026-05-02T16:45:30+00:00"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/matrix/20260503T012010Z-matrix.json",
+      "row_count": 24
+    },
+    {
+      "created_at": "2026-05-03T01:20:10",
+      "kind": "artifact",
+      "path": "data/results/matrix/20260503T012010Z-matrix.md",
+      "title": "Recall matrix - 2026-05-03T01:20:10+00:00"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/results/relchain_null_20260611/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/results/relchain_pass1_defaults_20260611/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/results/relchain_pass2_gate015_20260611/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/results/relchain_pass3_gate040_20260611/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/results/relchain_pass4_combo_20260611/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/results/relchain_pass5_auto_20260611/summary.json",
+      "row_count": 27
+    },
+    {
+      "created_at": "2026-05-22T11:35:58",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113558-drift-adapter-phase-smoke/automem/writ-automem-1779442560961.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:35:58",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113558-drift-adapter-phase-smoke/baseline/writ-baseline-1779442561217.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:35:58",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113558-drift-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:38:46",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113846-drift-adapter-phase-smoke/automem/writ-automem-1779442729088.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:38:46",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113846-drift-adapter-phase-smoke/baseline/writ-baseline-1779442729387.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:38:46",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113846-drift-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:38:55",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113855-update-adapter-phase-smoke/automem/writ-automem-1779442738027.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:38:55",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113855-update-adapter-phase-smoke/baseline/writ-baseline-1779442738289.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:38:55",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T113855-update-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:41:57",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114157-update-adapter-phase-smoke/automem/writ-automem-1779442919409.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:41:57",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114157-update-adapter-phase-smoke/baseline/writ-baseline-1779442919671.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:41:57",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114157-update-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:42:04",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114204-temporal-adapter-phase-smoke/automem/writ-automem-1779442926377.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:04",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114204-temporal-adapter-phase-smoke/baseline/writ-baseline-1779442926652.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:04",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114204-temporal-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:42:10",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114210-lifecycle-adapter-phase-smoke/automem/writ-automem-1779442933287.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:10",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114210-lifecycle-adapter-phase-smoke/baseline/writ-baseline-1779442933556.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:10",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114210-lifecycle-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:42:18",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114218-provenance-adapter-phase-smoke/automem/writ-automem-1779442940493.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:18",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114218-provenance-adapter-phase-smoke/baseline/writ-baseline-1779442940777.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:18",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114218-provenance-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:42:44",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114244-all-adapter-phase-smoke/automem/writ-automem-1779442993285.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:44",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114244-all-adapter-phase-smoke/baseline/writ-baseline-1779442993573.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:42:44",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114244-all-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:45:20",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114520-drift-adapter-phase-smoke/automem/writ-automem-1779443122991.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:20",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114520-drift-adapter-phase-smoke/baseline/writ-baseline-1779443123249.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:20",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114520-drift-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:45:26",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114526-update-adapter-phase-smoke/automem/writ-automem-1779443128560.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:26",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114526-update-adapter-phase-smoke/baseline/writ-baseline-1779443128859.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:26",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114526-update-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:45:32",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114532-temporal-adapter-phase-smoke/automem/writ-automem-1779443134176.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:32",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114532-temporal-adapter-phase-smoke/baseline/writ-baseline-1779443134446.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:32",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114532-temporal-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:45:38",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114538-lifecycle-adapter-phase-smoke/automem/writ-automem-1779443141171.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:38",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114538-lifecycle-adapter-phase-smoke/baseline/writ-baseline-1779443141442.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:38",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114538-lifecycle-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:45:44",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114544-provenance-adapter-phase-smoke/automem/writ-automem-1779443146937.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:44",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114544-provenance-adapter-phase-smoke/baseline/writ-baseline-1779443147196.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:44",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114544-provenance-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "created_at": "2026-05-22T11:45:50",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114550-all-adapter-phase-smoke/automem/writ-automem-1779443181001.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:50",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114550-all-adapter-phase-smoke/baseline/writ-baseline-1779443181578.md",
+      "title": "WRIT Benchmark Report"
+    },
+    {
+      "created_at": "2026-05-22T11:45:50",
+      "kind": "artifact",
+      "path": "data/results/writ/20260522T114550-all-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+      "title": "WRIT comparison \u2014 automem vs baseline"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-062019-mirror8011-cleanup/dry2-sweep-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-062019-mirror8011-cleanup/dry2-sweep-session-milestone/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-062019-mirror8011-cleanup/exec-sweep-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-093734-recall-compare-localhost-8011-vs-localhost-8011/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-093827-recall-compare-localhost-8011-vs-localhost-8011/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-build-results/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-engagement-workflow-summary/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-locomo-benchmark/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-moltbook-engagement-pings/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-started-session/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-test-results/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/dry-sweep-twitter-engagement-pings/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-build-results/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-engagement-workflow-summary/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-locomo-benchmark/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-moltbook-engagement-pings/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-started-session/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-test-results/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/exec-sweep-twitter-engagement-pings/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-build-results/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-engagement-workflow-summary/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-locomo-benchmark/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-moltbook-engagement-pings/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-started-session/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-test-results/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-after-sweep-twitter-engagement-pings/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-095153-mirror8011-stage1/recall-baseline/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-BUILD-RESULTS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-ENGAGEMENT-WORKFLOW-SUMMARY/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-LOCOMO-BENCHMARK/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-MOLTBOOK-ENGAGEMENT-PINGS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-STARTED-SESSION/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-TEST-RESULTS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-122106-prod-stage1-dry-run/dry-SWEEP-TWITTER-ENGAGEMENT-PINGS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-BUILD-RESULTS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-ENGAGEMENT-WORKFLOW-SUMMARY/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-LOCOMO-BENCHMARK/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-MOLTBOOK-ENGAGEMENT-PINGS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-STARTED-SESSION/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-TEST-RESULTS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/execute-SWEEP-TWITTER-ENGAGEMENT-PINGS/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-BUILD-RESULTS/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-ENGAGEMENT-WORKFLOW-SUMMARY/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-LOCOMO-BENCHMARK/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-MOLTBOOK-ENGAGEMENT-PINGS/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-STARTED-SESSION/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-TEST-RESULTS/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-after-SWEEP-TWITTER-ENGAGEMENT-PINGS/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-124737-prod-stage1-execute/recall-baseline/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-173242-graph-diagnostics/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-local-dry-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-local-dry-session-milestone/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-local-exec-memory-cache/summary.json"
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T181749Z-current-state-base-922d23b/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T181937Z-current-state-pr170-current-only-false/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T181942Z-current-state-pr170-default-current/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T231750Z-current-state-pr170-default-current/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T233256Z-current-state-pr170-default-current-c032ea6/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T233620Z-current-state-pr170-default-current-c0ec99d/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T233834Z-current-state-pr170-default-current-c0ec99d-cleanup-fix/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260522T234046Z-current-state-pr170-default-current-bca114a/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-162441/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-162501/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-162514/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-165450/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-170328/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-170942/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-173839/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-175951/summary.json"
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260606-181117-real-data-entity-repair/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "current-state",
+      "path": "data/sweep_runs/20260606T044215Z-current-state-current/summary.json",
+      "row_count": 6
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-171514-real-data-entity-repair/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-canonicalize-safe-overfetch/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-canonicalize-safe-post-migration/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260608-182212-canonicalize-safe-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-reject-only-overfetch/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-reject-only-overfetch-v2/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-reject-only-synced-baseline/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-182212-sync-only-synced-baseline/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-fresh-v1-canonicalize-safe/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-fresh-v1-post-migration/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260608-entity-repair-fresh-v1-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-fresh-v1-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-fresh-v1-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v1-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v2-canonicalize-safe/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v2-post-migration/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v2-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v2-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v2-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v3-canonicalize-safe/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v3-post-migration/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v3-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v3-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v3-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v4-canonicalize/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260608-entity-repair-loop-v4-canonicalize/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-diagnostics-refresh-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-local-loop-v7-sync-only/recall-compare-retry/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260609-entity-repair-local-loop-v8-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260609-entity-repair-skip-restore-after-qdrant-retrieve-retry-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-after-api-restart/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-after-baseline-qdrant-sync/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-after-score-change/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-gate-check/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260611-211703-recall-compare-localhost-8121-vs-localhost-8122/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260611-212035-recall-compare-localhost-8121-vs-localhost-8122/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/entity-repair-20260606/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v1/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v2-executed/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/probes-post-repair/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/probes-pre-repair/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/reject-only-v3/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/reject-only-v4-executed/summary.json"
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-canonicalize-safe/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-post-migration/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/beam.md",
+      "title": "BEAM Retrieval-Proxy Harness"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/maturation.md",
+      "title": "Memory Maturation \u2014 benchmark methodology (cold vs matured)"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_2026-04-28_hook_replay.md",
+      "title": "Session 2026-04-28 \u2014 Layer-1 hook-replay eval harness"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_2026-06-10_prod_entity_repair.md",
+      "title": "Session 2026-06-10/11 \u2014 Production entity-tag repair (issue #72 rollout)"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_2026-06-11_negative_control_probes.md",
+      "title": "Session 2026-06-11 \u2014 Negative-control probes (recall_cleanup_v2)"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260417_notes.md",
+      "title": "Session 2026-04-17 \u2014 evaluating the bare-tag 1M recall strategy"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260421_beam_setup.md",
+      "title": "Session 2026-04-21 \u2014 BEAM via shim: setup complete, smoke pending"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260421_beam_smoke.md",
+      "title": "Session 2026-04-21 \u2014 BEAM 100K / 2-conv smoke"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260422_beam_fullbucket.md",
+      "title": "Session 2026-04-22 \u2014 BEAM full bucket + AutoMem vs mem0 meta-summary"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_failure_modes.md",
+      "title": "Session 2026-04-23 \u2014 V1 failure-mode forensics"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_overnight_insights.md",
+      "title": "Session 2026-04-23 \u2014 Overnight insights: V1 vs V2 on BEAM 100K"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_overnight_strategy.md",
+      "title": "Session 2026-04-23 \u2014 Overnight strategy (apples-to-apples)"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_v1_vs_v2_fullbucket.md",
+      "title": "BEAM diff \u2014 beam_results_20260422_035020.json vs beam_results_20260422_121026.json"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_v2_smoke.md",
+      "title": "Session 2026-04-23 \u2014 V2 extraction shim smoke (convs 0-1)"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260613_beam_retrieval_proxy_100k.md",
+      "title": "Session 2026-06-13 - BEAM retrieval-proxy 100K full bucket"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260616_beam_judged_100k.md",
+      "title": "Session 2026-06-16 \u2014 BEAM judged 100K (native, official scorer)"
+    }
+  ],
+  "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+  "generated_at": "2026-06-22T19:36:49+00:00",
+  "orphan_artifacts": [
+    {
+      "created_at": "2026-05-01T12:21:06",
+      "kind": "artifact",
+      "path": "data/results/20260501-122106-prod-stage1-dry-run.md",
+      "title": "Production Stage 1 Cleanup Dry-Run"
+    },
+    {
+      "created_at": "2026-05-01T17:32:42",
+      "kind": "artifact",
+      "path": "data/results/20260501-173242-graph-diagnostics.md",
+      "title": "Local AutoMem graph diagnostics - 2026-05-01T17:32:42"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-062019-mirror8011-cleanup/dry2-sweep-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-062019-mirror8011-cleanup/dry2-sweep-session-milestone/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-062019-mirror8011-cleanup/exec-sweep-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-093734-recall-compare-localhost-8011-vs-localhost-8011/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-093827-recall-compare-localhost-8011-vs-localhost-8011/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-173242-graph-diagnostics/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-local-dry-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-local-dry-session-milestone/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260501-local-exec-memory-cache/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-162441/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-162501/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-162514/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-165450/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-170328/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-170942/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-173839/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260606-175951/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-diagnostics-refresh-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-local-loop-v7-sync-only/recall-compare-retry/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260609-entity-repair-local-loop-v8-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/20260609-entity-repair-skip-restore-after-qdrant-retrieve-retry-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-after-api-restart/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-after-baseline-qdrant-sync/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-after-score-change/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260609-entity-repair-strict-gate-check/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260611-211703-recall-compare-localhost-8121-vs-localhost-8122/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/20260611-212035-recall-compare-localhost-8121-vs-localhost-8122/summary.json",
+      "row_count": 27
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/entity-repair-20260606/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v1/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v2-executed/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/probes-post-repair/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/probes-pre-repair/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/reject-only-v3/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-20260610/reject-only-v4-executed/summary.json"
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-canonicalize-safe/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-post-migration/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-post-migration/recall-compare-post-migration/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-reject-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "kind": "recall-endpoint-comparison",
+      "path": "data/sweep_runs/prod-rollout-rehearsal-20260610-sync-only/recall-compare/summary.json",
+      "row_count": 22
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_failure_modes.md",
+      "title": "Session 2026-04-23 \u2014 V1 failure-mode forensics"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_overnight_insights.md",
+      "title": "Session 2026-04-23 \u2014 Overnight insights: V1 vs V2 on BEAM 100K"
+    },
+    {
+      "created_at": null,
+      "kind": "session-note",
+      "path": "docs/session_20260423_overnight_strategy.md",
+      "title": "Session 2026-04-23 \u2014 Overnight strategy (apples-to-apples)"
+    }
+  ],
+  "prs": [
+    {
+      "headRefName": "feat/matrix-parallel-harness",
+      "mergedAt": "2026-06-17T12:58:27Z",
+      "number": 19,
+      "state": "MERGED",
+      "title": "feat(matrix): parallel experiment harness for AutoMem config sweeps",
+      "updatedAt": "2026-06-17T12:58:29Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/19"
+    },
+    {
+      "headRefName": "feat/beam-retrieval-harness",
+      "mergedAt": "2026-06-15T22:19:09Z",
+      "number": 12,
+      "state": "MERGED",
+      "title": "feat(beam): add retrieval proxy harness",
+      "updatedAt": "2026-06-15T22:19:11Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/12"
+    },
+    {
+      "headRefName": "feat/negative-control-probes",
+      "mergedAt": "2026-06-11T17:19:23Z",
+      "number": 11,
+      "state": "MERGED",
+      "title": "feat(scenarios): add negative-control probes for recall regression harness",
+      "updatedAt": "2026-06-11T17:19:25Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/11"
+    },
+    {
+      "headRefName": "feat/metadata-signal-diagnosis",
+      "mergedAt": "2026-06-10T18:55:20Z",
+      "number": 10,
+      "state": "MERGED",
+      "title": "feat(metadata): support server-side metadata search evals",
+      "updatedAt": "2026-06-10T18:55:22Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/10"
+    },
+    {
+      "headRefName": "fix/worktree-safe-metadata-harness",
+      "mergedAt": "2026-06-10T12:41:27Z",
+      "number": 9,
+      "state": "MERGED",
+      "title": "feat(metadata): add worktree-safe real-data harness",
+      "updatedAt": "2026-06-10T12:41:30Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/9"
+    },
+    {
+      "headRefName": "test/entity-repair-eval-harness",
+      "mergedAt": "2026-06-10T08:38:29Z",
+      "number": 8,
+      "state": "MERGED",
+      "title": "test(entity): add staged repair recall harness",
+      "updatedAt": "2026-06-10T08:38:32Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/8"
+    },
+    {
+      "headRefName": "test/pr170-current-state-eval-log",
+      "mergedAt": "2026-05-23T00:06:57Z",
+      "number": 7,
+      "state": "MERGED",
+      "title": "test(recall): document pr170 current-state eval",
+      "updatedAt": "2026-05-23T00:06:59Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/7"
+    },
+    {
+      "headRefName": "feat/writ-adapter-reporting",
+      "mergedAt": "2026-05-22T11:38:07Z",
+      "number": 6,
+      "state": "MERGED",
+      "title": "feat(writ): add history-aware adapter diagnostics",
+      "updatedAt": "2026-05-22T11:38:09Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/6"
+    },
+    {
+      "headRefName": "codex/hook-v3-add-fields",
+      "mergedAt": "2026-05-09T05:55:08Z",
+      "number": 5,
+      "state": "MERGED",
+      "title": "feat: add hook v3 field-presence variant",
+      "updatedAt": "2026-05-09T05:55:10Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/5"
+    },
+    {
+      "headRefName": "feat/matrix-runner",
+      "mergedAt": "2026-05-02T17:12:38Z",
+      "number": 4,
+      "state": "MERGED",
+      "title": "feat: add recall matrix runner",
+      "updatedAt": "2026-05-02T17:12:40Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/4"
+    },
+    {
+      "headRefName": "feat/stage1-corpus-cleanup",
+      "mergedAt": "2026-05-01T16:38:48Z",
+      "number": 3,
+      "state": "MERGED",
+      "title": "feat: stage-1 corpus cleanup harness",
+      "updatedAt": "2026-05-01T16:38:50Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/3"
+    },
+    {
+      "headRefName": "feat/hook-eval-layer1",
+      "mergedAt": "2026-05-01T01:48:29Z",
+      "number": 2,
+      "state": "MERGED",
+      "title": "feat: layer-1 hook-replay harness + corpus sweep runner",
+      "updatedAt": "2026-05-01T01:48:29Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/2"
+    },
+    {
+      "headRefName": "pin-judge-gpt-5.4-mini",
+      "mergedAt": "2026-04-24T15:30:14Z",
+      "number": 1,
+      "state": "MERGED",
+      "title": "Pin benchmark judge to gpt-5.4-mini snapshot",
+      "updatedAt": "2026-04-24T15:30:15Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
+    }
+  ],
+  "root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
+  "schema": "automem-evals.experiment-index.v1",
+  "scores": [
+    {
+      "accuracy": 85.12987012987013,
+      "answer_llm": "gemini:gemini-3.1-pro-preview",
+      "avg_context_tokens": 4768.2,
+      "avg_retrieve_time_ms": 132.0,
+      "benchmark": "amb",
+      "ci": 1.7770272071541817,
+      "dataset": "locomo",
+      "label": "LoCoMo",
+      "n": 1540,
+      "repeats": 1,
+      "run_name": "automem-sub",
+      "split": "locomo10",
+      "spread": null,
+      "status": "ok"
+    },
+    {
+      "accuracy": null,
+      "answer_llm": null,
+      "avg_context_tokens": null,
+      "avg_retrieve_time_ms": null,
+      "benchmark": "amb",
+      "ci": null,
+      "dataset": "longmemeval",
+      "label": "LongMemEval",
+      "n": 0,
+      "repeats": 1,
+      "run_name": "automem-sub",
+      "split": "s",
+      "spread": null,
+      "status": "missing"
+    },
+    {
+      "accuracy": 76.06112054329371,
+      "answer_llm": "gemini:gemini-3.1-pro-preview",
+      "avg_context_tokens": 2588.2,
+      "avg_retrieve_time_ms": 202.2,
+      "benchmark": "amb",
+      "ci": 3.4461302855363813,
+      "dataset": "personamem",
+      "label": "PersonaMem",
+      "n": 589,
+      "repeats": 1,
+      "run_name": "automem-sub",
+      "split": "32k",
+      "spread": null,
+      "status": "ok"
+    },
+    {
+      "accuracy": null,
+      "answer_llm": null,
+      "avg_context_tokens": null,
+      "avg_retrieve_time_ms": null,
+      "benchmark": "amb",
+      "ci": null,
+      "dataset": "beam",
+      "label": "BEAM-500K",
+      "n": 0,
+      "repeats": 1,
+      "run_name": "automem-sub",
+      "split": "500k",
+      "spread": null,
+      "status": "missing"
+    },
+    {
+      "accuracy": null,
+      "answer_llm": null,
+      "avg_context_tokens": null,
+      "avg_retrieve_time_ms": null,
+      "benchmark": "amb",
+      "ci": null,
+      "dataset": "beam",
+      "label": "BEAM-1M",
+      "n": 0,
+      "repeats": 1,
+      "run_name": "automem-sub",
+      "split": "1m",
+      "spread": null,
+      "status": "missing"
+    },
+    {
+      "accuracy": null,
+      "answer_llm": null,
+      "avg_context_tokens": null,
+      "avg_retrieve_time_ms": null,
+      "benchmark": "amb",
+      "ci": null,
+      "dataset": "beam",
+      "label": "BEAM-10M",
+      "n": 0,
+      "repeats": 1,
+      "run_name": "automem-sub",
+      "split": "10m",
+      "spread": null,
+      "status": "missing"
+    },
+    {
+      "accuracy": 72.65599383302724,
+      "answer_llm": "gemini:gemini-3.1-pro-preview",
+      "avg_context_tokens": 3843.4,
+      "avg_retrieve_time_ms": 226.8,
+      "benchmark": "amb",
+      "ci": null,
+      "dataset": "beam",
+      "label": "BEAM-100K",
+      "n": 840,
+      "repeats": 3,
+      "run_name": "automem-sub-rep1+automem-sub-rep2+automem-sub-rep3",
+      "split": "100k",
+      "spread": 17.403652539651617,
+      "status": "ok"
+    },
+    {
+      "accuracy": 70.0,
+      "answerer_model": "gpt-5-mini",
+      "avg_score": 0.639165,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 0.0,
+        "contradiction_resolution": 100.0,
+        "event_ordering": 50.0,
+        "information_extraction": 100.0,
+        "instruction_following": 50.0,
+        "knowledge_update": 100.0,
+        "multi_session_reasoning": 100.0,
+        "preference_following": 100.0,
+        "summarization": 50.0,
+        "temporal_reasoning": 50.0
+      },
+      "created_at": "2026-06-15T22:34:56.597734+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5-mini",
+      "run_id": "20260615-223139-a478c915",
+      "tier": "100K",
+      "total_questions": 20
+    },
+    {
+      "accuracy": 67.5,
+      "answerer_model": "gpt-5",
+      "avg_score": 0.6150325,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 55.00000000000001,
+        "contradiction_resolution": 62.5,
+        "event_ordering": 45.0,
+        "information_extraction": 85.0,
+        "instruction_following": 87.5,
+        "knowledge_update": 52.5,
+        "multi_session_reasoning": 67.5,
+        "preference_following": 92.5,
+        "summarization": 50.0,
+        "temporal_reasoning": 77.5
+      },
+      "created_at": "2026-06-15T23:53:27.541406+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5",
+      "run_id": "20260615-224220-e29f5f07",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "accuracy": 43.5,
+      "answerer_model": "gpt-5",
+      "avg_score": 0.405204,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 35.0,
+        "contradiction_resolution": 32.5,
+        "event_ordering": 37.5,
+        "information_extraction": 55.00000000000001,
+        "instruction_following": 55.00000000000001,
+        "knowledge_update": 40.0,
+        "multi_session_reasoning": 37.5,
+        "preference_following": 60.0,
+        "summarization": 45.0,
+        "temporal_reasoning": 37.5
+      },
+      "created_at": "2026-06-16T01:11:31.453758+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5",
+      "run_id": "20260615-235650-b67e9716",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "accuracy": 70.25,
+      "answerer_model": "gpt-5",
+      "avg_score": 0.649078,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 52.5,
+        "contradiction_resolution": 52.5,
+        "event_ordering": 62.5,
+        "information_extraction": 90.0,
+        "instruction_following": 80.0,
+        "knowledge_update": 57.49999999999999,
+        "multi_session_reasoning": 75.0,
+        "preference_following": 95.0,
+        "summarization": 62.5,
+        "temporal_reasoning": 75.0
+      },
+      "created_at": "2026-06-16T05:34:15.319399+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5",
+      "run_id": "20260616-042452-1d46f08a",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "accuracy": 82.0,
+      "answerer_model": "gpt-5-mini",
+      "avg_score": 0.7277765,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 45.0,
+        "contradiction_resolution": 97.5,
+        "event_ordering": 77.5,
+        "information_extraction": 95.0,
+        "instruction_following": 85.0,
+        "knowledge_update": 70.0,
+        "multi_session_reasoning": 80.0,
+        "preference_following": 97.5,
+        "summarization": 90.0,
+        "temporal_reasoning": 82.5
+      },
+      "created_at": "2026-06-16T06:31:24.482783+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5-mini",
+      "run_id": "20260616-053544-94fad569",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "accuracy": 82.25,
+      "answerer_model": "gpt-5-mini",
+      "avg_score": 0.7480905,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 52.5,
+        "contradiction_resolution": 100.0,
+        "event_ordering": 65.0,
+        "information_extraction": 95.0,
+        "instruction_following": 82.5,
+        "knowledge_update": 72.5,
+        "multi_session_reasoning": 82.5,
+        "preference_following": 100.0,
+        "summarization": 90.0,
+        "temporal_reasoning": 82.5
+      },
+      "created_at": "2026-06-16T07:25:19.747450+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5-mini",
+      "run_id": "20260616-063125-155316a0",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "accuracy": 81.5,
+      "answerer_model": "gpt-5-mini",
+      "avg_score": 0.735379,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 55.00000000000001,
+        "contradiction_resolution": 90.0,
+        "event_ordering": 72.5,
+        "information_extraction": 95.0,
+        "instruction_following": 87.5,
+        "knowledge_update": 72.5,
+        "multi_session_reasoning": 80.0,
+        "preference_following": 97.5,
+        "summarization": 82.5,
+        "temporal_reasoning": 82.5
+      },
+      "created_at": "2026-06-16T08:22:33.496973+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5-mini",
+      "run_id": "20260616-072521-cee12a39",
+      "tier": "100K",
+      "total_questions": 400
+    },
+    {
+      "accuracy": 70.0,
+      "answerer_model": "gpt-5-mini",
+      "avg_score": 0.673265,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 50.0,
+        "contradiction_resolution": 50.0,
+        "event_ordering": 0.0,
+        "information_extraction": 100.0,
+        "instruction_following": 100.0,
+        "knowledge_update": 100.0,
+        "multi_session_reasoning": 100.0,
+        "preference_following": 50.0,
+        "summarization": 50.0,
+        "temporal_reasoning": 100.0
+      },
+      "created_at": "2026-06-16T22:26:13.509351+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5-mini",
+      "run_id": "20260616-221846-26f5f74b",
+      "tier": "1M",
+      "total_questions": 20
+    },
+    {
+      "accuracy": 0.0,
+      "answerer_model": "gpt-5-mini",
+      "avg_score": 0.0,
+      "benchmark": "beam-judged",
+      "by_ability": {
+        "abstention": 0.0
+      },
+      "created_at": "2026-06-17T12:17:04.114283+00:00",
+      "cutoff": "top_100",
+      "judge_model": "gpt-5-mini",
+      "run_id": "20260617-121558-6099fa33",
+      "tier": "100K",
+      "total_questions": 2
+    }
+  ],
+  "status_counts": {
+    "adopted": 10,
+    "in-progress": 2,
+    "parked": 2,
+    "superseded": 1
+  },
+  "threads": [
+    {
+      "artifact_count": 0,
+      "artifact_samples": [],
+      "artifacts": [
+        "docs/superpowers/specs/2026-06-19-amb-throughput-runbook-design.md",
+        "docs/superpowers/plans/2026-06-20-amb-throughput-runbook-plan.md",
+        "data/results/amb/**"
+      ],
+      "branch": "feat/amb-adapter",
+      "decision": "Keep in progress until the active AMB run finishes, aggregate its outputs, and decide whether to PR the amb-adapter worktree.",
+      "hypothesis": "AutoMem can be evaluated against external AMB datasets by adapting benchmark memory and recall calls into the server's native API.",
+      "id": "EXP-AMB",
+      "notes": "The active omb job runs from ../agent-memory-benchmark and writes to that repo's outputs directory; copy or summarize final AMB outputs here only after review.",
+      "pr": null,
+      "related": [
+        "EXP-BEAM-JUDGED"
+      ],
+      "result": "Adapter work exists with multiple LoCoMo, LongMemEval, PersonaMem, and BEAM runs, but the current long stability run is still active and no PR has been opened.",
+      "started": "2026-06-16",
+      "status": "in-progress",
+      "title": "Agent Memory Benchmark adapter and submission",
+      "updated": "2026-06-22",
+      "worktree": "../automem-evals.worktrees/amb-adapter",
+      "worktree_status": {
+        "branch": "feat/amb-adapter",
+        "cleanup_candidate": false,
+        "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/amb-adapter",
+        "state": "in-flight"
+      }
+    },
+    {
+      "artifact_count": 12,
+      "artifact_samples": [
+        "data/results/matrix/20260502T135037Z-matrix.json",
+        "data/results/matrix/20260502T135037Z-matrix.md",
+        "data/results/matrix/20260502T153224Z-matrix.json",
+        "data/results/matrix/20260502T153224Z-matrix.md",
+        "data/results/matrix/20260502T153236Z-matrix.json"
+      ],
+      "artifacts": [
+        "runners/run_matrix.py",
+        "scripts/matrix_stack.py",
+        "data/results/matrix/**",
+        "data/matrix_stacks/**"
+      ],
+      "branch": "feat/matrix-parallel-harness",
+      "decision": "Adopted as infrastructure; no active worktree remains.",
+      "hypothesis": "A matrix runner with isolated stacks can compare many endpoints, rulesets, and scenarios without cross-run contamination.",
+      "id": "EXP-MATRIX",
+      "notes": "Worktree reconciliation should report this branch as merged/cleanup-only if it appears again.",
+      "pr": 19,
+      "related": [
+        "EXP-RULESET-ISO"
+      ],
+      "result": "PR #19 merged the parallel matrix harness and supporting stack helpers.",
+      "started": "2026-05-02",
+      "status": "adopted",
+      "title": "Parallel matrix harness for AutoMem config sweeps",
+      "updated": "2026-06-17",
+      "worktree": "../automem-evals.worktrees/matrix-harness",
+      "worktree_status": {
+        "branch": "feat/matrix-parallel-harness",
+        "path": "../automem-evals.worktrees/matrix-harness",
+        "state": "absent"
+      }
+    },
+    {
+      "artifact_count": 29,
+      "artifact_samples": [
+        "data/results/beam-judged/20260615-223139-a478c915-100K/MANIFEST.json",
+        "data/results/beam-judged/20260615-223139-a478c915-100K/report.md",
+        "data/results/beam-judged/20260615-223139-a478c915-100K/results.json",
+        "data/results/beam-judged/20260615-224220-e29f5f07-100K/MANIFEST.json",
+        "data/results/beam-judged/20260615-224220-e29f5f07-100K/report.md"
+      ],
+      "artifacts": [
+        "docs/eval/beam.md",
+        "docs/session_20260616_beam_judged_100k.md",
+        "scripts/beam_judged.py",
+        "runners/beam_judged_eval.py",
+        "data/results/beam-judged/**"
+      ],
+      "branch": "feat/beam-judged-harness",
+      "decision": "Park promotion decisions until the active judged/AMB runs complete and the branch lands.",
+      "hypothesis": "AutoMem should be measured with BEAM's judged answer task, not only proxy retrieval metrics, to make leaderboard-comparable claims.",
+      "id": "EXP-BEAM-JUDGED",
+      "notes": "This experiment is referenced before it lands on main; the first real index from main should be rerun after the branch merges.",
+      "pr": null,
+      "related": [
+        "EXP-BEAM-RETRIEVAL",
+        "EXP-AMB"
+      ],
+      "result": "A native judged harness exists on the beam-judged branch with 100K results and an active longer stability run pending.",
+      "started": "2026-06-15",
+      "status": "in-progress",
+      "title": "Native judged BEAM harness",
+      "updated": "2026-06-22",
+      "worktree": "../automem-evals",
+      "worktree_status": {
+        "branch": "feat/beam-judged-harness",
+        "cleanup_candidate": false,
+        "path": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+        "state": "in-flight"
+      }
+    },
+    {
+      "artifact_count": 4,
+      "artifact_samples": [
+        "data/results/beam-retrieval/20260613-100k-full-retrieval-proxy/manifest.json",
+        "data/results/beam-retrieval/20260613-100k-full-retrieval-proxy/report.md",
+        "data/results/beam-retrieval/20260613-100k-full-retrieval-proxy/results.json",
+        "docs/session_20260613_beam_retrieval_proxy_100k.md"
+      ],
+      "artifacts": [
+        "docs/session_20260613_beam_retrieval_proxy_100k.md",
+        "runners/beam_retrieval_eval.py",
+        "scripts/beam_eval.py",
+        "scripts/beam_ingest.py",
+        "scripts/beam_report.py",
+        "scripts/beam_cleanup.py",
+        "data/results/beam-retrieval/**"
+      ],
+      "branch": "feat/beam-retrieval-harness",
+      "decision": "Use as a cheap preflight, not as the final benchmark claim.",
+      "hypothesis": "A deterministic retrieval-only BEAM proxy can provide a cheap signal before running expensive judged BEAM.",
+      "id": "EXP-BEAM-RETRIEVAL",
+      "notes": "Retrieval proxy metrics should not be described as official BEAM scores.",
+      "pr": 12,
+      "related": [
+        "EXP-BEAM-SHIM",
+        "EXP-BEAM-JUDGED"
+      ],
+      "result": "PR #12 merged the retrieval proxy harness and documented the 100K proxy run.",
+      "started": "2026-06-13",
+      "status": "adopted",
+      "title": "BEAM retrieval proxy harness",
+      "updated": "2026-06-13",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 17,
+      "artifact_samples": [
+        "data/results/beam/20260421-051827-100K-0_1/MANIFEST.json",
+        "data/results/beam/20260421-051827-100K-0_1/beam_results_20260421_055555.rejudge-qwen3.6-35b-a3b-32k.md",
+        "data/results/beam/20260421-174617-100K-0_1/MANIFEST.json",
+        "data/results/beam/20260421-195900-100K-0_1/MANIFEST.json",
+        "data/results/beam/20260421-222043-100K-0_1/MANIFEST.json"
+      ],
+      "artifacts": [
+        "docs/session_20260421_beam_setup.md",
+        "docs/session_20260421_beam_smoke.md",
+        "docs/session_20260422_beam_fullbucket.md",
+        "docs/session_20260423_v1_vs_v2_fullbucket.md",
+        "docs/session_20260423_v2_smoke.md",
+        "docs/beam_diff_v1subset_vs_v2smoke.md",
+        "runners/run_beam.py",
+        "runners/beam_shim.py",
+        "runners/beam_shim_v2.py",
+        "data/results/beam/**"
+      ],
+      "branch": null,
+      "decision": "Superseded by EXP-BEAM-RETRIEVAL and EXP-BEAM-JUDGED; keep artifacts for historical comparison.",
+      "hypothesis": "The upstream BEAM runner can be pointed at AutoMem through a mem0-compatible shim.",
+      "id": "EXP-BEAM-SHIM",
+      "notes": "Use for historical failure analysis only.",
+      "pr": null,
+      "related": [
+        "EXP-BEAM-RETRIEVAL"
+      ],
+      "result": "The shim established a baseline and revealed failure modes, but was replaced for ongoing work by retrieval proxy and native judged harnesses.",
+      "started": "2026-04-21",
+      "status": "superseded",
+      "title": "BEAM mem0-shim harness",
+      "updated": "2026-04-24",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 30,
+      "artifact_samples": [
+        "data/results/20260417-230940-comparison.md",
+        "data/results/20260417-232615-comparison.md",
+        "data/results/20260417-232804-comparison.md",
+        "data/results/20260417-232944-comparison.md",
+        "data/results/20260417-233314-comparison.md"
+      ],
+      "artifacts": [
+        "docs/session_20260417_notes.md",
+        "data/results/SUMMARY-20260417.md",
+        "data/results/SUMMARY-20260418-v2.md",
+        "data/results/*-comparison.md",
+        "rulesets/*.json",
+        "runners/compare_rulesets.py"
+      ],
+      "branch": null,
+      "decision": "Adopt bare_tag_1m_v2 as the recommended local default; treat server-side expand_relations under tag gating as ineffective.",
+      "hypothesis": "Isolating recall knobs across the same scenarios can attribute quality changes to specific parameters.",
+      "id": "EXP-RULESET-ISO",
+      "notes": "compare_rulesets.py is still markdown-only; adding a JSON sidecar remains a later enhancement.",
+      "pr": null,
+      "related": [
+        "EXP-PROD-CLEANUP",
+        "EXP-MATRIX"
+      ],
+      "result": "The v2 default ruleset improved recall by combining wider time windows, higher limits, auto decomposition, and project tag gating.",
+      "started": "2026-04-17",
+      "status": "adopted",
+      "title": "Ruleset knob isolation and v2 defaults",
+      "updated": "2026-04-18",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 56,
+      "artifact_samples": [
+        "data/results/20260501-062019-mirror8011-cleanup.md",
+        "data/results/20260501-065453-mirror8011-cleanup-plan.md",
+        "data/results/20260501-095153-mirror8011-stage1-cleanup.md",
+        "data/results/20260501-124737-prod-stage1-execute.md",
+        "data/results/20260501-124737-prod-stage1-recall-after-SWEEP-BUILD-RESULTS.md"
+      ],
+      "artifacts": [
+        "data/results/20260501-*-cleanup*.md",
+        "data/results/20260501-124737-prod-stage1-*.md",
+        "data/sweep_runs/20260501-*-stage1*",
+        "runners/sweep_corpus.py"
+      ],
+      "branch": "feat/stage1-corpus-cleanup",
+      "decision": "Adopt staged cleanup workflow for raw corpus pruning.",
+      "hypothesis": "Noisy memory clusters can be identified and staged for deletion without damaging preserved recall scenarios.",
+      "id": "EXP-PROD-CLEANUP",
+      "notes": "Preserve vs cleanup groups are useful vocabulary for later dashboards.",
+      "pr": 3,
+      "related": [
+        "EXP-RULESET-ISO",
+        "EXP-METADATA"
+      ],
+      "result": "Stage-1 cleanup harness and reports were produced and PR #3 merged.",
+      "started": "2026-05-01",
+      "status": "adopted",
+      "title": "Production corpus stage-1 cleanup",
+      "updated": "2026-05-01",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/session_2026-04-28_hook_replay.md"
+      ],
+      "artifacts": [
+        "docs/session_2026-04-28_hook_replay.md",
+        "data/hook_fixtures/**",
+        "runners/replay_hooks.py",
+        "runners/hook_metrics.py",
+        "runners/diff_hook_runs.py",
+        "variants/**"
+      ],
+      "branch": "feat/hook-eval-layer1",
+      "decision": "Adopt as layer-1 regression coverage for ingestion hooks.",
+      "hypothesis": "Canned hook fixtures can detect capture-quality regressions before they reach production memory.",
+      "id": "EXP-HOOK-REPLAY",
+      "notes": "This is operational regression tooling rather than benchmark scoring.",
+      "pr": 2,
+      "related": [
+        "EXP-PROD-CLEANUP"
+      ],
+      "result": "Hook replay, metrics, and diff tooling merged in PR #2 and follow-up hook field variants.",
+      "started": "2026-04-28",
+      "status": "adopted",
+      "title": "Layer-1 hook replay harness",
+      "updated": "2026-05-03",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 18,
+      "artifact_samples": [
+        "data/results/20260522T181749Z-current-state-base-922d23b.md",
+        "data/results/20260522T181937Z-current-state-pr170-current-only-false.md",
+        "data/results/20260522T181942Z-current-state-pr170-default-current.md",
+        "data/results/20260522T231750Z-current-state-pr170-default-current.md",
+        "data/results/20260522T233256Z-current-state-pr170-default-current-c032ea6.md"
+      ],
+      "artifacts": [
+        "data/results/SUMMARY-20260522-pr170-current-state.md",
+        "data/results/*-current-state-*.md",
+        "data/sweep_runs/*-current-state-*",
+        "runners/run_current_state_recall_eval.py"
+      ],
+      "branch": "test/pr170-current-state-eval-log",
+      "decision": "Use as a targeted regression harness for temporal validity.",
+      "hypothesis": "Recall should prefer current facts over stale superseded facts when both exist.",
+      "id": "EXP-CURRENT-STATE",
+      "notes": "Useful status fields include current_only, expectation, and probes passed.",
+      "pr": 7,
+      "related": [
+        "EXP-NEG-CONTROL"
+      ],
+      "result": "Current-state fixture runner and PR #170 comparison reports were produced.",
+      "started": "2026-05-22",
+      "status": "adopted",
+      "title": "Current-state and temporal recall probes",
+      "updated": "2026-05-22",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 21,
+      "artifact_samples": [
+        "data/sweep_runs/20260606-181117-real-data-entity-repair/recall-compare/summary.json",
+        "data/sweep_runs/20260608-171514-real-data-entity-repair/recall-compare/summary.json",
+        "data/sweep_runs/20260608-entity-repair-fresh-v1-canonicalize-safe/recall-compare/summary.json",
+        "data/sweep_runs/20260608-entity-repair-fresh-v1-post-migration/recall-compare/summary.json",
+        "data/sweep_runs/20260608-entity-repair-fresh-v1-post-migration/recall-compare-post-migration/summary.json"
+      ],
+      "artifacts": [
+        "docs/session_2026-06-10_prod_entity_repair.md",
+        "data/sweep_runs/20260606-*entity-repair*",
+        "data/sweep_runs/20260608-*entity-repair*",
+        "scripts/real_data_entity_repair_eval.sh",
+        "runners/apply_metadata_treatment.py",
+        "runners/run_metadata_ab_eval.py"
+      ],
+      "branch": "test/entity-repair-eval-harness",
+      "decision": "Adopt staged repair evaluation before metadata migrations.",
+      "hypothesis": "Canonicalizing entity tags and rejecting unsafe metadata updates can improve recall without broad overfetch.",
+      "id": "EXP-ENTITY-REPAIR",
+      "notes": "Key variants include sync-only, reject-only, canonicalize-safe, and post-migration.",
+      "pr": 8,
+      "related": [
+        "EXP-METADATA"
+      ],
+      "result": "Entity-repair harnesses and multiple fresh/loop runs were documented and merged in PR #8.",
+      "started": "2026-06-06",
+      "status": "adopted",
+      "title": "Entity tag repair on real data",
+      "updated": "2026-06-10",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 37,
+      "artifact_samples": [
+        "data/results/20260610-222435-recall-endpoint-comparison.md",
+        "data/results/20260611-000354-recall-endpoint-comparison.md",
+        "data/results/20260611-040548-recall-endpoint-comparison.md",
+        "data/results/20260611-040707-recall-endpoint-comparison.md",
+        "data/results/20260611-042653-recall-endpoint-comparison.md"
+      ],
+      "artifacts": [
+        "data/results/20260610-*-recall-endpoint-comparison.md",
+        "data/results/20260611-*-recall-endpoint-comparison.md",
+        "data/sweep_runs/20260608-*",
+        "scripts/real_data_metadata_eval.sh",
+        "runners/compare_recall_endpoints.py",
+        "runners/check_vector_identity.py",
+        "runners/vector_identity.py",
+        "runners/metadata_eval_common.py"
+      ],
+      "branch": "feat/metadata-signal-diagnosis",
+      "decision": "Adopt metadata A/B and vector identity checks as part of server-side recall diagnostics.",
+      "hypothesis": "Better metadata treatment can improve /recall behavior on real-data probes without changing vectors.",
+      "id": "EXP-METADATA",
+      "notes": "Endpoint comparison has structured summary.json under sweep_runs, but markdown reports are separate.",
+      "pr": 10,
+      "related": [
+        "EXP-ENTITY-REPAIR",
+        "EXP-NEG-CONTROL"
+      ],
+      "result": "Worktree-safe metadata A/B tooling and server-side metadata search evals merged in PR #9 and PR #10.",
+      "started": "2026-06-08",
+      "status": "adopted",
+      "title": "Server-side metadata signal diagnosis",
+      "updated": "2026-06-11",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/session_2026-06-11_negative_control_probes.md"
+      ],
+      "artifacts": [
+        "docs/session_2026-06-11_negative_control_probes.md",
+        "scenarios/*negative*",
+        "runners/compare_recall_endpoints.py"
+      ],
+      "branch": "feat/negative-control-probes",
+      "decision": "Adopt as guardrail coverage for recall regression testing.",
+      "hypothesis": "Negative controls can expose broad overfetch and unsafe recall wins that positive-only scenarios miss.",
+      "id": "EXP-NEG-CONTROL",
+      "notes": "Treat negative controls as safety checks, not quality wins.",
+      "pr": 11,
+      "related": [
+        "EXP-METADATA",
+        "EXP-CURRENT-STATE"
+      ],
+      "result": "Negative-control probes were added and documented in PR #11.",
+      "started": "2026-06-11",
+      "status": "adopted",
+      "title": "Negative-control recall probes",
+      "updated": "2026-06-11",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 42,
+      "artifact_samples": [
+        "data/results/writ/20260522T113558-drift-adapter-phase-smoke/automem/writ-automem-1779442560961.md",
+        "data/results/writ/20260522T113558-drift-adapter-phase-smoke/baseline/writ-baseline-1779442561217.md",
+        "data/results/writ/20260522T113558-drift-adapter-phase-smoke/comparison-automem-vs-baseline.md",
+        "data/results/writ/20260522T113846-drift-adapter-phase-smoke/automem/writ-automem-1779442729088.md",
+        "data/results/writ/20260522T113846-drift-adapter-phase-smoke/baseline/writ-baseline-1779442729387.md"
+      ],
+      "artifacts": [
+        "docs/writ_integration.md",
+        "runners/run_writ.py",
+        "runners/writ/**",
+        "data/results/writ/**"
+      ],
+      "branch": "feat/writ-adapter-reporting",
+      "decision": "Keep as a supplemental benchmark harness, separate from official AutoMem benchmark claims.",
+      "hypothesis": "WRIT-style history-aware adapter diagnostics can complement /recall scenario scoring.",
+      "id": "EXP-WRIT",
+      "notes": "third_party/writ may show submodule-local generated files during runs.",
+      "pr": 6,
+      "related": [
+        "EXP-AMB"
+      ],
+      "result": "WRIT integration and adapter reporting merged in PR #6.",
+      "started": "2026-05-22",
+      "status": "adopted",
+      "title": "WRIT adapter diagnostics",
+      "updated": "2026-05-22",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/eval/maturation.md"
+      ],
+      "artifacts": [
+        "docs/eval/maturation.md"
+      ],
+      "branch": null,
+      "decision": "Parked until a concrete maturation runner is prioritized.",
+      "hypothesis": "Recall quality may improve through maturation or consolidation processes beyond immediate ingestion.",
+      "id": "EXP-MATURATION",
+      "notes": "Stub record for future backfill.",
+      "pr": null,
+      "related": [
+        "EXP-RULESET-ISO"
+      ],
+      "result": "Design notes exist, but there is no durable runner or decision record yet.",
+      "started": "2026-06-17",
+      "status": "parked",
+      "title": "Memory maturation evaluation concept",
+      "updated": "2026-06-17",
+      "worktree": null,
+      "worktree_status": null
+    },
+    {
+      "artifact_count": 6,
+      "artifact_samples": [
+        "data/results/relchain_null_20260611/summary.json",
+        "data/results/relchain_pass1_defaults_20260611/summary.json",
+        "data/results/relchain_pass2_gate015_20260611/summary.json",
+        "data/results/relchain_pass3_gate040_20260611/summary.json",
+        "data/results/relchain_pass4_combo_20260611/summary.json"
+      ],
+      "artifacts": [
+        "data/results/fama/**",
+        "data/results/memora/**",
+        "data/results/memora-fama/**",
+        "data/results/relchain_*"
+      ],
+      "branch": null,
+      "decision": "Keep parked until someone reviews the raw outputs and either backfills records or deletes the artifacts.",
+      "hypothesis": "These result clusters likely represent real experiments, but the hypothesis and decision are not recorded in session notes.",
+      "id": "EXP-ORPHAN-FAMA-MEMORA-RELCHAIN",
+      "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill.",
+      "pr": null,
+      "related": [
+        "EXP-METADATA"
+      ],
+      "result": "Artifact directories exist without a matching narrative writeup.",
+      "started": "2026-05-22",
+      "status": "parked",
+      "title": "Undocumented FAMA, Memora, and relation-chain result clusters",
+      "updated": "2026-06-22",
+      "worktree": null,
+      "worktree_status": null
+    }
+  ],
+  "worktrees": [
+    {
+      "branch": "feat/beam-judged-harness",
+      "cleanup_candidate": false,
+      "dirty_entries": 1,
+      "head": "6bf5444",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "feat/amb-adapter",
+      "cleanup_candidate": false,
+      "dirty_entries": 7,
+      "head": "9204eac",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/amb-adapter",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "feat/experiment-registry",
+      "cleanup_candidate": false,
+      "dirty_entries": 5,
+      "head": "38d87d4",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
+      "pr": null,
+      "status": "in-flight"
+    }
+  ]
+}
