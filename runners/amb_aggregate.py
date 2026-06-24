@@ -81,22 +81,22 @@ def within_run_ci(d: dict) -> tuple[float, float, int]:
     return mean, ci, n
 
 
-def p50_latency_tokens(runs: list[dict]) -> tuple[float, float]:
-    """P50 (median) recall latency + context tokens, pooled over per-query data.
-    Median, not mean, for two stated reasons: (1) it matches how peers report
-    recall latency (P50), and (2) it is robust to per-query wall-clock outliers.
-    Recall latency here is wall time around memory.retrieve() on local hardware,
-    so it reflects host load; the median keeps a minority of load-inflated samples
-    from dominating the figure. Accuracy is unaffected by host load (retrieval is
-    deterministic) — only timing is — so a robust central estimate is the honest
-    summary, and we disclose the hardware + that latency is environment-relative."""
+def recall_latency_tokens(runs: list[dict]) -> tuple[float, float, float]:
+    """Recall latency as both P50 (median) AND mean, plus median context tokens,
+    pooled over per-query `retrieve_time_ms`. Both are derived from the same stored
+    per-query array (nothing extra needs storing). P50 is the robust central estimate
+    (peer-standard, and immune to a minority of host-load-inflated samples); the mean
+    is the board's 'RECALL AVG' metric — use it for board-comparable numbers, but note
+    it is outlier-sensitive (see footnote 3 re: the 10M host-contention tail). Latency
+    is wall time around memory.retrieve() on local hardware → environment-relative."""
     rts = [r["retrieve_time_ms"] for d in runs for r in d.get("results", [])
            if r.get("retrieve_time_ms") is not None]
     cts = [r["context_tokens"] for d in runs for r in d.get("results", [])
            if r.get("context_tokens") is not None]
-    ret = statistics.median(rts) if rts else float("nan")
+    p50 = statistics.median(rts) if rts else float("nan")
+    mean = statistics.mean(rts) if rts else float("nan")
     tok = statistics.median(cts) if cts else float("nan")
-    return ret, tok
+    return p50, mean, tok
 
 
 def row_single(out: Path, ds: str, split: str, ext: dict) -> str:
@@ -104,24 +104,24 @@ def row_single(out: Path, ds: str, split: str, ext: dict) -> str:
     d = load(out, ds, RUN, split)
     if not d:
         # AutoMem not run yet — still show the Honcho target we're chasing.
-        return f"| {ds}/{split} | **pending** | {_cmp_cols(None, h)} | — | — |"
-    mean, ci, n = within_run_ci(d)
-    ret, tok = p50_latency_tokens([d])
-    return (f"| {ds}/{split} | {mean*100:.1f}% ± {ci*100:.1f} (n={n}) | "
-            f"{_cmp_cols(mean, h)} | {ret:.0f} ms | {tok:.0f} |")
+        return f"| {ds}/{split} | **pending** | {_cmp_cols(None, h)} | — | — | — |"
+    acc, ci, n = within_run_ci(d)
+    ret_p50, ret_mean, tok = recall_latency_tokens([d])
+    return (f"| {ds}/{split} | {acc*100:.1f}% ± {ci*100:.1f} (n={n}) | "
+            f"{_cmp_cols(acc, h)} | {ret_p50:.0f} ms | {ret_mean:.0f} ms | {tok:.0f} |")
 
 
 def row_repro(out: Path, ds: str, split: str, runs: list[str], ext: dict) -> str:
     h = honcho_acc(ext, ds, split)
     ds_runs = [d for d in (load(out, ds, r, split) for r in runs) if d]
     if not ds_runs:
-        return f"| {ds}/{split} (×{len(runs)}) | **pending** | {_cmp_cols(None, h)} | — | — |"
+        return f"| {ds}/{split} (×{len(runs)}) | **pending** | {_cmp_cols(None, h)} | — | — | — |"
     accs = [d["accuracy"] for d in ds_runs]
-    mean = statistics.mean(accs)
+    acc = statistics.mean(accs)
     spread = (max(accs) - min(accs)) if len(accs) > 1 else 0.0
-    ret, tok = p50_latency_tokens(ds_runs)
-    return (f"| {ds}/{split} (×{len(ds_runs)} repro) | {mean*100:.1f}% "
-            f"(spread {spread*100:.1f}pp) | {_cmp_cols(mean, h)} | {ret:.0f} ms | {tok:.0f} |")
+    ret_p50, ret_mean, tok = recall_latency_tokens(ds_runs)
+    return (f"| {ds}/{split} (×{len(ds_runs)} repro) | {acc*100:.1f}% "
+            f"(spread {spread*100:.1f}pp) | {_cmp_cols(acc, h)} | {ret_p50:.0f} ms | {ret_mean:.0f} ms | {tok:.0f} |")
 
 
 def main() -> None:
@@ -129,8 +129,8 @@ def main() -> None:
     ap.add_argument("--outputs", type=Path, default=DEFAULT_OUT)
     args = ap.parse_args()
     ext = load_external(args.outputs)
-    rows = ["| Dataset | AutoMem (95% CI) | Honcho¹ | Δ (pp) | Recall P50² | Context tokens (P50) |",
-            "|---|---|---|---|---|---|"]
+    rows = ["| Dataset | AutoMem (95% CI) | Honcho¹ | Δ (pp) | Recall P50² | Recall avg³ | Context tokens |",
+            "|---|---|---|---|---|---|---|"]
     for ds, split in SINGLE:
         rows.append(row_single(args.outputs, ds, split, ext))
     for ds, split, runs in REPRO:
@@ -154,6 +154,13 @@ def main() -> None:
         "(retrieval is deterministic; only timing is load-sensitive). Latency is "
         "environment-relative — not comparable across hardware/deployments — and is not a "
         "cross-system axis on this board (external_results.json carries accuracy only)."
+    )
+    print(
+        "\n³ Recall avg = MEAN retrieve latency — the board's 'RECALL AVG' column; use this "
+        "for board-comparable numbers (P50 above is the robust central estimate). Mean is "
+        "outlier-sensitive: every split's mean ≈ its P50 EXCEPT beam/10m, whose mean (~2.2x "
+        "its median) carries the host-CPU-contention tail from its measurement window. For "
+        "10m, prefer the P50, or re-measure on a quiet host for a clean mean."
     )
 
 
