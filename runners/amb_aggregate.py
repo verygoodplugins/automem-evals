@@ -81,8 +81,22 @@ def within_run_ci(d: dict) -> tuple[float, float, int]:
     return mean, ci, n
 
 
-def latency_tokens(d: dict) -> tuple[float, float]:
-    return d.get("avg_retrieve_time_ms") or float("nan"), d.get("avg_context_tokens") or float("nan")
+def p50_latency_tokens(runs: list[dict]) -> tuple[float, float]:
+    """P50 (median) recall latency + context tokens, pooled over per-query data.
+    Median, not mean, for two stated reasons: (1) it matches how peers report
+    recall latency (P50), and (2) it is robust to per-query wall-clock outliers.
+    Recall latency here is wall time around memory.retrieve() on local hardware,
+    so it reflects host load; the median keeps a minority of load-inflated samples
+    from dominating the figure. Accuracy is unaffected by host load (retrieval is
+    deterministic) — only timing is — so a robust central estimate is the honest
+    summary, and we disclose the hardware + that latency is environment-relative."""
+    rts = [r["retrieve_time_ms"] for d in runs for r in d.get("results", [])
+           if r.get("retrieve_time_ms") is not None]
+    cts = [r["context_tokens"] for d in runs for r in d.get("results", [])
+           if r.get("context_tokens") is not None]
+    ret = statistics.median(rts) if rts else float("nan")
+    tok = statistics.median(cts) if cts else float("nan")
+    return ret, tok
 
 
 def row_single(out: Path, ds: str, split: str, ext: dict) -> str:
@@ -92,7 +106,7 @@ def row_single(out: Path, ds: str, split: str, ext: dict) -> str:
         # AutoMem not run yet — still show the Honcho target we're chasing.
         return f"| {ds}/{split} | **pending** | {_cmp_cols(None, h)} | — | — |"
     mean, ci, n = within_run_ci(d)
-    ret, tok = latency_tokens(d)
+    ret, tok = p50_latency_tokens([d])
     return (f"| {ds}/{split} | {mean*100:.1f}% ± {ci*100:.1f} (n={n}) | "
             f"{_cmp_cols(mean, h)} | {ret:.0f} ms | {tok:.0f} |")
 
@@ -105,10 +119,7 @@ def row_repro(out: Path, ds: str, split: str, runs: list[str], ext: dict) -> str
     accs = [d["accuracy"] for d in ds_runs]
     mean = statistics.mean(accs)
     spread = (max(accs) - min(accs)) if len(accs) > 1 else 0.0
-    rets = [d["avg_retrieve_time_ms"] for d in ds_runs if d.get("avg_retrieve_time_ms")]
-    toks = [d["avg_context_tokens"] for d in ds_runs if d.get("avg_context_tokens")]
-    ret = statistics.median(rets) if rets else float("nan")
-    tok = statistics.median(toks) if toks else float("nan")
+    ret, tok = p50_latency_tokens(ds_runs)
     return (f"| {ds}/{split} (×{len(ds_runs)} repro) | {mean*100:.1f}% "
             f"(spread {spread*100:.1f}pp) | {_cmp_cols(mean, h)} | {ret:.0f} ms | {tok:.0f} |")
 
@@ -118,7 +129,7 @@ def main() -> None:
     ap.add_argument("--outputs", type=Path, default=DEFAULT_OUT)
     args = ap.parse_args()
     ext = load_external(args.outputs)
-    rows = ["| Dataset | AutoMem (95% CI) | Honcho¹ | Δ (pp) | Recall latency | Context tokens |",
+    rows = ["| Dataset | AutoMem (95% CI) | Honcho¹ | Δ (pp) | Recall P50² | Context tokens (P50) |",
             "|---|---|---|---|---|---|"]
     for ds, split in SINGLE:
         rows.append(row_single(args.outputs, ds, split, ext))
@@ -133,6 +144,16 @@ def main() -> None:
         "answerer/judge confound this harness otherwise removes.\n  Honcho has no "
         "PersonaMem entry (its splits are 128k/1M, not our 32k). Δ = AutoMem − Honcho "
         "(positive = AutoMem ahead)."
+    )
+    print(
+        "\n² Recall P50 = median wall-clock around memory.retrieve(), measured on local "
+        "hardware (Apple M-series; FastEmbed bge-base-768 in-process; single-query/RAG "
+        "mode). We report the median because it is the standard peer reporting unit (P50) "
+        "and because these runs share a workstation — some queries were timed under "
+        "incidental host-CPU contention, which inflates wall-clock but NOT accuracy "
+        "(retrieval is deterministic; only timing is load-sensitive). Latency is "
+        "environment-relative — not comparable across hardware/deployments — and is not a "
+        "cross-system axis on this board (external_results.json carries accuracy only)."
     )
 
 
