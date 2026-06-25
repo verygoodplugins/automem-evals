@@ -12,10 +12,19 @@ Usage:  python3 runners/amb_aggregate.py [--outputs DIR]
 import argparse
 import json
 import math
+import os
 import statistics
+import sys
 from pathlib import Path
 
-DEFAULT_OUT = Path("/Users/jgarturo/Projects/OpenAI/agent-memory-benchmark/outputs")
+# Default to the sibling agent-memory-benchmark/outputs (standard layout:
+# automem-evals checked out next to agent-memory-benchmark). Override with the
+# AMB_OUTPUTS env var or --outputs. main() warns loudly if the resolved dir is
+# missing instead of silently rendering every row "pending".
+DEFAULT_OUT = (
+    Path(os.environ["AMB_OUTPUTS"]) if os.environ.get("AMB_OUTPUTS")
+    else Path(__file__).resolve().parents[2] / "agent-memory-benchmark" / "outputs"
+)
 
 # Single full-split runs (run_name "automem-sub"): within-run CI.
 RUN = "automem-sub"
@@ -128,6 +137,13 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--outputs", type=Path, default=DEFAULT_OUT)
     args = ap.parse_args()
+    if not args.outputs.exists():
+        print(
+            f"⚠️  outputs dir not found: {args.outputs}\n"
+            f"   pass --outputs <dir> or set AMB_OUTPUTS (default: sibling "
+            f"agent-memory-benchmark/outputs). Rows will render 'pending'.",
+            file=sys.stderr,
+        )
     ext = load_external(args.outputs)
     rows = ["| Dataset | AutoMem (95% CI) | Honcho¹ | Δ (pp) | Recall P50² | Recall avg³ | Context tokens |",
             "|---|---|---|---|---|---|---|"]

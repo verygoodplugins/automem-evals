@@ -238,15 +238,28 @@ async def compute_event_ordering_score(
     }
 
 
+def _metric_score(cr: dict) -> float:
+    """Score the metrics use: the tau-b-blended score (`score_with_tau`) for
+    event_ordering questions, else the nugget rubric-mean (`score`). Without
+    this, Kendall tau-b is computed per the BEAM spec but never reflected in the
+    reported metrics."""
+    return cr.get("score_with_tau", cr.get("score", 0.0))
+
+
 def compute_beam_metrics(evaluations: list[dict], cutoffs: list[int]) -> dict[str, Any]:
-    """Per-question-type + overall metrics at each cutoff (pass threshold 0.5)."""
+    """Per-question-type + overall metrics at each cutoff.
+
+    `beam_score` is the BEAM rubric-mean (mean of per-question 0/0.5/1 scores
+    ×100) — the AMB-comparable accuracy. `accuracy` is the separate pass-rate at
+    threshold 0.5; it is informational and INFLATED vs the rubric-mean whenever
+    partial credit (0.5) occurs, so it is NOT the comparable number."""
     from collections import defaultdict
 
     metrics_by_cutoff: dict[str, Any] = {}
     pass_threshold = 0.5
     for c in cutoffs:
         label = cutoff_label(c)
-        scores = [e.get("cutoff_results", {}).get(label, {}).get("score", 0.0) for e in evaluations]
+        scores = [_metric_score(e.get("cutoff_results", {}).get(label, {})) for e in evaluations]
         total = len(scores)
         correct = sum(1 for s in scores if s >= pass_threshold)
         errors = sum(
@@ -259,13 +272,14 @@ def compute_beam_metrics(evaluations: list[dict], cutoffs: list[int]) -> dict[st
         for qt in sorted(by_type):
             items = by_type[qt]
             qt_scores = [
-                i.get("cutoff_results", {}).get(label, {}).get("score", 0.0) for i in items
+                _metric_score(i.get("cutoff_results", {}).get(label, {})) for i in items
             ]
             qt_correct = sum(1 for s in qt_scores if s >= pass_threshold)
             type_metrics[qt] = {
                 "total": len(items),
                 "correct": qt_correct,
-                "accuracy": qt_correct / len(items) * 100 if items else 0.0,
+                "beam_score": statistics.mean(qt_scores) * 100 if qt_scores else 0.0,
+                "accuracy": qt_correct / len(items) * 100 if items else 0.0,  # pass-rate (informational)
                 "avg_score": statistics.mean(qt_scores) if qt_scores else 0.0,
             }
         metrics_by_cutoff[label] = {
@@ -273,7 +287,8 @@ def compute_beam_metrics(evaluations: list[dict], cutoffs: list[int]) -> dict[st
                 "total": total,
                 "correct": correct,
                 "errors": errors,
-                "accuracy": correct / total * 100 if total > 0 else 0.0,
+                "beam_score": statistics.mean(scores) * 100 if scores else 0.0,
+                "accuracy": correct / total * 100 if total > 0 else 0.0,  # pass-rate (informational)
                 "avg_score": statistics.mean(scores) if scores else 0.0,
             },
             "by_question_type": type_metrics,
@@ -851,17 +866,17 @@ def format_report(results: dict[str, Any]) -> str:
         lines += [
             f"## Cutoff {label}",
             "",
-            f"**Overall: {ov['accuracy']:.2f}% accuracy** "
-            f"({ov['correct']}/{ov['total']}), avg_score={ov['avg_score']:.3f}, "
-            f"errors={ov['errors']}",
+            f"**Overall BEAM score: {ov['beam_score']:.2f}%** (rubric-mean, AMB-comparable) "
+            f"· pass-rate {ov['accuracy']:.1f}% ({ov['correct']}/{ov['total']}), "
+            f"avg_score={ov['avg_score']:.3f}, errors={ov['errors']}",
             "",
-            "| ability | accuracy | avg_score | correct/total |",
-            "|---|---|---|---|",
+            "| ability | BEAM score | pass-rate | avg_score | correct/total |",
+            "|---|---|---|---|---|",
         ]
         for qt in sorted(m["by_question_type"]):
             x = m["by_question_type"][qt]
             lines.append(
-                f"| {qt} | {x['accuracy']:.1f}% | {x['avg_score']:.3f} | "
+                f"| {qt} | {x['beam_score']:.1f}% | {x['accuracy']:.1f}% | {x['avg_score']:.3f} | "
                 f"{x['correct']}/{x['total']} |"
             )
         lines.append("")
