@@ -175,18 +175,23 @@ async def judge_single_nugget(
     _USAGE["nugget_judge_calls"] = _USAGE.get("nugget_judge_calls", 0) + 1
     prompt = get_beam_nugget_judge_prompt(question, nugget, generated_answer)
     raw = await judge_llm.generate_structured(system=BEAM_JUDGE_SYSTEM_PROMPT, user=prompt)
-    if isinstance(raw, dict):
+    if isinstance(raw, dict) and raw:
         try:
             score = _clamp_nugget_score(float(raw.get("score", 0.0)))
         except (ValueError, TypeError):
             score = 0.0
         return {"score": score, "reason": raw.get("reason", "")}
+    if isinstance(raw, dict):
+        # Empty dict = generate_structured() exhausted retries (quota / rate-limit /
+        # auth). Flag as an error instead of a silent 0.0 so the failed judge call is
+        # counted/visible rather than depressing the official_beam_score unnoticed.
+        return {"score": 0.0, "error": "judge_failed", "reason": "empty judge response (retries exhausted)"}
     raw_str = str(raw)
     if "1.0" in raw_str:
         return {"score": 1.0, "reason": raw_str[:200]}
     if "0.5" in raw_str:
         return {"score": 0.5, "reason": raw_str[:200]}
-    return {"score": 0.0, "reason": f"Parse error: {raw_str[:200]}"}
+    return {"score": 0.0, "error": "parse_error", "reason": f"Parse error: {raw_str[:200]}"}
 
 
 async def compute_event_ordering_score(
@@ -477,6 +482,7 @@ async def evaluate_question(
             {"nugget": n, "score": ns["score"], "reason": ns["reason"]}
             for n, ns in zip(rubric, nugget_raw)
         ]
+        judge_errors = sum(1 for ns in nugget_raw if ns.get("error"))
         avg_score = statistics.mean(ns["score"] for ns in nugget_scores) if nugget_scores else 0.0
 
         cr: dict[str, Any] = {
@@ -487,6 +493,12 @@ async def evaluate_question(
             "context_tokens": ctx_tokens,
             "nugget_scores": nugget_scores,
         }
+        if judge_errors:
+            # A judge call returned no verdict (retries exhausted / unparseable), so
+            # compute_beam_metrics counts this question as an error and the depressed
+            # score is visible rather than silent. (Excluding errored questions from
+            # the official mean / aborting on error-rate is a tracked follow-up.)
+            cr["error"] = f"judge_failed:{judge_errors}/{len(nugget_raw)}"
         if question.question_type == "event_ordering":
             try:
                 tau = await compute_event_ordering_score(question.question, rubric, answer, judge)
@@ -1007,12 +1019,15 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\nArtifacts: {run_dir}")
     md = results["metadata"]
     if not md["returned_to_baseline"]:
+        kept = getattr(args, "keep", False)
         print(
             "WARNING: AutoMem memory/vector counts did not return to baseline "
-            f"({md['health_before']} -> {md['health_after']}).",
+            f"({md['health_before']} -> {md['health_after']})."
+            + (" (expected with --keep)" if kept else ""),
             file=sys.stderr,
         )
-        return 2
+        if not kept:
+            return 2  # only a hard failure when we intended to clean up
     return 0
 
 
