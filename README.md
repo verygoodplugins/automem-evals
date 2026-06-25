@@ -29,6 +29,7 @@ The current implementation is a focused recall-quality harness against a locally
 - Generate timestamped markdown reports for quick A/B analysis
 - Prototype retrieval behavior such as client-side graph expansion without changing `automem`
 - A/B two AutoMem endpoints with `runners/compare_recall_endpoints.py` using `preserve`/`mixed`/`noise` probes (`scenarios/recall_cleanup_v1.json`); `scenarios/recall_cleanup_v2.json` adds `negative` controls whose correct answer is "nothing relevant", so over-retrieval and false-positive regressions (e.g. automem#130) show up as `REGRESSION` — report-only, since the `--fail-on-preserve-*` exit-code gates only inspect `preserve` probes
+- Run AutoMem through the neutral [Agent Memory Benchmark](https://agentmemorybenchmark.ai) (Core-3 + BEAM) and aggregate the accuracy / recall-latency / context-token triplet against the board with `runners/amb_aggregate.py` — see [`data/results/SUMMARY-amb-submission-2026-06.md`](data/results/SUMMARY-amb-submission-2026-06.md)
 
 It is intentionally narrower than a full benchmark platform. Today it is primarily about answering:
 
