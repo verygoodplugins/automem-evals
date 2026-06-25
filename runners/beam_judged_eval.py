@@ -239,11 +239,18 @@ async def compute_event_ordering_score(
 
 
 def _metric_score(cr: dict) -> float:
-    """Score the metrics use: the tau-b-blended score (`score_with_tau`) for
-    event_ordering questions, else the nugget rubric-mean (`score`). Without
-    this, Kendall tau-b is computed per the BEAM spec but never reflected in the
-    reported metrics."""
-    return cr.get("score_with_tau", cr.get("score", 0.0))
+    """Official per-question score for metrics: the BEAM rubric nugget-mean (`score`).
+
+    For event_ordering questions the harness ALSO computes a Kendall tau-b
+    (`event_ordering` + `score_with_tau`), but we deliberately do NOT fold it into
+    the official metric here. `score_with_tau` = (rubric + normalized_tau)/2 is a
+    local blend, not the upstream BEAM event-ordering score; using it breaks
+    leaderboard-comparability and can flip pass/fail (a content-empty but
+    perfectly-ordered answer would pass). Scoring event_ordering on the official
+    normalized tau-b instead of the rubric is a tracked follow-up — it must match
+    the upstream BEAM scorer exactly before it lands in an `official_beam_score`
+    artifact. tau-b stays stored on each result for inspection in the meantime."""
+    return cr.get("score", 0.0)
 
 
 def compute_beam_metrics(evaluations: list[dict], cutoffs: list[int]) -> dict[str, Any]:
