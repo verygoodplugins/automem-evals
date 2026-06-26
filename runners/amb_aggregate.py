@@ -91,8 +91,8 @@ def within_run_ci(d: dict) -> tuple[float, float, int]:
 
 
 def recall_latency_tokens(runs: list[dict]) -> tuple[float, float, float]:
-    """Recall latency as both P50 (median) AND mean, plus median context tokens,
-    pooled over per-query `retrieve_time_ms`. Both are derived from the same stored
+    """Recall latency as both P50 (median) AND mean, plus mean context tokens
+    (the board's `avg_context_tokens` metric), pooled over per-query data. Both are derived from the same stored
     per-query array (nothing extra needs storing). P50 is the robust central estimate
     (peer-standard, and immune to a minority of host-load-inflated samples); the mean
     is the board's 'RECALL AVG' metric — use it for board-comparable numbers, but note
@@ -104,7 +104,11 @@ def recall_latency_tokens(runs: list[dict]) -> tuple[float, float, float]:
            if r.get("context_tokens") is not None]
     p50 = statistics.median(rts) if rts else float("nan")
     mean = statistics.mean(rts) if rts else float("nan")
-    tok = statistics.median(cts) if cts else float("nan")
+    # Context tokens as the MEAN, matching the board's `avg_context_tokens`
+    # (vectorize-io cli.py::publish_results / runner.py::_save). Unlike recall
+    # latency, context size is deterministic (not host-load-sensitive), so there is
+    # no robustness reason to prefer the median — the board metric is the mean.
+    tok = statistics.mean(cts) if cts else float("nan")
     return p50, mean, tok
 
 

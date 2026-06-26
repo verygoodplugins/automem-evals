@@ -10,13 +10,13 @@
 
 | Dataset | AutoMem (95% CI) | Honcho¹ | Δ (pp) | Recall P50² | Recall avg³ | Ctx tokens |
 |---|---|---|---|---|---|---|
-| locomo/locomo10 | 85.1% ± 1.8 (n=1540) | 89.9% | −4.8 | 127 ms | 132 ms | 4,786 |
-| longmemeval/s | 74.4% ± 3.8 (n=500) | 90.4% | −16.0 | 905 ms | 1,012 ms | 3,766 |
-| personamem/32k | 76.1% ± 3.4 (n=589) | — | — | 180 ms | 202 ms | 2,626 |
-| beam/100k (×3 repro) | 67.5% (spread 1.8pp) | 63.0% | **+4.5** | 195 ms | 247 ms | 3,817 |
-| beam/500k | 65.6% ± 2.8 (n=700) | 64.9% | +0.7 | 432 ms | 440 ms | 3,782 |
-| beam/1m | 63.8% ± 2.7 (n=700) | 63.1% | +0.7 | 424 ms | 451 ms | 3,775 |
-| beam/10m | **57.4% ± 5.5** (n=200) | 40.6% | **+16.8** | 1,707 ms | 2,260 ms | 3,844 |
+| locomo/locomo10 | 85.1% ± 1.8 (n=1540) | 89.9% | −4.8 | 127 ms | 132 ms | 4,768 |
+| longmemeval/s | 74.4% ± 3.8 (n=500) | 90.4% | −16.0 | 905 ms | 1,012 ms | 3,756 |
+| personamem/32k | 76.1% ± 3.4 (n=589) | — | — | 180 ms | 202 ms | 2,588 |
+| beam/100k (×3 repro) | 67.5% (spread 1.8pp) | 63.0% | **+4.5** | 195 ms | 247 ms | 3,842 |
+| beam/500k | 65.6% ± 2.8 (n=700) | 64.9% | +0.7 | 432 ms | 440 ms | 3,929 |
+| beam/1m | 63.8% ± 2.7 (n=700) | 63.1% | +0.7 | 424 ms | 451 ms | 3,900 |
+| beam/10m | **57.4% ± 5.5** (n=200) | 40.6% | **+16.8** | 1,707 ms | 2,260 ms | 3,932 |
 
 _BEAM scores are rubric-mean (BEAM paper's 0/0.5/1 per-item scoring averaged per question) — a different scale than pass/fail benchmarks._
 
@@ -44,7 +44,7 @@ On the conversational Core-3 datasets, AutoMem **trails the leaders**:
 ## Efficiency
 
 - **Recall latency:** sub-second on most tiers (127–451 ms P50), ~1.7 s at 10M. Latency is environment-relative (local Apple-silicon, FastEmbed in-process, single-query mode) and **not a cross-system axis** — reported for our own runs only.
-- **Context tokens:** ~2.6–4.8k fed to the answerer at every scale — a bounded-retrieval signature (the board's leader feeds 17–27k on BEAM). This is architectural, not hardware-dependent, and is AutoMem's strongest efficiency story.
+- **Context tokens:** ~2.6–4.8k fed to the answerer at every scale (reported as the **mean**, matching the board's `avg_context_tokens` metric) — a bounded-retrieval signature (the board's leader feeds 17–27k on BEAM). This is architectural, not hardware-dependent, and is AutoMem's strongest efficiency story.
 
 ## Methodology notes / caveats
 
