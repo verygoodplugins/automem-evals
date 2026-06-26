@@ -10,6 +10,7 @@ reported with the empirical across-run spread too.
 Usage:  python3 runners/amb_aggregate.py [--outputs DIR]
 """
 import argparse
+import gzip
 import json
 import math
 import os
@@ -35,8 +36,18 @@ REPRO = [("beam", "100k", ["automem-sub-rep1", "automem-sub-rep2", "automem-sub-
 
 
 def load(out: Path, ds: str, run: str, split: str):
-    p = out / ds / run / "rag" / f"{split}.json"
-    return json.loads(p.read_text()) if p.exists() else None
+    rag = out / ds / run / "rag"
+    p = rag / f"{split}.json"
+    if p.exists():
+        return json.loads(p.read_text())
+    # AMB's `publish-results` gzips outputs to <split>.json.gz and removes the
+    # plain JSON, so fall back to the compressed artifact — otherwise the
+    # aggregator can't read a published/committed outputs tree (renders "pending").
+    gz = rag / f"{split}.json.gz"
+    if gz.exists():
+        with gzip.open(gz, "rt") as fh:
+            return json.loads(fh.read())
+    return None
 
 
 def load_external(out: Path) -> dict:
