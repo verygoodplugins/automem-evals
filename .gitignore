@@ -104,3 +104,8 @@ data/results/writ/*-smoke/
 data/results/writ/**/*-smoke/
 !data/results/writ/README.md
 !data/results/writ/SUMMARY-*.md
+
+# Mem2ActBench: the upstream dataset clone (license unconfirmed, never commit it)
+# and raw per-run reports. Curated aggregates go in data/results/mem2actbench/.
+data/benchmarks/
+data/results/mem2actbench/runs/
