@@ -4,6 +4,8 @@ import { createServer } from 'node:http';
 const JSON_HEADERS = { 'Content-Type': 'application/json; charset=utf-8' };
 const DEFAULT_RETENTION_DAYS = 30;
 const MAX_BODY_BYTES = 1_000_000;
+const MAX_MEMORY_CONTENT_CHARS = 2_000;
+const DEFAULT_UPSTREAM_TIMEOUT_MS = 10_000;
 // AutoMem caps recall limits server-side; clamp rather than reject so an AML
 // top_k above the cap still gets the best evidence AutoMem can return.
 const MAX_RECALL_LIMIT = 100;
@@ -29,6 +31,27 @@ function formatMessage(message) {
     ? ` | ${new Date(message.timestamp).toISOString()}`
     : '';
   return `[${message.role}${timestamp}] ${message.content}`;
+}
+
+function storageEntries(messages) {
+  return messages.flatMap((message, messageIndex) => {
+    const prefix = formatMessage({ ...message, content: '' });
+    const chunkSize = MAX_MEMORY_CONTENT_CHARS - prefix.length;
+    if (chunkSize < 1) {
+      throw new Error('message role and timestamp prefix exceeds AutoMem limits');
+    }
+
+    const content = Array.from(message.content);
+    const entries = [];
+    for (let offset = 0; offset < content.length; offset += chunkSize) {
+      entries.push({
+        content: `${prefix}${content.slice(offset, offset + chunkSize).join('')}`,
+        messageIndex,
+        chunkIndex: entries.length,
+      });
+    }
+    return entries;
+  });
 }
 
 function getApiKey(request) {
@@ -189,6 +212,7 @@ export function createAmlAdapterServer({
   adapterApiKey = '',
   fetchImpl = fetch,
   retentionDays = DEFAULT_RETENTION_DAYS,
+  upstreamTimeoutMs = DEFAULT_UPSTREAM_TIMEOUT_MS,
 } = {}) {
   if (!automemUrl) {
     throw new Error('AUTOMEM_API_URL is required');
@@ -196,14 +220,21 @@ export function createAmlAdapterServer({
 
   const baseUrl = automemUrl.replace(/\/+$/, '');
   const completedAdds = new Map();
+  const resumableAdds = new Map();
   const pendingAdds = new Map();
+  const timeoutMs =
+    Number.isFinite(upstreamTimeoutMs) && upstreamTimeoutMs > 0
+      ? upstreamTimeoutMs
+      : DEFAULT_UPSTREAM_TIMEOUT_MS;
+  const upstreamFetch = (url, options = {}) =>
+    fetchImpl(url, { ...options, signal: AbortSignal.timeout(timeoutMs) });
 
   return createServer(async (request, response) => {
     const { pathname } = new URL(request.url || '/', 'http://localhost');
 
     if (request.method === 'GET' && pathname === '/health') {
       try {
-        const upstream = await fetchImpl(`${baseUrl}/health`, {
+        const upstream = await upstreamFetch(`${baseUrl}/health`, {
           headers: upstreamHeaders(automemApiKey),
         });
         if (upstream.ok) {
@@ -281,17 +312,33 @@ export function createAmlAdapterServer({
           return;
         }
 
+        const resumable = resumableAdds.get(body.request_id);
+        if (resumable && resumable.fingerprint !== fingerprint) {
+          detail(
+            response,
+            409,
+            'request_id was already used with different content'
+          );
+          return;
+        }
+
         const expiresAt = new Date(
           Date.now() + retentionDays * 24 * 60 * 60 * 1000
         ).toISOString();
         const tags = ['aml-evaluation', userTag(body.user_id)];
+        const entries = storageEntries(body.messages);
+        const startIndex = resumable?.nextIndex || 0;
         const responsePromise = (async () => {
-          for (const [index, message] of body.messages.entries()) {
+          for (let index = startIndex; index < entries.length; index += 1) {
+            const entry = entries[index];
+            const message = body.messages[entry.messageIndex];
+            // A timed-out write is ambiguous: AutoMem may have persisted it
+            // after the adapter stopped waiting. Do not retry that chunk.
             const upstream = await fetchImpl(`${baseUrl}/memory`, {
               method: 'POST',
               headers: upstreamHeaders(automemApiKey),
               body: JSON.stringify({
-                content: formatMessage(message),
+                content: entry.content,
                 type: 'Context',
                 tags,
                 importance: 0.5,
@@ -303,7 +350,8 @@ export function createAmlAdapterServer({
                 metadata: {
                   aml_request_id: body.request_id,
                   aml_session_id: body.session_id,
-                  aml_message_index: index,
+                  aml_message_index: entry.messageIndex,
+                  aml_message_chunk_index: entry.chunkIndex,
                   aml_role: message.role,
                 },
               }),
@@ -311,6 +359,9 @@ export function createAmlAdapterServer({
             if (!upstream.ok) {
               throw new Error('AutoMem could not persist the memory');
             }
+            // Retain the acknowledged prefix so a retry after a transient
+            // upstream failure resumes rather than duplicating evidence.
+            resumableAdds.set(body.request_id, { fingerprint, nextIndex: index + 1 });
           }
 
           const success = {
@@ -319,6 +370,7 @@ export function createAmlAdapterServer({
             user_id: body.user_id,
             session_id: body.session_id,
           };
+          resumableAdds.delete(body.request_id);
           completedAdds.set(body.request_id, { fingerprint, response: success });
           return success;
         })();
@@ -336,7 +388,7 @@ export function createAmlAdapterServer({
         userId: body.user_id,
         topK: body.top_k,
       });
-      const upstream = await fetchImpl(`${baseUrl}/recall?${params}`, {
+      const upstream = await upstreamFetch(`${baseUrl}/recall?${params}`, {
         headers: automemApiKey
           ? { Authorization: `Bearer ${automemApiKey}` }
           : {},
