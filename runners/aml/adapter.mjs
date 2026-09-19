@@ -196,6 +196,7 @@ export function createAmlAdapterServer({
 
   const baseUrl = automemUrl.replace(/\/+$/, '');
   const completedAdds = new Map();
+  const pendingAdds = new Map();
 
   return createServer(async (request, response) => {
     const { pathname } = new URL(request.url || '/', 'http://localhost');
@@ -266,13 +267,27 @@ export function createAmlAdapterServer({
           return;
         }
 
+        const pending = pendingAdds.get(body.request_id);
+        if (pending) {
+          if (pending.fingerprint !== fingerprint) {
+            detail(
+              response,
+              409,
+              'request_id was already used with different content'
+            );
+            return;
+          }
+          json(response, 200, await pending.response);
+          return;
+        }
+
         const expiresAt = new Date(
           Date.now() + retentionDays * 24 * 60 * 60 * 1000
         ).toISOString();
         const tags = ['aml-evaluation', userTag(body.user_id)];
-        const writes = await Promise.all(
-          body.messages.map((message, index) =>
-            fetchImpl(`${baseUrl}/memory`, {
+        const responsePromise = (async () => {
+          for (const [index, message] of body.messages.entries()) {
+            const upstream = await fetchImpl(`${baseUrl}/memory`, {
               method: 'POST',
               headers: upstreamHeaders(automemApiKey),
               body: JSON.stringify({
@@ -292,22 +307,27 @@ export function createAmlAdapterServer({
                   aml_role: message.role,
                 },
               }),
-            })
-          )
-        );
-        if (writes.some(upstream => !upstream.ok)) {
-          detail(response, 503, 'AutoMem could not persist the memory');
-          return;
-        }
+            });
+            if (!upstream.ok) {
+              throw new Error('AutoMem could not persist the memory');
+            }
+          }
 
-        const success = {
-          success: true,
-          request_id: body.request_id,
-          user_id: body.user_id,
-          session_id: body.session_id,
-        };
-        completedAdds.set(body.request_id, { fingerprint, response: success });
-        json(response, 200, success);
+          const success = {
+            success: true,
+            request_id: body.request_id,
+            user_id: body.user_id,
+            session_id: body.session_id,
+          };
+          completedAdds.set(body.request_id, { fingerprint, response: success });
+          return success;
+        })();
+        pendingAdds.set(body.request_id, { fingerprint, response: responsePromise });
+        try {
+          json(response, 200, await responsePromise);
+        } finally {
+          pendingAdds.delete(body.request_id);
+        }
         return;
       }
 

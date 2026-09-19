@@ -9,7 +9,7 @@ Dependency-free Node (24+). No `package.json`, no install step.
 - `GET /health`: unauthenticated, as AML requires. Returns 200 when AutoMem's `/health` answers, 503 when it doesn't.
 - `POST /add`: accepts `request_id`, `user_id`, `session_id` and `messages[]` (`role`, `content`, optional Unix-millisecond `timestamp`). Waits until every message is written to AutoMem, then echoes the three IDs:
   `{"success":true,"request_id":"...","user_id":"...","session_id":"..."}`.
-  Replaying a `request_id` with the same body returns the same response without writing again. Replaying it with a different body returns 409.
+  It writes `messages` in source order. Concurrent replays of a `request_id` with the same body share one in-flight write and then return the same response; a replay after completion also returns that response without writing again. A replay with different content returns 409.
 - `POST /search`: accepts `query`, `user_id`, `top_k` and optional `options`. Returns `{"data":[{"id","content","score","created_at"}]}` in AutoMem's ranked order, capped at `top_k` (AutoMem is asked for at most 100).
 
 Errors use `{"detail":{"reason":"..."}}`:
@@ -86,7 +86,8 @@ Neither command is an AML-issued smoke. That needs Cycle 2 access and an Eval Ke
 
 Deployment:
 - Deploy the pinned image behind HTTPS with a dedicated `AML_ADAPTER_API_KEY` and a secret-managed `AUTOMEM_API_KEY`.
-- Run at least two instances, with health checks on `/health`.
+- The `request_id` replay cache is process-local. Until deployment provides a durable shared idempotency store, use one write-capable instance or load-balancer affinity for retries of the same request; do not rely on multiple independent instances for cross-instance replay deduplication.
+- Use health checks on `/health` and size the service for the declared concurrency before submitting an AML version.
 - Size edge rate limits for AML's declared Add/Search concurrency (64/256). Don't turn legitimate evaluation bursts into 429s.
 - Alert on `/health` failures, p95 latency, 5xx rate, and AutoMem errors.
 
