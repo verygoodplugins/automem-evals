@@ -138,6 +138,7 @@ test('AML Add persists messages synchronously and Search returns scoped evidence
         aml_request_id: ADD_BODY.request_id,
         aml_session_id: ADD_BODY.session_id,
         aml_message_index: 1,
+        aml_message_chunk_index: 0,
         aml_role: 'assistant',
       });
 
@@ -259,6 +260,78 @@ test('Concurrent retries of one Add request write its messages once', async () =
   );
 });
 
+test('A retry after a partial Add failure resumes without duplicating its prefix', async () => {
+  let failSecondWrite = true;
+  await withAdapter(
+    {
+      fetchImpl: async (url, options) => {
+        if (url.endsWith('/memory')) {
+          const { content } = JSON.parse(options.body);
+          if (failSecondWrite && content.includes('remember juniper')) {
+            failSecondWrite = false;
+            return new Response(null, { status: 503 });
+          }
+        }
+        return fetch(url, options);
+      },
+    },
+    async ({ automem, adapterUrl }) => {
+      const failed = await request(adapterUrl, '/add', ADD_BODY);
+      assert.equal(failed.status, 503);
+      assert.equal(automem.records.length, 1);
+
+      const retry = await request(adapterUrl, '/add', ADD_BODY);
+      assert.equal(retry.status, 200);
+      assert.equal(automem.records.length, ADD_BODY.messages.length);
+      assert.deepEqual(
+        automem.records.map(record => record.content),
+        [
+          '[user | 2024-01-01T00:00:00.000Z] The launch codeword is juniper.',
+          '[assistant] I will remember juniper for the launch.',
+        ]
+      );
+    }
+  );
+});
+
+test('Add splits a valid long message to AutoMem-safe chunks', async () => {
+  const content = 'x'.repeat(5_000);
+  await withAdapter({}, async ({ automem, adapterUrl }) => {
+    const add = await request(adapterUrl, '/add', {
+      ...ADD_BODY,
+      request_id: 'eval:run-1:long-message',
+      messages: [{ role: 'user', content }],
+    });
+    assert.equal(add.status, 200);
+    assert.ok(automem.records.length > 1);
+    assert.ok(automem.records.every(record => record.content.length <= 2_000));
+    assert.equal(
+      automem.records.map(record => record.content.replace(/^\[user\] /, '')).join(''),
+      content
+    );
+    assert.deepEqual(
+      automem.records.map(record => record.metadata.aml_message_chunk_index),
+      [0, 1, 2]
+    );
+  });
+});
+
+test('Add preserves non-BMP characters at chunk boundaries', async () => {
+  const content = `${'😀'.repeat(1_992)}abcdef`;
+  await withAdapter({}, async ({ automem, adapterUrl }) => {
+    const add = await request(adapterUrl, '/add', {
+      ...ADD_BODY,
+      request_id: 'eval:run-1:unicode-message',
+      messages: [{ role: 'user', content }],
+    });
+    assert.equal(add.status, 200);
+    assert.equal(
+      automem.records.map(record => record.content.replace(/^\[user\] /, '')).join(''),
+      content
+    );
+  });
+});
+
 test('AML adapter rejects missing required contract fields and invalid credentials', async () => {
   await withAdapter(
     { adapterApiKey: 'adapter-key' },
@@ -296,6 +369,24 @@ test('AML adapter rejects missing required contract fields and invalid credentia
 test('Health reports 503 when AutoMem is unreachable', async () => {
   const adapter = createAmlAdapterServer({
     automemUrl: 'http://127.0.0.1:9',
+  });
+  const adapterUrl = await listen(adapter);
+  try {
+    const health = await request(adapterUrl, '/health');
+    assert.equal(health.status, 503);
+  } finally {
+    await close(adapter);
+  }
+});
+
+test('Health applies the configured upstream timeout', async () => {
+  const adapter = createAmlAdapterServer({
+    automemUrl: 'http://automem.test',
+    upstreamTimeoutMs: 10,
+    fetchImpl: async (_url, { signal }) =>
+      new Promise((resolve, reject) => {
+        signal.addEventListener('abort', () => reject(signal.reason));
+      }),
   });
   const adapterUrl = await listen(adapter);
   try {
