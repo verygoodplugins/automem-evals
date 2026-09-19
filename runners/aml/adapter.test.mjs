@@ -204,6 +204,61 @@ test('Add is idempotent per request_id and rejects a conflicting replay', async 
   });
 });
 
+test('Streaming Add persists incremental messages in source order', async () => {
+  const firstContent = 'The first incremental fact arrives first.';
+  const secondContent = 'The second incremental fact arrives second.';
+  await withAdapter(
+    {
+      fetchImpl: async (url, options) => {
+        if (url.endsWith('/memory')) {
+          const { content } = JSON.parse(options.body);
+          if (content.includes(firstContent)) {
+            await new Promise(resolve => setTimeout(resolve, 20));
+          }
+        }
+        return fetch(url, options);
+      },
+    },
+    async ({ automem, adapterUrl }) => {
+      const add = await request(adapterUrl, '/add', {
+        ...ADD_BODY,
+        request_id: 'eval:run-1:streaming:chunk-0',
+        messages: [
+          { role: 'user', content: firstContent },
+          { role: 'assistant', content: secondContent },
+        ],
+      });
+      assert.equal(add.status, 200);
+      assert.deepEqual(
+        automem.records.map(record => record.content),
+        [`[user] ${firstContent}`, `[assistant] ${secondContent}`]
+      );
+    }
+  );
+});
+
+test('Concurrent retries of one Add request write its messages once', async () => {
+  await withAdapter(
+    {
+      fetchImpl: async (url, options) => {
+        if (url.endsWith('/memory')) {
+          await new Promise(resolve => setTimeout(resolve, 20));
+        }
+        return fetch(url, options);
+      },
+    },
+    async ({ automem, adapterUrl }) => {
+      const [first, retry] = await Promise.all([
+        request(adapterUrl, '/add', ADD_BODY),
+        request(adapterUrl, '/add', ADD_BODY),
+      ]);
+      assert.equal(first.status, 200);
+      assert.equal(retry.status, 200);
+      assert.equal(automem.records.length, ADD_BODY.messages.length);
+    }
+  );
+});
+
 test('AML adapter rejects missing required contract fields and invalid credentials', async () => {
   await withAdapter(
     { adapterApiKey: 'adapter-key' },
