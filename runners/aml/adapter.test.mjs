@@ -332,6 +332,47 @@ test('Add preserves non-BMP characters at chunk boundaries', async () => {
   });
 });
 
+test('incremental Adds in one session are immediately searchable and retry safely', async () => {
+  await withAdapter({}, async ({ automem, adapterUrl }) => {
+    const firstChunk = {
+      request_id: 'eval:run-1:sample-1:chunk-0',
+      user_id: 'eval:run-1:user-streaming',
+      session_id: 'eval:run-1:session-streaming',
+      messages: [
+        { role: 'user', content: 'The first streaming detail is tangerine.' },
+      ],
+    };
+    const secondChunk = {
+      ...firstChunk,
+      request_id: 'eval:run-1:sample-1:chunk-1',
+      messages: [
+        { role: 'assistant', content: 'The next streaming detail is violet.' },
+      ],
+    };
+
+    assert.equal((await request(adapterUrl, '/add', firstChunk)).status, 200);
+    const afterFirstChunk = await request(adapterUrl, '/search', {
+      query: 'tangerine',
+      user_id: firstChunk.user_id,
+      top_k: 10,
+    });
+    assert.equal(afterFirstChunk.status, 200);
+    assert.match((await afterFirstChunk.json()).data[0].content, /tangerine/);
+
+    assert.equal((await request(adapterUrl, '/add', secondChunk)).status, 200);
+    const afterSecondChunk = await request(adapterUrl, '/search', {
+      query: 'violet',
+      user_id: secondChunk.user_id,
+      top_k: 10,
+    });
+    assert.equal(afterSecondChunk.status, 200);
+    assert.match((await afterSecondChunk.json()).data[0].content, /violet/);
+
+    assert.equal((await request(adapterUrl, '/add', secondChunk)).status, 200);
+    assert.equal(automem.records.length, 2);
+  });
+});
+
 test('AML adapter rejects missing required contract fields and invalid credentials', async () => {
   await withAdapter(
     { adapterApiKey: 'adapter-key' },
