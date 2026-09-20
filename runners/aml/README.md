@@ -4,6 +4,21 @@ HTTP adapter for the [Agent Memory Leaderboard (AML)](https://agentmemoryleaderb
 
 Dependency-free Node (24+). No `package.json`, no install step.
 
+## Cycle 2 status
+
+This entry targets the **textual track only** for Cycle 2. Coding-track and
+multimodal-track support are deliberately out of scope.
+
+Streaming Memory behavior is verified: incremental `/add` calls for the same
+`session_id`, using a distinct `request_id` for each chunk, append their
+messages and each synchronous Add is immediately searchable through `/search`.
+An exact retry of a chunk remains idempotent; reusing its `request_id` with a
+different body returns 409.
+
+**A human owner must sign off before requesting an AML Eval Key or running any
+live or scored AML evaluation.** This adapter work does not request an Eval Key
+or contact the AML platform.
+
 ## Endpoints
 
 - `GET /health`: unauthenticated, as AML requires. Returns 200 when AutoMem's `/health` answers, 503 when it doesn't.
@@ -91,7 +106,8 @@ Deployment:
 - Alert on `/health` failures, p95 latency, 5xx rate, and AutoMem errors.
 
 Access and uptime:
-- Once Cycle 2 opens, request evaluation access and bind the endpoints and key.
+- After human owner sign-off, request evaluation access and bind the endpoints
+  and key.
 - Run AML's non-scored compatibility smoke before any Full run.
 - Keep the endpoint and image revision reachable for at least 30 days after submission.
 
