@@ -16,6 +16,7 @@ PERSONA="${MEMORA_PERSONA:-software_engineer}"
 # same Track 2 contract and are comparable. Override only for deliberate
 # upstream-adapter compatibility work.
 MEMORA_REF="${MEMORA_REF:-a6493188efc836d6511ed5e4163fe3ba87da30ff}"
+MEMORA_VENV="${MEMORA_VENV:-$MEMORA_DIR/.venv-automem-fama}"
 MODE="smoke"
 
 if [[ "${1:-}" == "--full" ]]; then
@@ -65,14 +66,19 @@ COMMON=(--memora-dir "$MEMORA_DIR" --period "$PERIOD" --persona "$PERSONA"
 
 # The pinned Track 2 evaluator needs these core packages; its requirements file
 # also lists optional SDKs for other memory systems, which AutoMem does not use.
+if [[ ! -x "$MEMORA_VENV/bin/python" ]]; then
+  echo "[memora-fama] Creating isolated evaluator environment: $MEMORA_VENV"
+  python3 -m venv "$MEMORA_VENV"
+fi
 echo "[memora-fama] Installing pinned-harness core evaluation dependencies"
-python3 -m pip install --quiet \
+EVAL_PYTHON="$MEMORA_VENV/bin/python"
+"$EVAL_PYTHON" -m pip install --quiet \
   'openai>=1.0.0' 'python-dotenv>=1.0.0' 'tqdm>=4.66.0' 'requests>=2.31.0'
 
 echo "[memora-fama] Track 2 ingestion: $PERIOD/$PERSONA (run tag: $RUN_TAG)"
-python3 "$ADAPTER" "${COMMON[@]}" --ingest
+"$EVAL_PYTHON" "$ADAPTER" "${COMMON[@]}" --ingest
 echo "[memora-fama] Official Memora answer + strict multi-judge evaluation"
-python3 "$ADAPTER" "${COMMON[@]}" --evaluate
+"$EVAL_PYTHON" "$ADAPTER" "${COMMON[@]}" --evaluate
 
 REPORT_DIR="$MEMORA_DIR/data/$PERIOD/$PERSONA/eval_results/automem"
 REPORT="$(find "$REPORT_DIR" -name 'eval_report_*.json' -type f -print | sort | tail -n 1)"

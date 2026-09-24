@@ -74,9 +74,11 @@ bash scripts/benchmarks/run_memora_fama.sh --full
 It runs strict multi-judge evaluation and prints the generated local
 `eval_report_*.json` FAMA score. For a full run, the script installs the
 released evaluator's core dependencies (`openai`, `python-dotenv`, `tqdm`, and
-`requests`) with `python3 -m pip`; it deliberately does not install optional
-SDKs for the other memory-agent adapters. Use `MEMORA_PERIOD`, `MEMORA_PERSONA`,
-`MEMORA_DIR`, `MEMORA_REF`, `AUTOMEM_ENDPOINT`, `AUTOMEM_TOKEN`, or `MEMORA_RUN_TAG` to
+`requests`) into an isolated virtual environment at
+`third_party/memora/.venv-automem-fama`; it deliberately does not install
+optional SDKs for the other memory-agent adapters or modify the system Python.
+Use `MEMORA_PERIOD`, `MEMORA_PERSONA`, `MEMORA_DIR`, `MEMORA_REF`, `MEMORA_VENV`,
+`AUTOMEM_ENDPOINT`, `AUTOMEM_TOKEN`, or `MEMORA_RUN_TAG` to
 override the defaults. No command here submits results anywhere.
 
 ## Verification scope
