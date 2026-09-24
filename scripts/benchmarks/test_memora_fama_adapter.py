@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import pathlib
 import sys
+import tempfile
 import unittest
 from typing import Any
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
-from memora_fama_adapter import AutoMemFamaSystem
+from memora_fama_adapter import AutoMemFamaSystem, ingest
 
 
 class RecordingAutoMem:
@@ -56,6 +57,24 @@ def conversation(operation: str, date: str, message: str) -> dict[str, Any]:
 
 
 class AutoMemFamaSystemTest(unittest.TestCase):
+    def test_ingest_orders_unpadded_session_filenames_numerically(self) -> None:
+        class RecordingSystem:
+            seen: list[str] = []
+
+            def process_conversation_file(self, path: str) -> dict[str, str]:
+                self.seen.append(pathlib.Path(path).name)
+                return {"status": "stored"}
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            conversations = pathlib.Path(temporary_directory)
+            for name in ("session_10.json", "session_2.json", "session_1.json"):
+                (conversations / name).write_text("{}", encoding="utf-8")
+            system = RecordingSystem()
+            outcomes = ingest(system, conversations)
+
+        self.assertEqual(system.seen, ["session_1.json", "session_2.json", "session_10.json"])
+        self.assertEqual(outcomes["stored"], 3)
+
     def test_updates_supersede_previous_fact_and_searches_current_state(self) -> None:
         transport = RecordingAutoMem()
         subject = AutoMemFamaSystem(

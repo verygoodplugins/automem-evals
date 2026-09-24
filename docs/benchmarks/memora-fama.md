@@ -43,8 +43,10 @@ into an answer.
 ## Run
 
 The runner fetches the public Memora checkout to `third_party/memora` when it
-is absent. That checkout is intentionally ignored; it is an upstream input,
-not vendored source.
+is absent and checks out the pinned release revision
+`a6493188efc836d6511ed5e4163fe3ba87da30ff`. That checkout is intentionally
+ignored; it is an upstream input, not vendored source. Set `MEMORA_REF` only
+for deliberate compatibility work against a different upstream revision.
 
 ```bash
 # Free: reads every weekly/software_engineer session through the adapter,
@@ -71,7 +73,7 @@ bash scripts/benchmarks/run_memora_fama.sh --full
 `--full` fails before ingestion, with a clear message, if either key is absent.
 It runs strict multi-judge evaluation and prints the generated local
 `eval_report_*.json` FAMA score. Use `MEMORA_PERIOD`, `MEMORA_PERSONA`,
-`MEMORA_DIR`, `AUTOMEM_ENDPOINT`, `AUTOMEM_TOKEN`, or `MEMORA_RUN_TAG` to
+`MEMORA_DIR`, `MEMORA_REF`, `AUTOMEM_ENDPOINT`, `AUTOMEM_TOKEN`, or `MEMORA_RUN_TAG` to
 override the defaults. No command here submits results anywhere.
 
 ## Verification scope

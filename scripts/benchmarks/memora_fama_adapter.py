@@ -391,7 +391,14 @@ def ingest(
     system: AutoMemFamaSystem, conversations_dir: pathlib.Path, *, limit: int | None = None
 ) -> Counter[str]:
     outcomes: Counter[str] = Counter()
-    paths = sorted(conversations_dir.glob("session_*.json"))
+    def session_order(path: pathlib.Path) -> int:
+        """Order unpadded ``session_N.json`` files by their numeric N."""
+        match = re.fullmatch(r"session_(\d+)\.json", path.name)
+        if not match:
+            raise ValueError(f"unexpected Memora conversation filename: {path.name}")
+        return int(match.group(1))
+
+    paths = sorted(conversations_dir.glob("session_*.json"), key=session_order)
     if limit is not None:
         paths = paths[:limit]
     for path in paths:

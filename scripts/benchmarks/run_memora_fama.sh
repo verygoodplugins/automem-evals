@@ -12,6 +12,10 @@ ADAPTER="$ROOT/scripts/benchmarks/memora_fama_adapter.py"
 MEMORA_DIR="${MEMORA_DIR:-$ROOT/third_party/memora}"
 PERIOD="${MEMORA_PERIOD:-weekly}"
 PERSONA="${MEMORA_PERSONA:-software_engineer}"
+# Pin the released harness/data/evaluator revision so separate runs use the
+# same Track 2 contract and are comparable. Override only for deliberate
+# upstream-adapter compatibility work.
+MEMORA_REF="${MEMORA_REF:-a6493188efc836d6511ed5e4163fe3ba87da30ff}"
 MODE="smoke"
 
 if [[ "${1:-}" == "--full" ]]; then
@@ -24,8 +28,14 @@ fi
 
 if [[ ! -d "$MEMORA_DIR/.git" ]]; then
   echo "[memora-fama] Fetching the public Memora harness into $MEMORA_DIR"
-  git clone --depth 1 https://github.com/geniesinc/Memora.git "$MEMORA_DIR"
+  git clone --depth 1 --no-checkout https://github.com/geniesinc/Memora.git "$MEMORA_DIR"
 fi
+
+if ! git -C "$MEMORA_DIR" cat-file -e "${MEMORA_REF}^{commit}" 2>/dev/null; then
+  git -C "$MEMORA_DIR" fetch --depth 1 origin "$MEMORA_REF"
+fi
+git -C "$MEMORA_DIR" checkout --detach --quiet "$MEMORA_REF"
+echo "[memora-fama] Memora revision: $(git -C "$MEMORA_DIR" rev-parse HEAD)"
 
 if [[ "$MODE" == "smoke" ]]; then
   echo "[memora-fama] No-cost protocol smoke: $PERIOD/$PERSONA"
