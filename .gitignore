@@ -90,12 +90,17 @@ Thumbs.db
 *.log
 output/
 tmp/
+.cache/
 # BEAM per-run shim.log is the audit trail — keep these even though *.log is ignored
 !data/results/beam/*/shim.log
 
 # writ — adapter + entry point are copied into the submodule at run time
 third_party/writ/run_automem.ts
 third_party/writ/src/adapters/automem.ts
+# AMA-Hub is cloned and patched only by scripts/benchmarks/run_ama_bench.sh.
+third_party/AMA-Hub/
+# AMA-Bench per-question output is reproducible; EXPERIMENT_LOG.md is curated.
+data/results/ama-bench/
 # writ generated run outputs. Commit curated summaries at the root instead;
 # add a targeted ! exception only if a specific run must become source material.
 data/results/writ/[0-9]*-*/
