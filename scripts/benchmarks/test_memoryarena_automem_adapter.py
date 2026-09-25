@@ -85,6 +85,7 @@ class AutoMemMemorySystemTests(unittest.TestCase):
         self.assertIn("query=Plan+traveler+B%27s+trip.", get[1])
         self.assertIn("tags=memoryarena-smoke", get[1])
         self.assertIn("tags=user-group-17", get[1])
+        self.assertIn("tag_mode=all", get[1])
 
     def test_empty_chunks_do_not_call_automem(self):
         memory = AutoMemMemorySystem(user_id="empty", endpoint=self.endpoint, token="token")

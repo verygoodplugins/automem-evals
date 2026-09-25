@@ -72,7 +72,12 @@ class AutoMemMemorySystem:
         """Return the upstream-required memory block followed by the prompt."""
         question = str(prompt)
         query = urlencode(
-            [("query", question), *(("tags", tag) for tag in self.tags), ("limit", str(self.limit))]
+            [
+                ("query", question),
+                *(("tags", tag) for tag in self.tags),
+                ("tag_mode", "all"),
+                ("limit", str(self.limit)),
+            ]
         )
         payload = self._request("GET", f"/recall?{query}")
         lines = ["<memory_context>"]
