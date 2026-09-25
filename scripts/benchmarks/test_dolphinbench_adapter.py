@@ -85,6 +85,8 @@ class DolphinBenchAutoMemAdapterTests(unittest.TestCase):
         self.assertIn("tags=dolphinbench", recorder.requests[1][0].full_url)
         self.assertIn("tags=dolphinbench-run-test", recorder.requests[1][0].full_url)
         self.assertIn("tags=dolphinbench-persona-morgan", recorder.requests[1][0].full_url)
+        self.assertIn("tag_mode=all", recorder.requests[1][0].full_url)
+        self.assertIn("tag_match=exact", recorder.requests[1][0].full_url)
         self.assertEqual(
             backend.freeze("morgan"),
             {"persona": "morgan", "scope_tag": "dolphinbench-run-test", "write_mode": "closed"},

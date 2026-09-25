@@ -157,7 +157,12 @@ class AutoMemDolphinBenchBackend:
             raise ValueError("query is required")
         if not 1 <= limit <= 100:
             raise ValueError("limit must be between 1 and 100")
-        params: list[tuple[str, str]] = [("query", query), ("limit", str(limit))]
+        params: list[tuple[str, str]] = [
+            ("query", query),
+            ("limit", str(limit)),
+            ("tag_mode", "all"),
+            ("tag_match", "exact"),
+        ]
         params.extend(("tags", tag) for tag in self.tags_for(persona))
         request = urllib.request.Request(
             f"{self.endpoint}/recall?{urllib.parse.urlencode(params)}",
