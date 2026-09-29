@@ -220,7 +220,9 @@ OPENAI_API_KEY=... python3 runners/run_beam.py --tier 100K --conversations 0-1
 may merge.” The `Arm auto-merge for babysit-ready PRs` workflow turns that
 handoff into GitHub native auto-merge only when the PR is non-draft and its REST
 author login is exactly `autojack-bot[bot]`. It always uses squash merge and
-deletes the source branch; external or manually authored PRs are never eligible.
+the guarded post-merge workflow deletes the source branch; external or manually
+authored PRs are never eligible. Removing `babysit:ready` revokes a pending
+native auto-merge, so the label remains the merge authorization until closure.
 
 GitHub, rather than the workflow, waits for all branch-protection-required
 checks. The repository must have **Allow auto-merge** enabled. After deploying
