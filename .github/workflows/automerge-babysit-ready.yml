@@ -16,6 +16,11 @@ permissions:
   contents: write
   pull-requests: write
 
+# Keep readiness withdrawal ordered after any arming run for the same PR.
+concurrency:
+  group: babysit-ready-${{ github.repository }}-${{ github.event.pull_request.number || inputs.pr_number }}
+  cancel-in-progress: false
+
 jobs:
   arm-native-auto-merge:
     # This early gate avoids starting a write-capable job for unrelated PRs.

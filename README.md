@@ -223,6 +223,8 @@ author login is exactly `autojack-bot[bot]`. It always uses squash merge and
 the guarded post-merge workflow deletes the source branch; external or manually
 authored PRs are never eligible. Removing `babysit:ready` revokes a pending
 native auto-merge, so the label remains the merge authorization until closure.
+Per-PR workflow serialization makes a readiness-withdrawal event run after any
+in-flight arm request, rather than allowing those two lifecycle events to race.
 
 GitHub, rather than the workflow, waits for all branch-protection-required
 checks. The repository must have **Allow auto-merge** enabled. After deploying
