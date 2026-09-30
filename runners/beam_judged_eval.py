@@ -609,14 +609,22 @@ def controlled_evaluation_fingerprint(args: argparse.Namespace) -> dict[str, Any
         "embedding_model_mode": args.embedding_model_mode,
         "reader_model": args.answerer_model,
         "reader_model_family": model_family(args.answerer_model, args.reader_model_family),
+        "provider": args.provider,
         "judge_model": args.judge_model,
         "judge_profile": args.judge_profile,
+        "judge_snapshot_pinned": args.judge_snapshot_pinned,
         "graph_edges": args.graph_edges,
         "recall_expansion": args.recall_expansion,
         "relation_limit": args.relation_limit,
         "expansion_limit": args.expansion_limit,
         "top_k": args.top_k,
         "ranking": build_ranking(args),
+        "tier": args.tier,
+        "cutoffs": list(args.cutoffs),
+        "answer_max_tokens": args.answer_max_tokens,
+        "with_timestamps": not args.no_timestamps,
+        "question_limit_per_conv": args.question_limit_per_conv,
+        "dataset_json": args.dataset_json,
     }
 
 

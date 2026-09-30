@@ -37,7 +37,8 @@ test('MemDelta result schema requires model and write-path disclosures', () => {
     'association_write_failures',
     'unavailable_measurements',
   ]);
-  assert.deepEqual(controlled.properties.graph.required, ['edges']);
+  assert.deepEqual(controlled.properties.graph.required, ['edges', 'edge_types']);
+  assert.equal(controlled.properties.graph.allOf[0].then.properties.edge_types.minItems, 1);
   assert.deepEqual(controlled.properties.recall.required, [
     'relation_expansion',
     'relation_limit',

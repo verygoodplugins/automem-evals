@@ -53,11 +53,17 @@
         },
         "graph": {
           "type": "object",
-          "required": ["edges"],
+          "required": ["edges", "edge_types"],
           "properties": {
             "edges": {"enum": ["on", "off"]},
             "edge_types": {"type": "array", "items": {"type": "string"}}
-          }
+          },
+          "allOf": [
+            {
+              "if": {"properties": {"edges": {"const": "on"}}},
+              "then": {"properties": {"edge_types": {"minItems": 1}}}
+            }
+          ]
         },
         "recall": {
           "type": "object",
