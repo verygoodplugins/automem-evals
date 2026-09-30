@@ -321,6 +321,7 @@ def recall_judged(
     conv_tag: str,
     limit: int,
     ranking: dict[str, Any] | None,
+    recall_expansion: str,
 ) -> dict[str, Any]:
     """Tag-scoped native /recall with optional ranking flags (recency_bias, min_score)."""
     params: dict[str, Any] = {
@@ -329,6 +330,7 @@ def recall_judged(
         "tag_mode": "all",
         "tag_match": "exact",
         "limit": limit,
+        "expand_relations": recall_expansion == "on",
     }
     if ranking:
         params.update(ranking)
@@ -572,6 +574,20 @@ def build_ranking(args: argparse.Namespace) -> dict[str, Any]:
     return ranking
 
 
+def model_family(model: str, configured_family: str = "auto") -> str:
+    """Return a stable family label for stratified controlled comparisons."""
+    if configured_family != "auto":
+        return configured_family
+    normalized = model.lower()
+    if normalized.startswith(("gpt", "o1", "o3", "o4")):
+        return "openai"
+    if normalized.startswith(("claude", "sonnet", "haiku", "opus")):
+        return "anthropic"
+    if normalized.startswith("gemini"):
+        return "google"
+    return "other"
+
+
 async def run(args: argparse.Namespace) -> dict[str, Any]:
     _reset_usage()
     _load_dotenv()
@@ -626,6 +642,10 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         )
     total_memories = 0
     total_associations = 0
+    write_input_tokens = 0
+    write_latency_ms = 0.0
+    memory_write_calls = 0
+    association_write_calls = 0
 
     logger.info(
         "BEAM judged run %s: tier=%s conversations=%d cutoffs=%s ranking=%s timestamps=%s",
@@ -645,8 +665,15 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             chunks = proxy.build_memory_chunks(
                 conv, run_id=run_id, with_timestamps=not args.no_timestamps
             )
+            write_started = time.perf_counter()
             memory_ids = client.store_memory_batch(chunks)
-            total_associations += client.associate_sequential_chunks(memory_ids)
+            memory_write_calls += (len(chunks) + proxy.BATCH_LIMIT - 1) // proxy.BATCH_LIMIT
+            if args.graph_edges == "on":
+                total_associations += client.associate_sequential_chunks(memory_ids)
+                edge_count = max(0, len(memory_ids) - 1)
+                association_write_calls += (edge_count + proxy.BATCH_LIMIT - 1) // proxy.BATCH_LIMIT
+            write_latency_ms += (time.perf_counter() - write_started) * 1000
+            write_input_tokens += sum(_count_tokens(chunk.content) for chunk in chunks)
             total_memories += len(memory_ids)
 
             questions = conv.questions
@@ -665,6 +692,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                         conv_tag=conv.conversation_tag,
                         limit=args.top_k,
                         ranking=ranking,
+                        recall_expansion=args.recall_expansion,
                     )
                     formatted = to_answer_memories(recall)
                     ev = await evaluate_question(
@@ -815,6 +843,41 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "returned_to_baseline": returned_to_baseline,
             "vectors_returned_to_baseline": vectors_returned_to_baseline,
             "shim_baseline_100k": SHIM_BASELINE_100K,
+            "controlled_evaluation": {
+                "schema": "automem-evals.memdelta-controlled-results.v1",
+                "embedding_model": {
+                    "name": args.embedding_model,
+                    "mode": args.embedding_model_mode,
+                },
+                "reader_model": {
+                    "name": args.answerer_model,
+                    "family": model_family(args.answerer_model, args.reader_model_family),
+                    "provider": args.provider,
+                },
+                "judge": {
+                    "model": args.judge_model,
+                    "profile": args.judge_profile,
+                    "provider": args.provider,
+                    "snapshot_pinned": args.judge_snapshot_pinned,
+                },
+                "graph": {
+                    "edges": args.graph_edges,
+                    "edge_types": ["OCCURRED_BEFORE"] if args.graph_edges == "on" else [],
+                },
+                "recall": {"relation_expansion": args.recall_expansion},
+                "write_path_cost": {
+                    "input_tokens": write_input_tokens,
+                    "output_tokens": None,
+                    "latency_ms": round(write_latency_ms, 1),
+                    "enrichment_calls": None,
+                    "memory_write_calls": memory_write_calls,
+                    "association_write_calls": association_write_calls,
+                    "unavailable_measurements": [
+                        "output_tokens",
+                        "enrichment_calls",
+                    ],
+                },
+            },
         },
         "metrics_by_cutoff": metrics,
         "evaluations": evaluations,
@@ -859,6 +922,13 @@ def format_report(results: dict[str, Any]) -> str:
         f"| tier | {md['tier']} |",
         f"| answerer | {md['answerer_model']} |",
         f"| judge | {md['judge_model']} ({md['provider']}) |",
+        f"| embedding | {md['controlled_evaluation']['embedding_model']} |",
+        f"| reader family | {md['controlled_evaluation']['reader_model']['family']} |",
+        f"| graph / relation expansion | {md['controlled_evaluation']['graph']['edges']} / "
+        f"{md['controlled_evaluation']['recall']['relation_expansion']} |",
+        f"| write path | {md['controlled_evaluation']['write_path_cost']['input_tokens']} input tokens; "
+        f"{md['controlled_evaluation']['write_path_cost']['latency_ms']} ms; "
+        f"enrichment calls={md['controlled_evaluation']['write_path_cost']['enrichment_calls']} |",
         f"| top_k / cutoffs | {md['top_k']} / {md['cutoffs']} |",
         f"| ranking | {md['ranking']} |",
         f"| per-turn timestamps | {md['with_timestamps']} |",
@@ -946,6 +1016,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--answerer-model", default=DEFAULT_ANSWERER_MODEL)
     parser.add_argument("--judge-model", default=DEFAULT_JUDGE_MODEL)
+    parser.add_argument(
+        "--reader-model-family",
+        default="auto",
+        help="Reader family label for stratified comparisons (default: infer from model).",
+    )
+    parser.add_argument(
+        "--embedding-model",
+        default="automem-default",
+        help="Embedding model name/version; record automem-default when not pinned.",
+    )
+    parser.add_argument(
+        "--embedding-model-mode",
+        choices=["automem-default", "fixed"],
+        default="automem-default",
+        help="Whether this run pins an embedding model across comparison arms.",
+    )
+    parser.add_argument(
+        "--judge-profile",
+        default="unversioned",
+        help="Judge profile/snapshot identifier recorded in the result artifact.",
+    )
+    parser.add_argument(
+        "--judge-snapshot-pinned",
+        action="store_true",
+        help="Declare that --judge-model is a pinned provider snapshot.",
+    )
     parser.add_argument("--provider", default=DEFAULT_PROVIDER, choices=["openai", "anthropic", "azure"])
     parser.add_argument("--top-k", type=int, default=DEFAULT_TOP_K, help="Recall depth.")
     parser.add_argument(
@@ -965,6 +1061,18 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=None,
         help="AutoMem /recall min_score relevance gate (#194 ranking sweep).",
+    )
+    parser.add_argument(
+        "--graph-edges",
+        choices=["on", "off"],
+        default="on",
+        help="Ablation: write sequential graph edges or leave memories unlinked.",
+    )
+    parser.add_argument(
+        "--recall-expansion",
+        choices=["on", "off"],
+        default="off",
+        help="Ablation: request AutoMem relation expansion during recall.",
     )
     parser.add_argument(
         "--no-timestamps",
