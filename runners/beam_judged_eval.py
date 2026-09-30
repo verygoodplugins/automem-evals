@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import datetime as dt
+import hashlib
 import json
 import logging
 import os
@@ -602,7 +603,9 @@ def model_family(model: str, configured_family: str = "auto") -> str:
     return "other"
 
 
-def controlled_evaluation_fingerprint(args: argparse.Namespace) -> dict[str, Any]:
+def controlled_evaluation_fingerprint(
+    args: argparse.Namespace, dataset_checksum: str
+) -> dict[str, Any]:
     """Settings that must match before checkpoint rows may share one score."""
     return {
         "embedding_model": args.embedding_model,
@@ -625,6 +628,7 @@ def controlled_evaluation_fingerprint(args: argparse.Namespace) -> dict[str, Any
         "with_timestamps": not args.no_timestamps,
         "question_limit_per_conv": args.question_limit_per_conv,
         "dataset_json": args.dataset_json,
+        "dataset_checksum": dataset_checksum,
     }
 
 
@@ -648,12 +652,16 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         dataset_json=pathlib.Path(args.dataset_json) if args.dataset_json else None,
         no_download=args.no_download,
     )
+    dataset_checksum = hashlib.sha256(
+        json.dumps(rows, sort_keys=True, ensure_ascii=False, default=str).encode("utf-8")
+    ).hexdigest()
+    dataset_info = {**dataset_info, "checksum_sha256": dataset_checksum}
     conversations = proxy.select_conversations(
         rows, tier=args.tier, sample_conversations=args.sample_conversations
     )
     run_id = proxy.new_run_id()
     ranking = build_ranking(args)
-    evaluation_fingerprint = controlled_evaluation_fingerprint(args)
+    evaluation_fingerprint = controlled_evaluation_fingerprint(args, dataset_checksum)
     cutoffs = list(args.cutoffs)
     sem = asyncio.Semaphore(args.concurrency)
     evaluations: list[dict[str, Any]] = []
@@ -851,7 +859,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     resumed_write_path = bool(args.resume_from)
     expansion_only_memory_count = (
         sum(e["retrieval"].get("expansion_only_memory_count", 0) for e in evaluations)
-        if args.recall_expansion == "on" and not resumed_write_path
+        if args.recall_expansion == "on"
         else None
     )
     unavailable_write_measurements = [
@@ -920,6 +928,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             "shim_baseline_100k": SHIM_BASELINE_100K,
             "controlled_evaluation": {
                 "schema": "automem-evals.memdelta-controlled-results.v1",
+                "dataset_checksum": dataset_checksum,
                 "embedding_model": {
                     "name": args.embedding_model,
                     "mode": args.embedding_model_mode,
@@ -1206,6 +1215,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.recall_expansion == "on" and args.graph_edges != "on":
+        raise SystemExit("--recall-expansion on requires --graph-edges on for a controlled cell")
     logging.basicConfig(
         level=logging.WARNING if args.quiet else logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
