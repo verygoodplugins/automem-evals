@@ -322,6 +322,8 @@ def recall_judged(
     limit: int,
     ranking: dict[str, Any] | None,
     recall_expansion: str,
+    relation_limit: int,
+    expansion_limit: int,
 ) -> dict[str, Any]:
     """Tag-scoped native /recall with optional ranking flags (recency_bias, min_score)."""
     params: dict[str, Any] = {
@@ -332,6 +334,9 @@ def recall_judged(
         "limit": limit,
         "expand_relations": recall_expansion == "on",
     }
+    if recall_expansion == "on":
+        params["relation_limit"] = relation_limit
+        params["expansion_limit"] = expansion_limit
     if ranking:
         params.update(ranking)
     t0 = time.perf_counter()
@@ -597,6 +602,24 @@ def model_family(model: str, configured_family: str = "auto") -> str:
     return "other"
 
 
+def controlled_evaluation_fingerprint(args: argparse.Namespace) -> dict[str, Any]:
+    """Settings that must match before checkpoint rows may share one score."""
+    return {
+        "embedding_model": args.embedding_model,
+        "embedding_model_mode": args.embedding_model_mode,
+        "reader_model": args.answerer_model,
+        "reader_model_family": model_family(args.answerer_model, args.reader_model_family),
+        "judge_model": args.judge_model,
+        "judge_profile": args.judge_profile,
+        "graph_edges": args.graph_edges,
+        "recall_expansion": args.recall_expansion,
+        "relation_limit": args.relation_limit,
+        "expansion_limit": args.expansion_limit,
+        "top_k": args.top_k,
+        "ranking": build_ranking(args),
+    }
+
+
 async def run(args: argparse.Namespace) -> dict[str, Any]:
     _reset_usage()
     _load_dotenv()
@@ -622,6 +645,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     )
     run_id = proxy.new_run_id()
     ranking = build_ranking(args)
+    evaluation_fingerprint = controlled_evaluation_fingerprint(args)
     cutoffs = list(args.cutoffs)
     sem = asyncio.Semaphore(args.concurrency)
     evaluations: list[dict[str, Any]] = []
@@ -640,6 +664,11 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                 if not line:
                     continue
                 ev = json.loads(line)
+                if ev.get("controlled_evaluation_fingerprint") != evaluation_fingerprint:
+                    raise ValueError(
+                        "Checkpoint controlled-evaluation settings do not match this run; "
+                        "start a new run or resume with the original cell settings."
+                    )
                 evaluations.append(ev)
                 resumed_conv_ids.add(ev.get("conversation_id"))
                 out.write(line + "\n")
@@ -699,6 +728,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                         limit=args.top_k,
                         ranking=ranking,
                         recall_expansion=args.recall_expansion,
+                        relation_limit=args.relation_limit,
+                        expansion_limit=args.expansion_limit,
                     )
                     expansion_only_memory_count: int | None = None
                     if args.recall_expansion == "on":
@@ -711,6 +742,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                             limit=args.top_k,
                             ranking=ranking,
                             recall_expansion="off",
+                            relation_limit=args.relation_limit,
+                            expansion_limit=args.expansion_limit,
                         )
                         expansion_only_memory_count = len(result_ids(recall) - result_ids(unexpanded))
                     formatted = to_answer_memories(recall)
@@ -723,6 +756,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                         answer_max_tokens=args.answer_max_tokens,
                     )
                     ev["conversation_id"] = conv.conversation_id
+                    ev["controlled_evaluation_fingerprint"] = evaluation_fingerprint
                     ev["retrieval"].update(retrieval_diagnostics(recall, q, max(cutoffs)))
                     ev["retrieval"]["recall_latency_ms"] = recall.get("_recall_latency_ms")
                     ev["retrieval"]["expansion_only_memory_count"] = expansion_only_memory_count
@@ -899,6 +933,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                 },
                 "recall": {
                     "relation_expansion": args.recall_expansion,
+                    "relation_limit": args.relation_limit if args.recall_expansion == "on" else None,
+                    "expansion_limit": args.expansion_limit if args.recall_expansion == "on" else None,
                     "expansion_only_memory_count": expansion_only_memory_count,
                 },
                 "write_path_cost": {
@@ -1110,6 +1146,18 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["on", "off"],
         default="off",
         help="Ablation: request AutoMem relation expansion during recall.",
+    )
+    parser.add_argument(
+        "--relation-limit",
+        type=int,
+        default=8,
+        help="Pinned maximum relations per recalled memory for expansion arms.",
+    )
+    parser.add_argument(
+        "--expansion-limit",
+        type=int,
+        default=60,
+        help="Pinned maximum expanded memories for expansion arms.",
     )
     parser.add_argument(
         "--no-timestamps",

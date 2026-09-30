@@ -28,11 +28,22 @@ test('MemDelta result schema requires model and write-path disclosures', () => {
   ]);
   assert.deepEqual(controlled.properties.write_path_cost.required, [
     'input_tokens',
+    'source_content_tokens',
+    'output_tokens',
     'latency_ms',
     'enrichment_calls',
+    'memory_write_calls',
+    'association_write_calls',
+    'association_write_failures',
+    'unavailable_measurements',
   ]);
   assert.deepEqual(controlled.properties.graph.required, ['edges']);
-  assert.deepEqual(controlled.properties.recall.required, ['relation_expansion']);
+  assert.deepEqual(controlled.properties.recall.required, [
+    'relation_expansion',
+    'relation_limit',
+    'expansion_limit',
+    'expansion_only_memory_count',
+  ]);
 });
 
 test('judged BEAM artifacts carry the controlled-evaluation metadata block', () => {

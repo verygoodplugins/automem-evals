@@ -61,15 +61,32 @@
         },
         "recall": {
           "type": "object",
-          "required": ["relation_expansion"],
+          "required": [
+            "relation_expansion",
+            "relation_limit",
+            "expansion_limit",
+            "expansion_only_memory_count"
+          ],
           "properties": {
             "relation_expansion": {"enum": ["on", "off"]},
+            "relation_limit": {"$ref": "#/$defs/nullable_number"},
+            "expansion_limit": {"$ref": "#/$defs/nullable_number"},
             "expansion_only_memory_count": {"$ref": "#/$defs/nullable_number"}
           }
         },
         "write_path_cost": {
           "type": "object",
-          "required": ["input_tokens", "latency_ms", "enrichment_calls"],
+          "required": [
+            "input_tokens",
+            "source_content_tokens",
+            "output_tokens",
+            "latency_ms",
+            "enrichment_calls",
+            "memory_write_calls",
+            "association_write_calls",
+            "association_write_failures",
+            "unavailable_measurements"
+          ],
           "properties": {
             "input_tokens": {"$ref": "#/$defs/nullable_number"},
             "source_content_tokens": {"$ref": "#/$defs/nullable_number"},
