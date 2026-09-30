@@ -343,6 +343,15 @@ def recall_judged(
     return resp
 
 
+def result_ids(recall_response: dict[str, Any]) -> set[str]:
+    """Return stable ids so an expansion arm can disclose its incremental output."""
+    return {
+        memory_id
+        for result in recall_response.get("results") or []
+        if (memory_id := proxy.result_id(result))
+    }
+
+
 def _result_timestamp(result: dict[str, Any]) -> str:
     memory = result.get("memory") if isinstance(result.get("memory"), dict) else {}
     ts = memory.get("timestamp") or result.get("timestamp")
@@ -642,10 +651,9 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         )
     total_memories = 0
     total_associations = 0
-    write_input_tokens = 0
+    source_content_tokens = 0
     write_latency_ms = 0.0
     memory_write_calls = 0
-    association_write_calls = 0
 
     logger.info(
         "BEAM judged run %s: tier=%s conversations=%d cutoffs=%s ranking=%s timestamps=%s",
@@ -670,10 +678,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             memory_write_calls += (len(chunks) + proxy.BATCH_LIMIT - 1) // proxy.BATCH_LIMIT
             if args.graph_edges == "on":
                 total_associations += client.associate_sequential_chunks(memory_ids)
-                edge_count = max(0, len(memory_ids) - 1)
-                association_write_calls += (edge_count + proxy.BATCH_LIMIT - 1) // proxy.BATCH_LIMIT
             write_latency_ms += (time.perf_counter() - write_started) * 1000
-            write_input_tokens += sum(_count_tokens(chunk.content) for chunk in chunks)
+            source_content_tokens += sum(_count_tokens(chunk.content) for chunk in chunks)
             total_memories += len(memory_ids)
 
             questions = conv.questions
@@ -694,6 +700,19 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                         ranking=ranking,
                         recall_expansion=args.recall_expansion,
                     )
+                    expansion_only_memory_count: int | None = None
+                    if args.recall_expansion == "on":
+                        unexpanded = await asyncio.to_thread(
+                            recall_judged,
+                            client,
+                            q,
+                            run_id=run_id,
+                            conv_tag=conv.conversation_tag,
+                            limit=args.top_k,
+                            ranking=ranking,
+                            recall_expansion="off",
+                        )
+                        expansion_only_memory_count = len(result_ids(recall) - result_ids(unexpanded))
                     formatted = to_answer_memories(recall)
                     ev = await evaluate_question(
                         q,
@@ -706,6 +725,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                     ev["conversation_id"] = conv.conversation_id
                     ev["retrieval"].update(retrieval_diagnostics(recall, q, max(cutoffs)))
                     ev["retrieval"]["recall_latency_ms"] = recall.get("_recall_latency_ms")
+                    ev["retrieval"]["expansion_only_memory_count"] = expansion_only_memory_count
                     return ev
 
             conv_evals = await asyncio.gather(*(handle(q) for q in questions))
@@ -786,6 +806,19 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         "tokenizer": ("estimate" if _TOKENIZER is False else "tiktoken"),
         "measured_n": len(recall_ms),
     }
+    resumed_write_path = bool(args.resume_from)
+    expansion_only_memory_count = (
+        sum(e["retrieval"].get("expansion_only_memory_count", 0) for e in evaluations)
+        if args.recall_expansion == "on" and not resumed_write_path
+        else None
+    )
+    unavailable_write_measurements = [
+        "provider_input_tokens",
+        "provider_output_tokens",
+        "enrichment_calls",
+    ]
+    if resumed_write_path:
+        unavailable_write_measurements.append("all_write_path_measurements_resumed_checkpoint")
     # FalkorDB memory_count is the authoritative leak gate. vector_count is reported
     # too, but Qdrant can carry pre-existing orphaned vectors (sync_status), so we
     # don't hard-fail on vector drift — only on memories not returning to baseline.
@@ -864,18 +897,22 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                     "edges": args.graph_edges,
                     "edge_types": ["OCCURRED_BEFORE"] if args.graph_edges == "on" else [],
                 },
-                "recall": {"relation_expansion": args.recall_expansion},
+                "recall": {
+                    "relation_expansion": args.recall_expansion,
+                    "expansion_only_memory_count": expansion_only_memory_count,
+                },
                 "write_path_cost": {
-                    "input_tokens": write_input_tokens,
+                    # The client cannot observe provider prompts, enrichment, or
+                    # tokenizer usage. Do not label source text as provider usage.
+                    "input_tokens": None,
+                    "source_content_tokens": None if resumed_write_path else source_content_tokens,
                     "output_tokens": None,
-                    "latency_ms": round(write_latency_ms, 1),
+                    "latency_ms": None if resumed_write_path else round(write_latency_ms, 1),
                     "enrichment_calls": None,
-                    "memory_write_calls": memory_write_calls,
-                    "association_write_calls": association_write_calls,
-                    "unavailable_measurements": [
-                        "output_tokens",
-                        "enrichment_calls",
-                    ],
+                    "memory_write_calls": None if resumed_write_path else memory_write_calls,
+                    "association_write_calls": None if resumed_write_path else client.association_request_calls,
+                    "association_write_failures": None if resumed_write_path else client.association_write_failures,
+                    "unavailable_measurements": unavailable_write_measurements,
                 },
             },
         },
@@ -926,7 +963,7 @@ def format_report(results: dict[str, Any]) -> str:
         f"| reader family | {md['controlled_evaluation']['reader_model']['family']} |",
         f"| graph / relation expansion | {md['controlled_evaluation']['graph']['edges']} / "
         f"{md['controlled_evaluation']['recall']['relation_expansion']} |",
-        f"| write path | {md['controlled_evaluation']['write_path_cost']['input_tokens']} input tokens; "
+        f"| write path | {md['controlled_evaluation']['write_path_cost']['source_content_tokens']} source tokens; "
         f"{md['controlled_evaluation']['write_path_cost']['latency_ms']} ms; "
         f"enrichment calls={md['controlled_evaluation']['write_path_cost']['enrichment_calls']} |",
         f"| top_k / cutoffs | {md['top_k']} / {md['cutoffs']} |",

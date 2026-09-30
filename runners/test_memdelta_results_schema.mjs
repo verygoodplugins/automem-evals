@@ -17,6 +17,7 @@ test('MemDelta result schema requires model and write-path disclosures', () => {
   const controlled = schema.$defs.controlled_evaluation;
 
   assert.equal(schema.$id, 'https://verygoodplugins.com/schemas/automem-evals/memdelta-controlled-results.v1.json');
+  assert.equal(schema.$ref, '#/$defs/controlled_evaluation');
   assert.deepEqual(controlled.required, [
     'embedding_model',
     'reader_model',
@@ -30,6 +31,8 @@ test('MemDelta result schema requires model and write-path disclosures', () => {
     'latency_ms',
     'enrichment_calls',
   ]);
+  assert.deepEqual(controlled.properties.graph.required, ['edges']);
+  assert.deepEqual(controlled.properties.recall.required, ['relation_expansion']);
 });
 
 test('judged BEAM artifacts carry the controlled-evaluation metadata block', () => {

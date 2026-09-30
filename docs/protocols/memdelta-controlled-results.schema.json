@@ -3,7 +3,7 @@
   "$id": "https://verygoodplugins.com/schemas/automem-evals/memdelta-controlled-results.v1.json",
   "title": "AutoMem controlled-evaluation metadata",
   "description": "Required metadata block for a result that makes a MemDelta-style attribution claim.",
-  "type": "object",
+  "$ref": "#/$defs/controlled_evaluation",
   "$defs": {
     "nullable_number": {
       "type": ["number", "null"],
@@ -53,6 +53,7 @@
         },
         "graph": {
           "type": "object",
+          "required": ["edges"],
           "properties": {
             "edges": {"enum": ["on", "off"]},
             "edge_types": {"type": "array", "items": {"type": "string"}}
@@ -60,8 +61,10 @@
         },
         "recall": {
           "type": "object",
+          "required": ["relation_expansion"],
           "properties": {
-            "relation_expansion": {"enum": ["on", "off"]}
+            "relation_expansion": {"enum": ["on", "off"]},
+            "expansion_only_memory_count": {"$ref": "#/$defs/nullable_number"}
           }
         },
         "write_path_cost": {
@@ -69,11 +72,13 @@
           "required": ["input_tokens", "latency_ms", "enrichment_calls"],
           "properties": {
             "input_tokens": {"$ref": "#/$defs/nullable_number"},
+            "source_content_tokens": {"$ref": "#/$defs/nullable_number"},
             "output_tokens": {"$ref": "#/$defs/nullable_number"},
             "latency_ms": {"$ref": "#/$defs/nullable_number"},
             "enrichment_calls": {"$ref": "#/$defs/nullable_number"},
             "memory_write_calls": {"$ref": "#/$defs/nullable_number"},
             "association_write_calls": {"$ref": "#/$defs/nullable_number"},
+            "association_write_failures": {"$ref": "#/$defs/nullable_number"},
             "unavailable_measurements": {"type": "array", "items": {"type": "string"}}
           }
         }
