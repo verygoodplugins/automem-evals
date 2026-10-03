@@ -326,5 +326,21 @@
     "pr": null,
     "related": ["EXP-METADATA"],
     "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill."
+  },
+  {
+    "id": "EXP-MEMTRACE",
+    "title": "MemTrace evidence-use diagnostic adapter",
+    "status": "parked",
+    "hypothesis": "MemTrace can distinguish AutoMem evidence retrieval from evidence use across temporal question types and unsafe-evidence conditions.",
+    "result": "No official code or benchmark data was public on 2026-10-02, so no adapter or score was produced.",
+    "decision": "Park the adapter behind official artifacts; preserve the mapping plan without creating a synthetic substitute.",
+    "started": "2026-10-02",
+    "updated": "2026-10-02",
+    "artifacts": ["docs/eval/memtrace.md"],
+    "branch": "agent/kernel-worker/cf3bbbef",
+    "worktree": ".worktrees/agent-kernel-worker-cf3bbbef",
+    "pr": null,
+    "related": ["EXP-CURRENT-STATE", "EXP-ORPHAN-FAMA-MEMORA-RELCHAIN"],
+    "notes": "Issue tracker records the public-artifact evidence and release-gated acceptance criteria."
   }
 ]
