@@ -214,6 +214,24 @@ OPENAI_API_KEY=... python3 runners/run_beam.py --tier 100K --conversations 0-1
 - If an experiment needs LoCoMo or LongMemEval, call the official harness in `automem` or label the adapter as experimental.
 - Prefer curated `SUMMARY-*.md` writeups for durable findings and keep raw timestamped artifacts lightweight.
 
+## Babysit-ready auto-merge contract
+
+`babysit:ready` is load-bearing: it means “Codex all clear + gates pass; human
+may merge.” The `Arm auto-merge for babysit-ready PRs` workflow turns that
+handoff into GitHub native auto-merge only when the PR is non-draft and its REST
+author login is exactly `autojack-bot[bot]`. It always uses squash merge and
+the guarded post-merge workflow deletes the source branch; external or manually
+authored PRs are never eligible. Removing `babysit:ready` revokes a pending
+native auto-merge, so the label remains the merge authorization until closure.
+Per-PR workflow serialization makes a readiness-withdrawal event run after any
+in-flight arm request, rather than allowing those two lifecycle events to race.
+
+GitHub, rather than the workflow, waits for all branch-protection-required
+checks. The repository must have **Allow auto-merge** enabled. After deploying
+the workflow, use its `workflow_dispatch` input once for any already-labeled
+PR (for example, `46`); it repeats the same bot/label checks before arming
+native auto-merge. This is a one-time recovery path, not a polling mechanism.
+
 ## Related
 
 - [automem](https://github.com/verygoodplugins/automem) - backend memory service and canonical benchmark source of truth
