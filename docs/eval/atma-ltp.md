@@ -90,7 +90,9 @@ where the artifact permits it.
 
 Report the cross-level contingency table, not just final QA accuracy: bank-pass /
 retrieval-pass /
-answer-pass, with source-provided current, historical, and transition slices.
+answer-pass, with source-provided current and historical slices. Assess
+transition-record and chronological-path handling within those official probes;
+do not invent a third transition QA slice.
 This keeps a lucky correct answer from concealing a malformed bank and keeps a
 missing record from being blamed on QA. Record returned memory IDs, state roles,
 lifecycle paths, requested view, as-of boundary, answer, and official judge
