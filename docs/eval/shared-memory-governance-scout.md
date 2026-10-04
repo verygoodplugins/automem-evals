@@ -155,12 +155,13 @@ evaluators.
    ids and raw policy inputs. Apply the source-provided authorization/visibility
    rule before the answer layer, and emit the official action/answer shape without
    exposing hidden labels to that layer.
-5. **Process lifecycle events explicitly.** For an official update, write a
-   replacement using `supersedes_memory_id`, verify the old → new `INVALIDATED_BY`
-   direction, and assert `t_invalid` on the old record. For an official deletion,
-   set `t_invalid` on the active record without writing a replacement or
-   retrievable tombstone. Record any unresolved dependent/derived record as a
-   limitation rather than claiming lineage collapse.
+5. **Process lifecycle events explicitly.** For an official update, use the MCP
+   `supersedes_memory_id` surface, or expand it into: fetch the old record, store
+   the replacement, patch `t_invalid` on the old record, and create the old → new
+   `INVALIDATED_BY` edge. Verify that sequence. For an official deletion, set
+   `t_invalid` on the active record without writing a replacement or retrievable
+   tombstone. Record any unresolved dependent/derived record as a limitation rather
+   than claiming lineage collapse.
 6. **Score only with the official evaluator.** Keep source categories and
    denominators intact. Report source revision, run tag, action trace, retrieval
    trace, all exclusions, and the cold/matured status; never translate paper
