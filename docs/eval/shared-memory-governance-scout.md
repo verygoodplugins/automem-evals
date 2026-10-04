@@ -123,7 +123,7 @@ synthetic benchmark or report an AutoMem score.
 
 | Governance construct | Adapter treatment | Current limitation / assertion |
 | --- | --- | --- |
-| Isolated evaluation run | Add one generated run tag to every record and send it with source-derived visibility tags using `tag_match=exact` and `tag_mode=all` on every recall. | Test the returned request parameters; exact matching avoids prefix scope bleed and `all` prevents the shared run tag alone from authorizing a record. |
+| Isolated evaluation run | Add generated run and episode tags to every record, and send both with source-derived visibility tags using `tag_match=exact` and `tag_mode=all` on every recall. | Test the returned request parameters; exact matching avoids prefix scope bleed, `all` prevents the shared run tag alone from authorizing a record, and episode tags prevent reset leakage. |
 | Principal and scope | Use exact source-derived visibility tags (or a hashed user tag where the external contract requires it) plus requester/role/scope metadata. | Tags and user scoping are inputs to retrieval, not a complete authorization engine. |
 | Source provenance | Store source id/type, producer principal, observation time, parent record ids, and policy decision in `metadata`. | Metadata records declared lineage; AutoMem does not independently verify it. |
 | Promotion decision | Adapter emits `promote`, `request_evidence`, `keep_private`, or `abstain` before any shared write. | **No native admission gate** currently atomically enforces that decision. |
@@ -138,14 +138,17 @@ the source’s episode order, hidden fields, scoring implementation, and native
 evaluators.
 
 1. **Pin and isolate.** Record upstream URL, immutable revision, license, dataset
-   checksum, model/prompt/seed, and a generated `smg-run-<uuid>` tag. Reject every
-   non-local AutoMem endpoint.
+   checksum, model/prompt/seed, a generated `smg-run-<uuid>` tag, and a distinct
+   `smg-episode-<id>` tag for every official episode. Include both tags on every
+   write and recall; an episode reset must not retrieve records from an earlier
+   episode. Reject every non-local AutoMem endpoint.
 2. **Encode authority and lineage before writing.** For every input, derive only
    the source-provided principal/role/scope/relation and attach them as metadata.
    Materialize exact record-level visibility tags only from source policy events;
    maintain those tags when the source changes a delegation, assignment, or
-   relationship. At recall, require the generated run tag and the applicable
-   source-derived visibility tags with `tag_match=exact` and `tag_mode=all`.
+   relationship. At recall, require the generated run and episode tags plus the
+   applicable source-derived visibility tags with `tag_match=exact` and
+   `tag_mode=all`.
    Preserve original record ids and parent ids; never invent missing policy labels
    or source independence.
 3. **Preserve source-specific write semantics.** A CPB adapter applies its
@@ -156,7 +159,7 @@ evaluators.
    non-lifecycle episode turn unchanged and uses only GateMem's official
    checkpoint-time actions (`answer`, `answer_redacted`, `refuse`, or
    `no_memory`). Log the applicable source action even when no write occurs.
-4. **Retrieve under declared requester scope.** Recall with the run and
+4. **Retrieve under declared requester scope.** Recall with the run, episode, and
    source-derived visibility constraints using `tag_match=exact` and
    `tag_mode=all`; retain returned ids and raw policy inputs. Apply the
    source-provided authorization/visibility rule before the answer layer, and emit
@@ -175,9 +178,11 @@ evaluators.
 
 For GateMem specifically, first validate the official loader and external scorer
 at the pinned revisions, then add a small official smoke subset containing each of
-utility, access control, and active forgetting. Unit tests should cover exact tag
-scope, unauthorized-request denial/redaction, no shared write for non-promotion,
-lifecycle edge direction, and refusal to score an unpinned or non-local run.
+utility, access control, and active forgetting. Unit tests should cover exact
+run/episode/visibility tag scope, reset isolation, unauthorized-request
+denial/redaction, unconditional non-lifecycle GateMem turn ingestion, lifecycle
+edge direction, and refusal to score an unpinned or non-local run. A CPB adapter
+should separately test no shared write for a non-`promote` action.
 
 ## Cold versus matured reporting
 
