@@ -123,8 +123,8 @@ synthetic benchmark or report an AutoMem score.
 
 | Governance construct | Adapter treatment | Current limitation / assertion |
 | --- | --- | --- |
-| Isolated evaluation run | Add one generated run tag to every record and send it with requester scope tags using `tag_match=exact` and `tag_mode=all` on every recall. | Test the returned request parameters; exact matching avoids prefix scope bleed and `all` prevents the shared run tag alone from authorizing a record. |
-| Principal and scope | Use exact principal/scope tags (or a hashed user tag where the external contract requires it) plus requester/role/scope metadata. | Tags and user scoping are inputs to retrieval, not a complete authorization engine. |
+| Isolated evaluation run | Add one generated run tag to every record and send it with source-derived visibility tags using `tag_match=exact` and `tag_mode=all` on every recall. | Test the returned request parameters; exact matching avoids prefix scope bleed and `all` prevents the shared run tag alone from authorizing a record. |
+| Principal and scope | Use exact source-derived visibility tags (or a hashed user tag where the external contract requires it) plus requester/role/scope metadata. | Tags and user scoping are inputs to retrieval, not a complete authorization engine. |
 | Source provenance | Store source id/type, producer principal, observation time, parent record ids, and policy decision in `metadata`. | Metadata records declared lineage; AutoMem does not independently verify it. |
 | Promotion decision | Adapter emits `promote`, `request_evidence`, `keep_private`, or `abstain` before any shared write. | **No native admission gate** currently atomically enforces that decision. |
 | Revision and deletion provenance | Use `supersedes_memory_id`, `INVALIDATED_BY` (old → new), and `t_invalid`; preserve the audit record. | This controls lifecycle state but does not automatically collapse all derived or paraphrased lineage. |
@@ -141,20 +141,26 @@ evaluators.
    checksum, model/prompt/seed, and a generated `smg-run-<uuid>` tag. Reject every
    non-local AutoMem endpoint.
 2. **Encode authority and lineage before writing.** For every input, derive only
-   the source-provided principal/role/scope/relation and attach them as exact tags
-   and metadata. Require the generated run tag and every requester-scope tag at
-   recall with `tag_match=exact` and `tag_mode=all`. Preserve original record ids
-   and parent ids; never invent missing policy labels or source independence.
-3. **Apply an adapter-owned admission decision.** A deterministic policy adapter
-   returns `promote`, `request_evidence`, `keep_private`, or `abstain`. Only
-   `promote` can create a shared memory. `keep_private` may write only to an
-   explicitly private, exact-scoped namespace; `request_evidence` and `abstain`
-   must leave no shared claim behind. Log the decision even when no write occurs.
-4. **Retrieve under declared requester scope.** Recall with the run and requester
-   scope constraints using `tag_match=exact` and `tag_mode=all`; retain returned
-   ids and raw policy inputs. Apply the source-provided authorization/visibility
-   rule before the answer layer, and emit the official action/answer shape without
-   exposing hidden labels to that layer.
+   the source-provided principal/role/scope/relation and attach them as metadata.
+   Materialize exact record-level visibility tags only from source policy events;
+   maintain those tags when the source changes a delegation, assignment, or
+   relationship. At recall, require the generated run tag and the applicable
+   source-derived visibility tags with `tag_match=exact` and `tag_mode=all`.
+   Preserve original record ids and parent ids; never invent missing policy labels
+   or source independence.
+3. **Preserve source-specific write semantics.** A CPB adapter applies its
+   source-provided `promote`, `request_evidence`, `keep_private`, or `abstain`
+   decision before a shared write: only `promote` can create shared memory;
+   `keep_private` may write only to an explicitly private namespace; the other
+   actions leave no shared claim behind. A GateMem adapter ingests every
+   non-lifecycle episode turn unchanged and uses only GateMem's official
+   checkpoint-time actions (`answer`, `answer_redacted`, `refuse`, or
+   `no_memory`). Log the applicable source action even when no write occurs.
+4. **Retrieve under declared requester scope.** Recall with the run and
+   source-derived visibility constraints using `tag_match=exact` and
+   `tag_mode=all`; retain returned ids and raw policy inputs. Apply the
+   source-provided authorization/visibility rule before the answer layer, and emit
+   the official action/answer shape without exposing hidden labels to that layer.
 5. **Process lifecycle events explicitly.** For an official update, use the MCP
    `supersedes_memory_id` surface, or expand it into: fetch the old record, store
    the replacement, patch `t_invalid` on the old record, and create the old → new
