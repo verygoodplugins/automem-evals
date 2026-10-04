@@ -123,7 +123,7 @@ synthetic benchmark or report an AutoMem score.
 
 | Governance construct | Adapter treatment | Current limitation / assertion |
 | --- | --- | --- |
-| Isolated evaluation run | Add one generated run tag to every record and send `tag_match=exact` on every recall. | Test the returned request parameters; exact matching avoids prefix scope bleed. |
+| Isolated evaluation run | Add one generated run tag to every record and send it with requester scope tags using `tag_match=exact` and `tag_mode=all` on every recall. | Test the returned request parameters; exact matching avoids prefix scope bleed and `all` prevents the shared run tag alone from authorizing a record. |
 | Principal and scope | Use exact principal/scope tags (or a hashed user tag where the external contract requires it) plus requester/role/scope metadata. | Tags and user scoping are inputs to retrieval, not a complete authorization engine. |
 | Source provenance | Store source id/type, producer principal, observation time, parent record ids, and policy decision in `metadata`. | Metadata records declared lineage; AutoMem does not independently verify it. |
 | Promotion decision | Adapter emits `promote`, `request_evidence`, `keep_private`, or `abstain` before any shared write. | **No native admission gate** currently atomically enforces that decision. |
@@ -138,27 +138,29 @@ the source’s episode order, hidden fields, scoring implementation, and native
 evaluators.
 
 1. **Pin and isolate.** Record upstream URL, immutable revision, license, dataset
-   checksum, model/prompt/seed, and a generated `smg-run-<uuid>` tag. Reject a
-   non-local AutoMem endpoint unless a caller explicitly opts in.
+   checksum, model/prompt/seed, and a generated `smg-run-<uuid>` tag. Reject every
+   non-local AutoMem endpoint.
 2. **Encode authority and lineage before writing.** For every input, derive only
    the source-provided principal/role/scope/relation and attach them as exact tags
-   and metadata. Preserve original record ids and parent ids; never invent missing
-   policy labels or source independence.
+   and metadata. Require the generated run tag and every requester-scope tag at
+   recall with `tag_match=exact` and `tag_mode=all`. Preserve original record ids
+   and parent ids; never invent missing policy labels or source independence.
 3. **Apply an adapter-owned admission decision.** A deterministic policy adapter
    returns `promote`, `request_evidence`, `keep_private`, or `abstain`. Only
    `promote` can create a shared memory. `keep_private` may write only to an
    explicitly private, exact-scoped namespace; `request_evidence` and `abstain`
    must leave no shared claim behind. Log the decision even when no write occurs.
 4. **Retrieve under declared requester scope.** Recall with the run and requester
-   scope constraints and `tag_match=exact`; retain returned ids and raw policy
-   inputs. Apply the source-provided authorization/visibility rule before the
-   answer layer, and emit the official action/answer shape without exposing hidden
-   labels to that layer.
-5. **Process lifecycle events explicitly.** For an official update/deletion,
-   write a replacement using `supersedes_memory_id`, verify the old → new
-   `INVALIDATED_BY` direction, and assert `t_invalid` on the old record. Record
-   any unresolved dependent/derived record as a limitation rather than claiming
-   lineage collapse.
+   scope constraints using `tag_match=exact` and `tag_mode=all`; retain returned
+   ids and raw policy inputs. Apply the source-provided authorization/visibility
+   rule before the answer layer, and emit the official action/answer shape without
+   exposing hidden labels to that layer.
+5. **Process lifecycle events explicitly.** For an official update, write a
+   replacement using `supersedes_memory_id`, verify the old → new `INVALIDATED_BY`
+   direction, and assert `t_invalid` on the old record. For an official deletion,
+   set `t_invalid` on the active record without writing a replacement or
+   retrievable tombstone. Record any unresolved dependent/derived record as a
+   limitation rather than claiming lineage collapse.
 6. **Score only with the official evaluator.** Keep source categories and
    denominators intact. Report source revision, run tag, action trace, retrieval
    trace, all exclusions, and the cold/matured status; never translate paper
