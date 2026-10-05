@@ -634,6 +634,10 @@ class AutoMemClient:
         self.endpoint = endpoint.rstrip("/")
         self.token = token
         self.request_json = request_json
+        # Exposed so evaluators can report actual association HTTP work, including
+        # the compatibility fallback from one rejected batch to individual writes.
+        self.association_request_calls = 0
+        self.association_write_failures = 0
 
     def health(self) -> dict[str, Any]:
         return self.request_json(self.endpoint, self.token, "GET", "/health", timeout=10)
@@ -700,6 +704,7 @@ class AutoMemClient:
         for start in range(0, len(associations), batch_size):
             batch = associations[start : start + batch_size]
             try:
+                self.association_request_calls += 1
                 response = self.request_json(
                     self.endpoint,
                     self.token,
@@ -711,6 +716,7 @@ class AutoMemClient:
             except AutoMemRequestError as exc:
                 if exc.status not in {400, 404, 405}:
                     raise
+                self.association_write_failures += 1
                 created += self._associate_single_fallback(batch)
                 continue
             created += int(response.get("created_count", len(batch)))
@@ -719,6 +725,7 @@ class AutoMemClient:
     def _associate_single_fallback(self, associations: list[dict[str, Any]]) -> int:
         created = 0
         for association in associations:
+            self.association_request_calls += 1
             self.request_json(
                 self.endpoint,
                 self.token,
