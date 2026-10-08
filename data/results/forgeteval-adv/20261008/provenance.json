@@ -1,0 +1,30 @@
+{
+  "exploratory": true,
+  "api_commit": "3caa9d5d396ba4cb303df1fb39da7602126f60c9",
+  "api_image": "sha256:668fccdfd77afba9be262df8b1ef944da072b72834da098bdd5fc87c7feb722d",
+  "upstream_commit": "b6053b7bdacc78a91b9ea4bb25f32edad278c495",
+  "upstream_license": "MIT; see UPSTREAM-LICENSE",
+  "embedding": "BAAI/bge-small-en-v1.5; FastEmbed local; 384 dimensions",
+  "cold_suite": {
+    "cases": 385,
+    "k": 10,
+    "enrichment": false,
+    "jit": false,
+    "consolidation": false
+  },
+  "graph_extension": {
+    "cases": 10,
+    "jit": true,
+    "entities_verified": true,
+    "oracle": "joined top-k and complete serialized rows including inline relation content, reported separately"
+  },
+  "paid_calls": 0,
+  "llm_judge": false,
+  "scope": "dedicated Compose project forgeteval-a5b095e4, loopback 18031; separate FalkorDB and Qdrant; reset deletes tracked IDs only",
+  "upstream_files": {
+    "bench/forgeteval/adapter.py": "f1eff0efa89437e8c44ce6f60b5a88280592094c2c6b9b955524cc0262c3c307",
+    "bench/forgeteval/adversarial.py": "cfdf125aba5b90975634ce48bdf0f078397a72a1cc9dd1aa5bb59ab067c322d3",
+    "bench/forgeteval/adversarial_generated.py": "aefa73df027a947a0535cb0c47d66d64010a124cdc1fad2c3985fa59bf5cb5a8",
+    "bench/forgeteval/adversarial_generated_labels.json": "8cb3c6d8da859e13b832578452364ae594562502d9a2dbb6ad0640df1a60486b"
+  }
+}
