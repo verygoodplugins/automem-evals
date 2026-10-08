@@ -54,6 +54,38 @@ class AttributionTests(unittest.TestCase):
                 main()
         self.assertEqual(exc.exception.code, 2)
 
+    def test_summary_only_graph_target_uses_validated_bank_content(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dataset, output = Path(tmp) / "locomo10.json", Path(tmp) / "result.json"
+            dataset.write_text(json.dumps([{"sample_id": "conv-26", "conversation": {
+                "session_1": [{"dia_id": "D1", "speaker": "A", "text": "Trip"},
+                              {"dia_id": "D2", "speaker": "A", "text": "Paris"}]},
+                "qa": [{"category": 1, "question": "Where?", "answer": "Paris", "evidence": ["D2"]}]}]))
+            dataset.with_name("manifest.json").write_text(json.dumps({"scope_prefix": "run",
+                "conversations": {"conv-26": {"D1": "m1", "D2": "m2"}}}))
+            memories = {mid: {"id": mid, "content": text, "tags": ["run:conv-26"],
+                "metadata": {"conversation_id": "conv-26", "dialog_id": dialog,
+                             "session_datetime": "2023-01-01"}}
+                for mid, dialog, text in (("m1", "D1", "A: Trip"), ("m2", "D2", "A: Paris"))}
+
+            def http(url, *args):
+                if "/memory/" in url:
+                    return {"memory": memories[url.rsplit("/", 1)[-1]]}
+                return {"results": [{"id": "m1", "memory": memories["m1"], "relations": [
+                    {"type": "RELATES_TO", "strength": .9,
+                     "memory": {"id": "m2", "summary": "Trip destination"}}]}]}
+
+            with patch("sys.argv", ["evalmem", "--dataset", str(dataset), "--output", str(output)]), patch(
+                    "scripts.benchmarks.evalmem_diagnostic.request", side_effect=http), contextlib.redirect_stdout(io.StringIO()):
+                main()
+            result = json.loads(output.read_text())
+            off, on = result["rows"]["graph_off"][0], result["rows"]["graph_on"][0]
+            self.assertEqual(len(off["recalled"]), 1)
+            self.assertEqual(on["added_graph_records"], 1)
+            self.assertEqual(on["recalled"][1], {"id": "m2", "content": "A: Paris", "time": "2023-01-01"})
+            self.assertEqual(on["heuristic_recalled_turn_coverage"], 1)
+            self.assertEqual(on["status"], "not_scored")
+
     def test_offline_and_exhausted_judge_preserve_unknown_rates(self):
         for offline in (True, False):
             with self.subTest(offline=offline), tempfile.TemporaryDirectory() as tmp:

@@ -158,7 +158,8 @@ def main():
                       "limit": args.limit, "expand_relations": "false", "current_only": "false"}
             response = request(args.endpoint.rstrip("/") + "/recall?" + urllib.parse.urlencode(params), headers)
             native = [r for r in response["results"] if r.get("id") in bank]
-            expanded = [r for r in client_expand({"results": native}) if r["id"] in bank][:args.limit]
+            expanded = [dict(r, memory=bank[r["id"]])
+                        for r in client_expand({"results": native}) if r["id"] in bank][:args.limit]
         if model and not judge_failed:
             try:
                 oracle_answer = model.ask(ANSWER_PROMPT, {"question": qa["question"], "context": oracle})["answer"]
