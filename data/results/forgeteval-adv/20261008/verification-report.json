@@ -1,0 +1,59 @@
+{
+  "status": "passed",
+  "exploratory": true,
+  "commands": [
+    {
+      "command": "python3 scripts/test_experiment_index.py",
+      "tests": 14,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p 'test_*.py'",
+      "tests": 30,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts/benchmarks -p 'test_*.py'",
+      "tests": 10,
+      "skipped": 0,
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s runners -p 'test_*.py'",
+      "tests": 233,
+      "skipped": 13,
+      "exit_code": 0
+    },
+    {
+      "command": "AUTOMEM_CHECKOUT=<pinned-source> docker compose -p forgeteval-config-check -f scripts/benchmarks/forgeteval.compose.yml config --quiet",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/experiment_index.py --no-vcs --no-amb --no-scoreboard --status .agent-drafts/experiment-status.md --index-json .agent-drafts/experiment-index.json",
+      "exit_code": 0
+    }
+  ],
+  "live_evidence": {
+    "unique_upstream_cases": 385,
+    "passed": 234,
+    "adapter_errors": 0,
+    "oracle_verdicts_independently_recomputed": 385,
+    "graph_top_k_passed": 10,
+    "graph_complete_rows_passed": 5,
+    "entity_seeds_verified": 10,
+    "real_rest_interruption_states": 2,
+    "final_memories": 0,
+    "final_vectors": 0
+  },
+  "notes": [
+    "273 unique unittest cases run; 13 skipped; no failures/errors. The standalone experiment-index 14 tests are included in the scripts suite.",
+    "Generated full dashboard/index are kept in ignored .agent-drafts; the canonical registry is committed. Global cache refresh would mix unrelated historical artifact/worktree churn into this PR.",
+    "No changes to companion AutoMem source. No push, PR creation, review, CI finalization, or merge by this worker. Orchestrator owns signed babysit finalization."
+  ]
+}

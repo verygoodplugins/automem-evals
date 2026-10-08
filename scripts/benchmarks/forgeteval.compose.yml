@@ -1,0 +1,33 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:v4.18.10
+  qdrant:
+    image: qdrant/qdrant:v1.11.3
+  api:
+    image: automem-forgeteval-local
+    build: {context: "${AUTOMEM_CHECKOUT:?Set AUTOMEM_CHECKOUT to the pinned local source}"}
+    volumes:
+      - ${AUTOMEM_CHECKOUT:?Set AUTOMEM_CHECKOUT}:/app:ro
+      - models:/root/.config/automem/models
+    ports: ["127.0.0.1:18031:8001"]
+    environment:
+      FALKORDB_HOST: falkordb
+      FALKORDB_PORT: "6379"
+      FALKORDB_GRAPH: forgeteval-${FORGETEVAL_RUN_ID:-local}
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: forgeteval-${FORGETEVAL_RUN_ID:-local}
+      AUTOMEM_API_TOKEN: forgeteval-isolated-test
+      EMBEDDING_PROVIDER: local
+      VECTOR_SIZE: "384"
+      EMBEDDING_BATCH_TIMEOUT_SECONDS: "0.05"
+      AUTOMEM_MODELS_DIR: /root/.config/automem/models
+      OPENAI_API_KEY: ""
+      VOYAGE_API_KEY: ""
+      ANTHROPIC_API_KEY: ""
+      JIT_ENRICHMENT_ENABLED: "${FORGETEVAL_JIT:-false}"
+      ENRICHMENT_ENABLE_SUMMARIES: "false"
+      MEMORY_AUTO_SUMMARIZE: "false"
+    command: ["python", "-c", "import app; app.init_embedding_provider(); app.init_embedding_pipeline(); app.app.run(host='0.0.0.0', port=8001, threaded=True)"]
+    depends_on: [falkordb, qdrant]
+volumes:
+  models:

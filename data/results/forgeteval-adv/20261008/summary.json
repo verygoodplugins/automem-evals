@@ -1,0 +1,89 @@
+{
+  "exploratory": true,
+  "upstream": "b6053b7bdacc78a91b9ea4bb25f32edad278c495",
+  "categories": {
+    "substring_trap": {
+      "passed": 26,
+      "total": 36,
+      "errors": 0
+    },
+    "prefix_collision": {
+      "passed": 23,
+      "total": 39,
+      "errors": 0
+    },
+    "paraphrase_supersession": {
+      "passed": 30,
+      "total": 38,
+      "errors": 0
+    },
+    "negation_trap": {
+      "passed": 38,
+      "total": 40,
+      "errors": 0
+    },
+    "temporal_qualifier": {
+      "passed": 37,
+      "total": 37,
+      "errors": 0
+    },
+    "shared_attribute": {
+      "passed": 39,
+      "total": 40,
+      "errors": 0
+    },
+    "compound_fact": {
+      "passed": 0,
+      "total": 40,
+      "errors": 0
+    },
+    "identifier_obfuscation": {
+      "passed": 4,
+      "total": 38,
+      "errors": 0
+    },
+    "cross_lingual_identifier": {
+      "passed": 1,
+      "total": 38,
+      "errors": 0
+    },
+    "recursive_supersession": {
+      "passed": 36,
+      "total": 39,
+      "errors": 0
+    }
+  },
+  "oracle": "case-insensitive joined top-10 substring; errors count as failures",
+  "graph_residual": {
+    "passed": 5,
+    "total": 10
+  },
+  "graph_top_k": {
+    "passed": 10,
+    "total": 10
+  },
+  "health": {
+    "enrichment": {
+      "failed": 0,
+      "inflight": 0,
+      "pending": 0,
+      "processed": 0,
+      "queue_depth": 0,
+      "status": "stopped"
+    },
+    "falkordb": "connected",
+    "graph": "forgeteval-a5b095e4",
+    "memory_count": 0,
+    "qdrant": "connected",
+    "status": "healthy",
+    "sync_status": "synced",
+    "timestamp": "2026-10-08T06:35:38.883747+00:00",
+    "vector_count": 0,
+    "vector_dimensions": {
+      "collection": 384,
+      "configured": 384,
+      "effective": 384,
+      "mismatch": false
+    }
+  }
+}

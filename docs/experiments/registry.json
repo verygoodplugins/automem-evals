@@ -1,5 +1,29 @@
 [
   {
+    "id": "EXP-FORGETEVAL-ADV",
+    "title": "ForgetEval-Adv isolated primitive adapter",
+    "status": "in-progress",
+    "hypothesis": "Explicit lifecycle primitives can suppress obsolete facts while preserving independent facts and sibling identifiers.",
+    "result": "Exploratory cold local run: 234/385, zero errors. Temporal 37/37; obfuscation 4/38; cross-lingual 1/38; prefix 23/39; compound 0/40. Graph extension: top-k 10/10, full rows 5/10 due to inline superseded relation text.",
+    "decision": "Full suite and atomic-supersede proposal complete; keep semantic mutation planning and inline relation suppression as separate follow-ups.",
+    "started": "2026-10-08",
+    "updated": "2026-10-08",
+    "artifacts": [
+      "docs/eval/forgeteval-adv.md",
+      "docs/atomic-supersede-proposal.md",
+      "scripts/benchmarks/forgeteval_automem.py",
+      "scripts/benchmarks/forgeteval.compose.yml",
+      "data/results/forgeteval-adv/**"
+    ],
+    "branch": "agent/kernel-worker/a5b095e4",
+    "worktree": null,
+    "pr": null,
+    "related": [
+      "EXP-CURRENT-STATE"
+    ],
+    "notes": "Issue #31; draft #59 checked (STALE scout, no duplicate adapter). No paid calls or LLM judge; official benchmark claims remain in automem."
+  },
+  {
     "id": "EXP-AMB",
     "title": "Agent Memory Benchmark adapter and submission",
     "status": "in-progress",
