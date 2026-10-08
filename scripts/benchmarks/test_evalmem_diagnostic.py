@@ -90,11 +90,12 @@ class AttributionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             dataset, output = Path(tmp) / "locomo10.json", Path(tmp) / "result.json"
             dataset.write_text(json.dumps([{"sample_id": "conv-26", "conversation": {
-                "session_1": [{"dia_id": "D1", "speaker": "A", "text": "Paris"}]},
+                "session_1": [{"dia_id": "D1", "speaker": "A", "text": "Shared a photo",
+                               "blip_caption": "Paris skyline"}]},
                 "qa": [{"category": 1, "question": "Where?", "answer": "Paris", "evidence": ["D1"]}]}]))
             dataset.with_name("manifest.json").write_text(json.dumps({"scope_prefix": "run",
                 "conversations": {"conv-26": {"D1": "m1"}}}))
-            memory = {"id": "m1", "content": "A: Paris", "tags": ["run:conv-26"],
+            memory = {"id": "m1", "content": "A: Shared a photo [Image: Paris skyline]", "tags": ["run:conv-26"],
                       "metadata": {"conversation_id": "conv-26", "dialog_id": "D1"}}
 
             def http(url, *args):
@@ -106,6 +107,7 @@ class AttributionTests(unittest.TestCase):
 
             def model_reply(system, payload):
                 if "context" in payload:
+                    self.assertEqual(payload["context"][0]["content"], memory["content"])
                     answer = "London" if not answers else "Paris"
                     answers.append(answer)
                     return {"answer": answer}

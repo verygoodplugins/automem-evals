@@ -110,7 +110,8 @@ def main():
         parser.error("only local AutoMem endpoints are supported")
     dataset = json.loads(args.dataset.read_text())
     sample = next(s for s in dataset if s["sample_id"] == args.sample_id)
-    turns = {t["dia_id"]: {"id": t["dia_id"], "content": t["speaker"] + ": " + t["text"],
+    turns = {t["dia_id"]: {"id": t["dia_id"], "content": t["speaker"] + ": " + t["text"]
+             + (f" [Image: {t['blip_caption']}]" if t.get("blip_caption") else ""),
              "metadata": {"session_datetime": sample["conversation"].get(k + "_date_time", "")}}
              for k, session in sample["conversation"].items()
              if k.startswith("session_") and isinstance(session, list) for t in session}
