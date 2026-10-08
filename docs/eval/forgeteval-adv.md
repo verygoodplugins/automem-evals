@@ -41,20 +41,21 @@ The dedicated stack used AutoMem `3caa9d5`, local BGE-small 384d, no external AP
 
 ## Reproduce
 
-Use a clean checkout of each pinned revision; the companion AutoMem source is read-only to containers. The compose file starts new backend containers with no production volumes or credentials. Substitute a free dedicated port if 18031 is occupied and update the adapter argument accordingly.
+Use a clean checkout of each pinned revision; the companion AutoMem source is read-only to containers. The runner verifies the exact AutoMem commit and clean working tree from the same exported `AUTOMEM_CHECKOUT` that Compose mounts, before contacting the API, and records `automem_checkout_revision` in new summaries. This is source provenance, not attestation of an independently started daemon; use the dedicated Compose service below for reproduction. The compose file starts new backend containers with no production volumes or credentials. Set `FORGETEVAL_PORT` to a free dedicated port if 18031 is occupied; both Compose and the adapter below use it.
 
 ```bash
 git clone https://github.com/deeplethe/lethe.git /tmp/forgeteval-lethe
 git -C /tmp/forgeteval-lethe checkout b6053b7bdacc78a91b9ea4bb25f32edad278c495
 export AUTOMEM_CHECKOUT=/absolute/path/to/clean/automem-at-3caa9d5
 export FORGETEVAL_RUN_ID=reproduction
+export FORGETEVAL_PORT=18031
 unset FORGETEVAL_JIT
 docker compose -p forgeteval-reproduction -f scripts/benchmarks/forgeteval.compose.yml up -d --build
-python3 scripts/benchmarks/forgeteval_automem.py --upstream /tmp/forgeteval-lethe --endpoint http://127.0.0.1:18031 --graph forgeteval-reproduction --output data/results/forgeteval-adv/reproduction
+python3 scripts/benchmarks/forgeteval_automem.py --upstream /tmp/forgeteval-lethe --endpoint "http://127.0.0.1:$FORGETEVAL_PORT" --graph forgeteval-reproduction --output data/results/forgeteval-adv/reproduction
 # Re-run only the extension after enabling local JIT entity extraction.
 export FORGETEVAL_JIT=true
 docker compose -p forgeteval-reproduction -f scripts/benchmarks/forgeteval.compose.yml up -d
-python3 scripts/benchmarks/forgeteval_automem.py --upstream /tmp/forgeteval-lethe --endpoint http://127.0.0.1:18031 --graph forgeteval-reproduction --output data/results/forgeteval-adv/reproduction --diagnostics-only
+python3 scripts/benchmarks/forgeteval_automem.py --upstream /tmp/forgeteval-lethe --endpoint "http://127.0.0.1:$FORGETEVAL_PORT" --graph forgeteval-reproduction --output data/results/forgeteval-adv/reproduction --diagnostics-only
 docker compose -p forgeteval-reproduction -f scripts/benchmarks/forgeteval.compose.yml down -v
 ```
 

@@ -9,7 +9,7 @@ services:
     volumes:
       - ${AUTOMEM_CHECKOUT:?Set AUTOMEM_CHECKOUT}:/app:ro
       - models:/root/.config/automem/models
-    ports: ["127.0.0.1:18031:8001"]
+    ports: ["127.0.0.1:${FORGETEVAL_PORT:-18031}:8001"]
     environment:
       FALKORDB_HOST: falkordb
       FALKORDB_PORT: "6379"

@@ -2,6 +2,7 @@
 """Exploratory ForgetEval adapter; stdlib, local-only, no model judge."""
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -10,6 +11,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit
 from urllib.request import Request, urlopen
+
+
+AUTOMEM_REVISION = "3caa9d5d396ba4cb303df1fb39da7602126f60c9"
+
+
+def verify_automem_checkout(checkout):
+    if not checkout:
+        raise ValueError("Set AUTOMEM_CHECKOUT to the pinned local source used by Compose")
+    command = ["git", "-C", str(Path(checkout).resolve())]
+    revision = subprocess.check_output(command + ["rev-parse", "HEAD"], text=True).strip()
+    if revision != AUTOMEM_REVISION:
+        raise ValueError("Unexpected AutoMem revision: " + revision)
+    if subprocess.check_output(command + ["status", "--porcelain"], text=True).strip():
+        raise ValueError("AutoMem checkout must be clean")
+    return revision
 
 
 class AutoMemAdapter:
@@ -192,6 +208,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--diagnostics-only", action="store_true")
     args = parser.parse_args()
+    automem_revision = verify_automem_checkout(os.environ.get("AUTOMEM_CHECKOUT"))
     pin = subprocess.check_output(["git", "-C", str(args.upstream), "rev-parse", "HEAD"], text=True).strip()
     if pin != "b6053b7bdacc78a91b9ea4bb25f32edad278c495":
         raise ValueError("Unexpected Lethe revision")
@@ -207,7 +224,8 @@ def main():
     diagnostic = diagnostics(adapter)
     (args.output / "graph-residual.json").write_text(json.dumps(diagnostic, ensure_ascii=False) + "\n")
     (args.output / "summary.json").write_text(json.dumps({
-        "exploratory": True, "upstream": pin, "categories": counts,
+        "exploratory": True, "upstream": pin, "automem_checkout_revision": automem_revision,
+        "categories": counts,
         "oracle": "case-insensitive joined top-10 substring; errors count as failures",
         "graph_residual": {"passed": sum(r["passed"] for r in diagnostic["graph_residual"]), "total": 10},
         "graph_top_k": {"passed": sum(r["top_k"]["passed"] for r in diagnostic["graph_residual"]), "total": 10},

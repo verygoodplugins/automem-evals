@@ -2,10 +2,24 @@
 import unittest
 from unittest.mock import patch
 
-from forgeteval_automem import AutoMemAdapter, oracle
+from forgeteval_automem import AUTOMEM_REVISION, AutoMemAdapter, oracle, verify_automem_checkout
 
 
 class AdapterTests(unittest.TestCase):
+    def test_automem_source_pin_and_clean_checkout(self):
+        with self.assertRaises(ValueError):
+            verify_automem_checkout(None)
+        with patch("forgeteval_automem.subprocess.check_output", return_value="wrong-revision"):
+            with self.assertRaises(ValueError):
+                verify_automem_checkout(".")
+        with patch("forgeteval_automem.subprocess.check_output",
+                   side_effect=[AUTOMEM_REVISION, " M app.py"]):
+            with self.assertRaises(ValueError):
+                verify_automem_checkout(".")
+        with patch("forgeteval_automem.subprocess.check_output",
+                   side_effect=[AUTOMEM_REVISION, ""]):
+            self.assertEqual(verify_automem_checkout("."), AUTOMEM_REVISION)
+
     def test_isolation_refuses_remote_shared_and_wrong_graph(self):
         for endpoint, graph in [("https://example.org", "forgeteval-test"),
                                 ("http://127.0.0.1:8001", "forgeteval-test"),
