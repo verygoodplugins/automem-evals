@@ -10,7 +10,7 @@ This first slice uses the official companion `automem` LoCoMo dataset/ingestion 
 
 Encoding observes every manifested record through `GET /memory/<id>`, with conversation/dialog/tag validation; the judge sees that complete bank, independently of native retrieval. A stale/incomplete manifest produces unknown encoding and `not_scored`, never an inferred absence. Completeness is relative to the manifested bank; unmanifested summaries are outside scope. Gold/oracle evidence is supplied only to the examiner and separate oracle generator, never native generation or graph selection. JSON records contexts, answers, examiner states/reasons, model usage, prompts, and source/bank hashes.
 
-Graph-off uses `/recall` with `expand_relations=false`. Graph-on reuses exactly that response and the existing `client_side_expand` one-hop traversal (typed edges, strength >=0.6, at most three per seed), accepts only manifested targets, and adds at most `--limit` records. Identical contexts reuse judgments to remove sampling confounds. This is an additive context-budget intervention, not an equal-token comparison; a full study needs budget controls. The diagnostic issues only GETs to AutoMem; normal server recall may update access/enrichment metadata.
+Graph-off uses `/recall` with `expand_relations=false`. Graph-on reuses exactly that response and the existing `client_side_expand` one-hop traversal (typed edges, strength >=0.6, at most three per seed), accepts only manifested targets, hydrates them from validated bank records, and adds at most `--limit` records. Native correctness is graded in a separate gold-only call without oracle evidence or output; oracle generation is assessed independently. Identical contexts reuse judgments to remove sampling confounds. This is an additive context-budget intervention, not an equal-token comparison; a full study needs budget controls. The diagnostic issues only GETs to AutoMem; normal server recall may update access/enrichment metadata.
 
 ## Reproduce
 
@@ -52,7 +52,7 @@ Ran 233 tests; OK (skipped=13)
 python3 -m unittest discover -s scripts -p 'test_*.py'
 Ran 30 tests; OK
 python3 -m unittest discover -s scripts/benchmarks -p 'test_*.py'
-Ran 16 tests; OK
+Ran 18 tests; OK
 uv run --with pytest --with pyyaml --with requests python -m pytest tests/matrix/ -q
 12 passed
 python3 -m py_compile scripts/benchmarks/evalmem_diagnostic.py scripts/benchmarks/test_evalmem_diagnostic.py

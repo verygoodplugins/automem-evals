@@ -86,6 +86,53 @@ class AttributionTests(unittest.TestCase):
             self.assertEqual(on["heuristic_recalled_turn_coverage"], 1)
             self.assertEqual(on["status"], "not_scored")
 
+    def test_correct_native_answer_is_not_failed_by_wrong_oracle_answer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            dataset, output = Path(tmp) / "locomo10.json", Path(tmp) / "result.json"
+            dataset.write_text(json.dumps([{"sample_id": "conv-26", "conversation": {
+                "session_1": [{"dia_id": "D1", "speaker": "A", "text": "Paris"}]},
+                "qa": [{"category": 1, "question": "Where?", "answer": "Paris", "evidence": ["D1"]}]}]))
+            dataset.with_name("manifest.json").write_text(json.dumps({"scope_prefix": "run",
+                "conversations": {"conv-26": {"D1": "m1"}}}))
+            memory = {"id": "m1", "content": "A: Paris", "tags": ["run:conv-26"],
+                      "metadata": {"conversation_id": "conv-26", "dialog_id": "D1"}}
+
+            def http(url, *args):
+                if "/memory/" in url:
+                    return {"memory": memory}
+                return {"results": [{"id": "m1", "memory": memory}]}
+
+            answers, grades = [], []
+
+            def model_reply(system, payload):
+                if "context" in payload:
+                    answer = "London" if not answers else "Paris"
+                    answers.append(answer)
+                    return {"answer": answer}
+                if "bank" in payload:
+                    return {"correct": False, "encoding": "Exist", "retrieval": "Hit",
+                            "generation": "GF", "reason": "Only the oracle answer is incorrect."}
+                # Native grading must receive no oracle output or evidence.
+                self.assertEqual(set(payload), {"question", "gold", "answer"})
+                grades.append(payload)
+                return {"correct": payload["answer"] == payload["gold"]}
+
+            with patch("sys.argv", ["evalmem", "--dataset", str(dataset), "--output", str(output), "--model"]), patch.dict(
+                    "os.environ", {"OPENAI_API_KEY": "test"}), patch(
+                    "scripts.benchmarks.evalmem_diagnostic.request", side_effect=http), patch(
+                    "scripts.benchmarks.evalmem_diagnostic.Model.ask", side_effect=model_reply), contextlib.redirect_stdout(io.StringIO()):
+                main()
+            result = json.loads(output.read_text())
+            for arm in result["rows"]:
+                row = result["rows"][arm][0]
+                self.assertTrue(row["correct"])
+                self.assertEqual((row["answer"], row["oracle_answer"]), ("Paris", "London"))
+                self.assertEqual(row["generation"], "GF")
+                self.assertEqual(row["defect_codes"], [])
+                self.assertEqual(result["summaries"][arm]["failed_queries"], 0)
+                self.assertEqual(result["summaries"][arm]["rates"], dict.fromkeys(("encoding", "retrieval", "generation"), 0))
+            self.assertEqual(len(grades), 1)  # Identical graph arm reuses the judgment.
+
     def test_offline_and_exhausted_judge_preserve_unknown_rates(self):
         for offline in (True, False):
             with self.subTest(offline=offline), tempfile.TemporaryDirectory() as tmp:
