@@ -17,8 +17,15 @@ shasum -a 256 .agent-drafts/Veracium/tests/eval/scenarios.json
 ```
 
 Captured source revision: `f7a1a42159b1027b75e8a0c08e7cc4874b92e1b2`.
-For later reproduction fetch/check out that SHA explicitly; do not use moving
-HEAD. MIT library v0.26.1; Python 3.14.7, SQLite 3.53.4,
+For later reproduction, pin that revision before installing or running:
+
+```sh
+git -C .agent-drafts/Veracium fetch origin f7a1a42159b1027b75e8a0c08e7cc4874b92e1b2
+git -C .agent-drafts/Veracium checkout --detach f7a1a42159b1027b75e8a0c08e7cc4874b92e1b2
+```
+
+The commands above record the original checkout; this explicit checkout pins
+subsequent reproductions. MIT library v0.26.1; Python 3.14.7, SQLite 3.53.4,
 pydantic 2.14.0, pytest 9.1.1. Acceptance fixture SHA-256:
 `676375e68d5dbfcd0471a22e1002930762d0e72391928562430b7f29951c3f08`.
 
@@ -96,7 +103,14 @@ dashboard without refreshing unrelated historical worktree/score snapshots:
 python3 scripts/experiment_index.py --no-vcs --no-amb --no-scoreboard --status .agent-drafts/veracium-STATUS.md --index-json .agent-drafts/veracium-index.json
 ```
 
-Both outputs were generated successfully. The required next slice is an
+Both local outputs were generated successfully. PR finalization also refreshed
+the committed `STATUS.md`, `index.json`, and `scoreboard.html` using the existing
+`experiment_index.write_outputs` renderers and the committed result snapshot,
+adding `EXP-VERACIUM` and its PR/worktree state. All 15 historical threads,
+16 recorded scores, and unrelated artifact/VCS snapshots were preserved. This
+registry refresh does not re-run or re-score earlier experiments.
+
+The required next slice is an
 official-artifact adapter plus real smoke run after release/runtime blockers
 are resolved; scored evaluation additionally requires validated model access.
 PR creation and signed AutoVault babysit finalization belong to the orchestrator.

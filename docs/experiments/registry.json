@@ -342,7 +342,7 @@
     ],
     "branch": "agent/kernel-worker/da882528",
     "worktree": ".worktrees/agent-kernel-worker-da882528",
-    "pr": null,
+    "pr": 63,
     "related": [],
     "notes": "Public library f7a1a42159b1027b75e8a0c08e7cc4874b92e1b2; https://github.com/verygoodplugins/automem-evals/issues/62. No AutoMem scores or substitute data."
   }
