@@ -85,6 +85,7 @@ Thumbs.db
 
 # Claude Code / agent-local state
 .claude/
+.agent-drafts/
 
 # Logs / output artifacts
 *.log
