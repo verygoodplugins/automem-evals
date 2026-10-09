@@ -1737,7 +1737,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-09T06:54:10+00:00",
+  "generated_at": "2026-10-09T07:05:53+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2072,6 +2072,15 @@
       "title": "Pin benchmark judge to gpt-5.4-mini snapshot",
       "updatedAt": "2026-04-24T15:30:15Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
+    },
+    {
+      "headRefName": "agent/kernel-worker/da882528",
+      "mergedAt": null,
+      "number": 63,
+      "state": "OPEN",
+      "title": "docs(eval): track Veracium validity and provenance evaluation",
+      "updatedAt": "2026-10-09T07:04:24Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/63"
     }
   ],
   "root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
@@ -2966,6 +2975,23 @@
         "title": "feat(registry): experiment scoreboard with AMB cross-benchmark family",
         "updatedAt": "2026-06-22T20:20:14Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/da882528",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "15ee58a",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-da882528",
+      "pr": {
+        "headRefName": "agent/kernel-worker/da882528",
+        "mergedAt": null,
+        "number": 63,
+        "state": "OPEN",
+        "title": "docs(eval): track Veracium validity and provenance evaluation",
+        "updatedAt": "2026-10-09T07:04:24Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/63"
       },
       "status": "open-pr"
     }
