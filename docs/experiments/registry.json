@@ -326,5 +326,24 @@
     "pr": null,
     "related": ["EXP-METADATA"],
     "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill."
+  },
+  {
+    "id": "EXP-VERACIUM",
+    "title": "Veracium longitudinal validity and provenance evaluation",
+    "status": "blocked",
+    "hypothesis": "Fact-validity intervals and source trust reveal horizon-dependent write and recall failures.",
+    "result": "not_scored: official longitudinal study artifacts are unreleased; public acceptance harness refuses local SQLite 3.53.4.",
+    "decision": "Track issue #62; add the local-only adapter and real smoke subset after official artifacts and runnable harness are pinned.",
+    "started": "2026-10-09",
+    "updated": "2026-10-09",
+    "artifacts": [
+      "docs/eval/veracium.md",
+      "docs/eval/veracium-verification.md"
+    ],
+    "branch": "agent/kernel-worker/da882528",
+    "worktree": ".worktrees/agent-kernel-worker-da882528",
+    "pr": 63,
+    "related": [],
+    "notes": "Public library f7a1a42159b1027b75e8a0c08e7cc4874b92e1b2; https://github.com/verygoodplugins/automem-evals/issues/62. No AutoMem scores or substitute data."
   }
 ]

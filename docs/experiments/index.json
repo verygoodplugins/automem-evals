@@ -1722,10 +1722,22 @@
       "kind": "session-note",
       "path": "docs/session_20260616_beam_judged_100k.md",
       "title": "Session 2026-06-16 \u2014 BEAM judged 100K (native, official scorer)"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/veracium.md",
+      "title": "Veracium / Ground Truth First"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/veracium-verification.md",
+      "title": "Veracium feasibility verification \u2014 2026-10-09"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-06-22T20:26:29+00:00",
+  "generated_at": "2026-10-09T07:05:53+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2060,6 +2072,15 @@
       "title": "Pin benchmark judge to gpt-5.4-mini snapshot",
       "updatedAt": "2026-04-24T15:30:15Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
+    },
+    {
+      "headRefName": "agent/kernel-worker/da882528",
+      "mergedAt": null,
+      "number": 63,
+      "state": "OPEN",
+      "title": "docs(eval): track Veracium validity and provenance evaluation",
+      "updatedAt": "2026-10-09T07:04:24Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/63"
     }
   ],
   "root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
@@ -2388,6 +2409,7 @@
   ],
   "status_counts": {
     "adopted": 10,
+    "blocked": 1,
     "in-progress": 2,
     "parked": 2,
     "superseded": 1
@@ -2888,6 +2910,36 @@
       "updated": "2026-06-22",
       "worktree": null,
       "worktree_status": null
+    },
+    {
+      "artifact_count": 2,
+      "artifact_samples": [
+        "docs/eval/veracium.md",
+        "docs/eval/veracium-verification.md"
+      ],
+      "artifacts": [
+        "docs/eval/veracium.md",
+        "docs/eval/veracium-verification.md"
+      ],
+      "branch": "agent/kernel-worker/da882528",
+      "decision": "Track issue #62; add the local-only adapter and real smoke subset after official artifacts and runnable harness are pinned.",
+      "hypothesis": "Fact-validity intervals and source trust reveal horizon-dependent write and recall failures.",
+      "id": "EXP-VERACIUM",
+      "notes": "Public library f7a1a42159b1027b75e8a0c08e7cc4874b92e1b2; https://github.com/verygoodplugins/automem-evals/issues/62. No AutoMem scores or substitute data.",
+      "pr": 63,
+      "related": [],
+      "result": "not_scored: official longitudinal study artifacts are unreleased; public acceptance harness refuses local SQLite 3.53.4.",
+      "started": "2026-10-09",
+      "status": "blocked",
+      "title": "Veracium longitudinal validity and provenance evaluation",
+      "updated": "2026-10-09",
+      "worktree": ".worktrees/agent-kernel-worker-da882528",
+      "worktree_status": {
+        "branch": "agent/kernel-worker/da882528",
+        "cleanup_candidate": false,
+        "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-da882528",
+        "state": "open-pr"
+      }
     }
   ],
   "worktrees": [
@@ -2923,6 +2975,23 @@
         "title": "feat(registry): experiment scoreboard with AMB cross-benchmark family",
         "updatedAt": "2026-06-22T20:20:14Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/da882528",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "15ee58a",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-da882528",
+      "pr": {
+        "headRefName": "agent/kernel-worker/da882528",
+        "mergedAt": null,
+        "number": 63,
+        "state": "OPEN",
+        "title": "docs(eval): track Veracium validity and provenance evaluation",
+        "updatedAt": "2026-10-09T07:04:24Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/63"
       },
       "status": "open-pr"
     }
