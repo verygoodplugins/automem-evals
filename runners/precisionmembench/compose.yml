@@ -1,0 +1,34 @@
+# Cold: indexing worker only; no enrichment, consolidation, or paid providers.
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    volumes: [falkor:/data]
+  qdrant:
+    image: qdrant/qdrant:v1.11.3
+    volumes: [qdrant:/qdrant/storage]
+  api:
+    image: automem-flask-api
+    command: [python, -c, "import app as a; a.init_falkordb(); a.init_qdrant(); a.init_embedding_provider(); a.init_embedding_pipeline(); a.app.run(host='0.0.0.0', port=8001)"]
+    ports: ['127.0.0.1:8091:8001']
+    volumes:
+      - ${AUTOMEM_SOURCE:?set AutoMem checkout}:/app:ro
+      - models:/root/.config/automem/models
+    environment:
+      FALKORDB_HOST: falkordb
+      FALKORDB_PORT: 6379
+      QDRANT_URL: http://qdrant:6333
+      AUTOMEM_API_TOKEN: test-token
+      ADMIN_API_TOKEN: test-admin-token
+      EMBEDDING_PROVIDER: local
+      VECTOR_SIZE: 384
+      FLASK_DEBUG: '0'
+      JIT_ENRICHMENT_ENABLED: 'false'
+      ENRICHMENT_ENABLE_SUMMARIES: 'false'
+      CONSOLIDATION_DECAY_INTERVAL_SECONDS: 0
+      CONSOLIDATION_CREATIVE_INTERVAL_SECONDS: 0
+      CONSOLIDATION_CLUSTER_INTERVAL_SECONDS: 0
+      CONSOLIDATION_FORGET_INTERVAL_SECONDS: 0
+volumes:
+  falkor:
+  qdrant:
+  models:
