@@ -326,5 +326,29 @@
     "pr": null,
     "related": ["EXP-METADATA"],
     "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill."
+  },
+  {
+    "id": "EXP-PRECISIONMEMBENCH",
+    "title": "PrecisionMemBench retrieval-precision protocol adapter",
+    "status": "in-progress",
+    "hypothesis": "Scoring returned belief IDs before answer generation exposes overfetch, scope leakage, supersession leakage, and session drift hidden by answer-quality metrics.",
+    "result": "Official MIT data and scorer pinned; isolated-local cold smoke and wrapper limitations documented in docs/eval/precisionmembench.md.",
+    "decision": "Keep exploratory; matured comparison awaits frozen narrative-clock maintenance support. Track independently in issue #64, related to #50 and #31.",
+    "started": "2026-10-12",
+    "updated": "2026-10-12",
+    "artifacts": [
+      "docs/eval/precisionmembench.md",
+      "runners/precisionmembench/**",
+      "scripts/test_precisionmembench.py",
+      "data/results/SUMMARY-20261012-precisionmembench.md"
+    ],
+    "branch": "agent/kernel-worker/92ebad9f",
+    "worktree": ".worktrees/agent-kernel-worker-92ebad9f",
+    "pr": null,
+    "related": [
+      "EXP-CURRENT-STATE",
+      "EXP-MATURATION"
+    ],
+    "notes": "Issue: https://github.com/verygoodplugins/automem-evals/issues/64. Candidate: opportunity:automem-graph-rag-research-scout. Public artifacts; no synthetic benchmark substitute or paper-baseline AutoMem claim."
   }
 ]
