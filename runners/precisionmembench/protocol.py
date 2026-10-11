@@ -119,32 +119,32 @@ def prepare(upstream, port):
     actual = subprocess.check_output(["git", "-C", str(upstream), "rev-parse", "HEAD"], text=True).strip()
     if actual != REVISION:
         raise ValueError("Official checkout revision mismatch: " + actual)
-    subprocess.run(["git", "-C", str(upstream), "diff", "--exit-code", REVISION,
-                    "--", "fixtures", "src/utils/buildRetrievalReport.ts"], check=True)
+    def original(path):
+        return subprocess.check_output(["git", "-C", str(upstream), "show",
+                                        REVISION + ":" + path], text=True)
+
     config = upstream / "providers.config.json"
-    providers = json.loads(config.read_text())
+    providers = json.loads(original("providers.config.json"))
     providers["automem"] = {"envVar": "PRECISIONMEMBENCH_URL", "defaultUrl": f"http://127.0.0.1:{port}",
                             "seedDelayMs": 0, "supportsUpdate": True, "supportsMultiScope": False}
-    config.write_text(json.dumps(providers, indent=2) + "\n")
-    session = upstream / "src/session-retrieval.external.eval.test.ts"
+    config_text = json.dumps(providers, indent=2) + "\n"
+    session_path = "src/session-retrieval.external.eval.test.ts"
+    session = upstream / session_path
+    session_original = original(session_path)
     # Upstream forgets to await alias writes; retain all assertions, fix ordering only.
-    session.write_text(session.read_text().replace("          adapter.updateBeliefAliases(",
-                                                  "          await adapter.updateBeliefAliases("))
+    session_text = session_original.replace("          adapter.updateBeliefAliases(",
+                                            "          await adapter.updateBeliefAliases(")
+    for path, baseline, prepared in [(config, original("providers.config.json"), config_text),
+                                    (session, session_original, session_text)]:
+        if path.read_text() not in {baseline, prepared}:
+            raise ValueError("Unexpected official harness changes: " + str(path))
+    subprocess.run(["git", "-C", str(upstream), "diff", "--exit-code", REVISION,
+                    "--", ".", ":(exclude)providers.config.json", ":(exclude)" + session_path], check=True)
+    config.write_text(config_text)
+    session.write_text(session_text)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--upstream", type=Path, required=True)
-    parser.add_argument("--endpoint", required=True)
-    parser.add_argument("--isolated", action="store_true", required=True)
-    parser.add_argument("--port", type=int, default=18099)
-    parser.add_argument("--trace", type=Path, required=True)
-    args = parser.parse_args()
-    endpoint = local_url(args.endpoint)
-    prepare(args.upstream, args.port)
-    beliefs = json.loads((args.upstream / "fixtures/beliefs.seed.json").read_text())
-    protocol = Protocol(endpoint, os.getenv("AUTOMEM_EVAL_TOKEN", "test-token"), beliefs, args.trace)
-
+def create_server(protocol, port):
     class Handler(BaseHTTPRequestHandler):
         def handle_request(self):
             try:
@@ -162,10 +162,11 @@ def main():
                     raise ValueError("Unsupported protocol operation")
                 status = 200
             except Exception as exc:
-                status, result = 500, {"error": str(exc)}
                 with protocol.trace.open("a") as stream:
                     stream.write(json.dumps({"error": str(exc), "route": self.path}) + "\n")
-                print(result, flush=True)
+                # Upstream ignores HTTP error status and would score {} as no hits.
+                # Close the connection and stop the bridge so fetch rejects instead.
+                raise RuntimeError("Protocol request failed") from exc
             raw = json.dumps(result).encode()
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
@@ -175,7 +176,28 @@ def main():
 
         do_POST = do_PUT = do_DELETE = handle_request
 
-    server = HTTPServer(("127.0.0.1", args.port), Handler)
+    class FailClosedServer(HTTPServer):
+        def handle_error(self, request, client_address):
+            self.shutdown_request(request)
+            raise RuntimeError("Protocol failure invalidates this benchmark run")
+
+    return FailClosedServer(("127.0.0.1", port), Handler)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--upstream", type=Path, required=True)
+    parser.add_argument("--endpoint", required=True)
+    parser.add_argument("--isolated", action="store_true", required=True)
+    parser.add_argument("--port", type=int, default=18099)
+    parser.add_argument("--trace", type=Path, required=True)
+    args = parser.parse_args()
+    endpoint = local_url(args.endpoint)
+    prepare(args.upstream, args.port)
+    beliefs = json.loads((args.upstream / "fixtures/beliefs.seed.json").read_text())
+    protocol = Protocol(endpoint, os.getenv("AUTOMEM_EVAL_TOKEN", "test-token"), beliefs, args.trace)
+
+    server = create_server(protocol, args.port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

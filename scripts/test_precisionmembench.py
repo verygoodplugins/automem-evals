@@ -1,9 +1,14 @@
 """Protocol correctness tests; synthetic records here are tests, never scored cases."""
 import unittest
+import json
+import subprocess
+from http.client import HTTPConnection, RemoteDisconnected
+from tempfile import TemporaryDirectory
+from threading import Thread
 from pathlib import Path
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qs, urlsplit
-from runners.precisionmembench.protocol import NoRedirect, Protocol, local_url
+from runners.precisionmembench.protocol import NoRedirect, Protocol, create_server, local_url, prepare
 
 
 class ProtocolTests(unittest.TestCase):
@@ -63,6 +68,70 @@ class ProtocolTests(unittest.TestCase):
         self.assertEqual([c.args[1] for c in protocol.call.call_args_list[-2:]],
                          ["/memory/old-uuid", "/memory/new-uuid"])
         self.assertEqual(protocol.ids, {})
+
+
+    def test_preparation_rejects_changed_official_assertions_and_is_idempotent(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "src").mkdir()
+            (root / "providers.config.json").write_text('{"existing": {}}\n')
+            session = root / "src/session-retrieval.external.eval.test.ts"
+            session.write_text("          adapter.updateBeliefAliases(\n")
+            runner = root / "src/retrieval.external.eval.test.ts"
+            runner.write_text("official assertion\n")
+
+            def git(*args):
+                return subprocess.check_output(["git", "-C", directory, *args],
+                                               text=True, stderr=subprocess.DEVNULL)
+
+            git("init", "--quiet")
+            git("add", ".")
+            git("-c", "user.name=Protocol Test", "-c", "user.email=protocol-test@example.invalid",
+                "commit", "--quiet", "-m", "fixture")
+            revision = git("rev-parse", "HEAD").strip()
+            with patch("runners.precisionmembench.protocol.REVISION", revision):
+                prepare(root, 18099)
+                prepare(root, 18099)
+                self.assertIn("await adapter.updateBeliefAliases", session.read_text())
+                runner.write_text("modified assertion\n")
+                with self.assertRaises(subprocess.CalledProcessError):
+                    prepare(root, 18099)
+                runner.write_text("official assertion\n")
+                session.write_text("modified session assertion\n")
+                with self.assertRaises(ValueError):
+                    prepare(root, 18099)
+
+    def test_bridge_errors_disconnect_and_stop_instead_of_scoring_empty_hits(self):
+        for route, method in [("/search", "search"), ("/add", "add"), ("/wait", "wait")]:
+            with self.subTest(route=route), TemporaryDirectory() as directory:
+                protocol = self.make()
+                protocol.trace = Path(directory) / "trace.jsonl"
+                setattr(protocol, method, Mock(side_effect=TimeoutError("backend unavailable")))
+                server = create_server(protocol, 0)
+                failures = []
+
+                def serve():
+                    try:
+                        server.serve_forever(poll_interval=0.01)
+                    except RuntimeError as exc:
+                        failures.append(str(exc))
+                    finally:
+                        server.server_close()
+
+                thread = Thread(target=serve, daemon=True)
+                thread.start()
+                connection = HTTPConnection(*server.server_address, timeout=2)
+                try:
+                    connection.request("POST", route, body="{}")
+                    with self.assertRaises(RemoteDisconnected):
+                        connection.getresponse()
+                finally:
+                    connection.close()
+                    thread.join(timeout=2)
+                self.assertFalse(thread.is_alive())
+                self.assertEqual(failures, ["Protocol failure invalidates this benchmark run"])
+                self.assertEqual(json.loads(protocol.trace.read_text()),
+                                 {"error": "backend unavailable", "route": route})
 
 
 if __name__ == "__main__":

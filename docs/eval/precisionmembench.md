@@ -17,13 +17,13 @@ Artifacts are public. Use the official cases; do not invent a substitute. The ev
 
 The protocol maps `/recall` UUIDs to belief IDs without expected-ID filtering. Exact, conjunctive per-run/user/scope tags gate recall; the upstream wrapper fans out multiple scopes and interleaves ranks. `current_only=true` suppresses inactive records. Explicit source replacements use old-to-new `INVALIDATED_BY` and persisted `t_invalid`, equivalent to the MCP `supersedes_memory_id` operation. Historical records remain stored. Resolved questions receive source `resolved_at` as `t_invalid`; alias updates patch the same UUID.
 
-Use unchanged upstream assertions/report math. Upstream supplies persona, pinned facts, questions, and relation participants from its fixture index. Results therefore measure **AutoMem + the generic external wrapper**; structural passes do not prove native AutoMem context building. Preparation adds a provider config and awaits the upstream session alias-write promise (an ordering fix); no expectations or scoring formulas change. HTTP errors, indexing timeouts, or unknown UUIDs invalidate a run; inspect the trace before reporting.
+Use unchanged upstream assertions/report math. Upstream supplies persona, pinned facts, questions, and relation participants from its fixture index. Results therefore measure **AutoMem + the generic external wrapper**; structural passes do not prove native AutoMem context building. Preparation verifies all tracked upstream sources, permits only its exact idempotent patches, adds a provider config and awaits the upstream session alias-write promise (an ordering fix); no expectations or scoring formulas change. HTTP errors, indexing timeouts, or unknown UUIDs invalidate a run; inspect the trace before reporting.
 
 Follow [maturation.md](maturation.md): cold uses indexed ingestion without enrichment/consolidation. Curated comparisons require a frozen shared matured profile, enrichment drain, narrative-clock maintenance, decay/forget off, and `timestamp <= as_of` guard; matured-full remains separate. This smoke has **maturation: cold; matured: blocked** pending narrative-clock maintenance. The official probes provide no explicit query as-of timestamp; do not invent one or call current wall-clock suppression a historical-time evaluation. No answerer or LLM judge is used, and no paper baseline is an AutoMem score.
 
 ## Reproduce the isolated smoke
 
-Use a clean AutoMem checkout and Python 3.10+, Node 22+, Docker Compose. From this repo:
+Use a clean AutoMem checkout and Python 3.10+, Node 22+, Docker Compose. Use a fresh dedicated Compose project, or remove only that project's leftover benchmark volumes before retrying an interrupted run. The commands clear inherited `PRECISIONMEMBENCH_URL` so the upstream adapter uses the prepared loopback bridge. From this repo:
 
 ```sh
 mkdir -p .agent-drafts
@@ -37,12 +37,12 @@ git -C .agent-drafts/precisionmembench-upstream checkout 61a712a1754e7d27b6dee42
 python3 runners/precisionmembench/protocol.py --upstream .agent-drafts/precisionmembench-upstream \
   --endpoint http://127.0.0.1:8091 --isolated --trace .agent-drafts/precisionmembench-trace.jsonl
 # In a second terminal, run sequentially; each RESEED resets only adapter-owned IDs:
-(cd .agent-drafts/precisionmembench-upstream && MEMORY_PROVIDER=automem RESEED=true \
+(cd .agent-drafts/precisionmembench-upstream && env -u PRECISIONMEMBENCH_URL MEMORY_PROVIDER=automem RESEED=true \
   npm exec ava -- src/retrieval.external.eval.test.ts)
-(cd .agent-drafts/precisionmembench-upstream && MEMORY_PROVIDER=automem RESEED=true \
+(cd .agent-drafts/precisionmembench-upstream && env -u PRECISIONMEMBENCH_URL MEMORY_PROVIDER=automem RESEED=true \
   npm exec ava -- src/session-retrieval.external.eval.test.ts)
-# Stop the protocol with Ctrl-C to remove its memories, then stop the dedicated stack:
-docker compose -p precisionmembench-smoke -f runners/precisionmembench/compose.yml down
+# Stop the protocol with Ctrl-C to remove its memories, then stop the dedicated stack and its benchmark volumes:
+docker compose -p precisionmembench-smoke -f runners/precisionmembench/compose.yml down -v
 ```
 
-Failing benchmark assertions produce exit 1 and remain findings, not adapter-test failures. Check protocol trace errors separately. The protocol rejects external endpoints and redirects, binds loopback, and requires `--isolated`. Every add waits for graph/vector count agreement; indexing is ingestion, not maturation. Raw responses and official reports remain under `.agent-drafts/`; see [the committed smoke report](../../data/results/SUMMARY-20261012-precisionmembench.md) for observations and provenance. Next: freeze narrative-clock maturation before publishing a comparison; do not tune recall budgets to these gold cases.
+Failing benchmark assertions produce exit 1 and remain findings, not adapter-test failures. Protocol failures close the connection and terminate the bridge rather than returning a scoreable error body. Discard any partial report from such a run and inspect protocol trace errors separately. The protocol rejects external endpoints and redirects, binds loopback, and requires `--isolated`. Every add waits for graph/vector count agreement; indexing is ingestion, not maturation. Raw responses and official reports remain under `.agent-drafts/`; see [the committed smoke report](../../data/results/SUMMARY-20261012-precisionmembench.md) for observations and provenance. Next: freeze narrative-clock maturation before publishing a comparison; do not tune recall budgets to these gold cases.
