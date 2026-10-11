@@ -2,13 +2,15 @@
 import unittest
 import json
 import subprocess
+import os
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from http.client import HTTPConnection, RemoteDisconnected
 from tempfile import TemporaryDirectory
 from threading import Thread
 from pathlib import Path
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qs, urlsplit
-from runners.precisionmembench.protocol import NoRedirect, Protocol, create_server, local_url, prepare
+from runners.precisionmembench.protocol import NoRedirect, Protocol, create_server, local_url, prepare, main
 
 
 class ProtocolTests(unittest.TestCase):
@@ -69,6 +71,49 @@ class ProtocolTests(unittest.TestCase):
                          ["/memory/old-uuid", "/memory/new-uuid"])
         self.assertEqual(protocol.ids, {})
 
+
+    def test_loopback_requests_ignore_environment_proxy(self):
+        hits = []
+
+        class Handler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                hits.append(self.server.server_port)
+                body = b'{"status":"ok"}'
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(body)
+
+            def log_message(self, *args):
+                pass
+
+        backend, proxy = [HTTPServer(("127.0.0.1", 0), Handler) for _ in range(2)]
+        threads = [Thread(target=s.serve_forever, daemon=True) for s in [backend, proxy]]
+        for thread in threads:
+            thread.start()
+        try:
+            with TemporaryDirectory() as directory, patch.dict(os.environ,
+                    {"http_proxy": f"http://127.0.0.1:{proxy.server_port}", "no_proxy": ""}, clear=True):
+                p = Protocol(f"http://127.0.0.1:{backend.server_port}", "test-token", [],
+                             Path(directory) / "trace.jsonl")
+                self.assertEqual(p.call("GET", "/health"), {"status": "ok"})
+                self.assertEqual(hits, [backend.server_port])
+        finally:
+            for server, thread in zip([backend, proxy], threads):
+                server.shutdown()
+                server.server_close()
+                thread.join(2)
+
+    def test_existing_trace_is_rejected_before_preparation_or_backend_access(self):
+        with TemporaryDirectory() as directory:
+            trace = Path(directory) / "trace.jsonl"
+            trace.write_text("original audit\n")
+            with patch("sys.argv", ["protocol", "--upstream", directory,
+                       "--endpoint", "http://127.0.0.1:8091", "--isolated", "--trace", str(trace)]), \
+                 patch("runners.precisionmembench.protocol.prepare") as preparation:
+                with self.assertRaises(FileExistsError):
+                    main()
+                preparation.assert_not_called()
+            self.assertEqual(trace.read_text(), "original audit\n")
 
     def test_preparation_rejects_changed_official_assertions_and_is_idempotent(self):
         with TemporaryDirectory() as directory:

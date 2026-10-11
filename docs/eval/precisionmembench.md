@@ -23,7 +23,7 @@ Follow [maturation.md](maturation.md): cold uses indexed ingestion without enric
 
 ## Reproduce the isolated smoke
 
-Use a clean AutoMem checkout and Python 3.10+, Node 22+, Docker Compose. Use a fresh dedicated Compose project, or remove only that project's leftover benchmark volumes before retrying an interrupted run. The commands clear inherited `PRECISIONMEMBENCH_URL` so the upstream adapter uses the prepared loopback bridge. From this repo:
+Use a clean AutoMem checkout and Python 3.10+, Node 22+, Docker Compose. Use a fresh dedicated Compose project, or remove only that project's leftover benchmark volumes before retrying an interrupted run. Choose a new trace filename for each bridge invocation; startup rejects an existing audit rather than mixing runs. The commands clear inherited `PRECISIONMEMBENCH_URL` so the upstream adapter uses the prepared loopback bridge. From this repo:
 
 ```sh
 mkdir -p .agent-drafts
@@ -45,4 +45,6 @@ python3 runners/precisionmembench/protocol.py --upstream .agent-drafts/precision
 docker compose -p precisionmembench-smoke -f runners/precisionmembench/compose.yml down -v
 ```
 
-Failing benchmark assertions produce exit 1 and remain findings, not adapter-test failures. Protocol failures close the connection and terminate the bridge rather than returning a scoreable error body. Discard any partial report from such a run and inspect protocol trace errors separately. The protocol rejects external endpoints and redirects, binds loopback, and requires `--isolated`. Every add waits for graph/vector count agreement; indexing is ingestion, not maturation. Raw responses and official reports remain under `.agent-drafts/`; see [the committed smoke report](../../data/results/SUMMARY-20261012-precisionmembench.md) for observations and provenance. Next: freeze narrative-clock maturation before publishing a comparison; do not tune recall budgets to these gold cases.
+Failing benchmark assertions produce exit 1 and remain findings, not adapter-test failures. Protocol failures close the connection and terminate the bridge rather than returning a scoreable error body. Discard any partial report from such a run and inspect protocol trace errors separately. The protocol ignores environment HTTP proxies and rejects external endpoints and redirects, binds loopback, and requires `--isolated`. Every add waits for graph/vector count agreement; indexing is ingestion, not maturation. Raw responses and official reports remain under `.agent-drafts/`; see [the committed smoke report](../../data/results/SUMMARY-20261012-precisionmembench.md) for observations and provenance. Next: freeze narrative-clock maturation before publishing a comparison; do not tune recall budgets to these gold cases.
+
+The generated experiment dashboard uses the native indexer with full VCS reconciliation and read-only canonical artifact links plus the two new documents. Canonical AMB run files absent from the sibling checkout are reported missing; historical measurements remain in the committed AMB submission summary. No snapshot fallback or replacement measurement is invented. This refresh is not a new benchmark measurement.

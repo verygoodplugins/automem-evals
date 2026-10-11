@@ -344,7 +344,7 @@
     ],
     "branch": "agent/kernel-worker/92ebad9f",
     "worktree": ".worktrees/agent-kernel-worker-92ebad9f",
-    "pr": null,
+    "pr": 66,
     "related": [
       "EXP-CURRENT-STATE",
       "EXP-MATURATION"

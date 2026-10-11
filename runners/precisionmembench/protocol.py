@@ -9,7 +9,7 @@ import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import urlencode, urlsplit
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 REVISION = "61a712a1754e7d27b6dee42da32a2c214b003ece"
 
@@ -40,7 +40,7 @@ class Protocol:
                           data=json.dumps(data).encode() if data is not None else None,
                           headers={"Authorization": "Bearer " + self.token,
                                    "Content-Type": "application/json"})
-        with build_opener(NoRedirect).open(request, timeout=120) as response:
+        with build_opener(ProxyHandler({}), NoRedirect).open(request, timeout=120) as response:
             result = json.load(response)
         with self.trace.open("a") as stream:
             stream.write(json.dumps({"method": method, "path": path,
@@ -193,6 +193,7 @@ def main():
     parser.add_argument("--trace", type=Path, required=True)
     args = parser.parse_args()
     endpoint = local_url(args.endpoint)
+    args.trace.touch(exist_ok=False)
     prepare(args.upstream, args.port)
     beliefs = json.loads((args.upstream / "fixtures/beliefs.seed.json").read_text())
     protocol = Protocol(endpoint, os.getenv("AUTOMEM_EVAL_TOKEN", "test-token"), beliefs, args.trace)
