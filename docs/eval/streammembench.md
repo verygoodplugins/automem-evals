@@ -76,7 +76,7 @@ from scripts import experiment_index as indexer
 
 root = Path.cwd()
 index = json.loads(subprocess.check_output([
-    "git", "show", "e7b0d1ea3d:docs/experiments/index.json"
+    "git", "show", "35fa73d78703b4af6387762df7b74884520dc29f:docs/experiments/index.json"
 ], text=True))
 prior_generated_at = index["generated_at"]
 thread = next(t for t in indexer.load_registry(root)
