@@ -163,6 +163,27 @@ class ExperimentIndexTests(unittest.TestCase):
 
         self.assertIn("EXP-NO-WORKTREE", rendered)
 
+    def test_scoped_refresh_discloses_retained_date_in_both_views(self):
+        index = {
+            "generated_at": "2026-10-18T19:00:00+00:00",
+            "threads": [], "worktrees": [], "orphan_artifacts": [],
+            "snapshot_context": {
+                "refresh_scope": ["EXP-STREAMMEMBENCH", "<example>"],
+                "retained_snapshot_generated_at": "2026-06-22T20:26:29+00:00",
+            },
+        }
+        status = self.mod.render_status(index)
+        html = self.mod.render_scoreboard_html(index)
+        for rendered in (status, html):
+            self.assertIn("Retained snapshot: 2026-06-22T20:26:29+00:00", rendered)
+            self.assertIn("Scoped refresh: EXP-STREAMMEMBENCH", rendered)
+        self.assertIn("&lt;example&gt;", html)
+        self.assertNotIn("<example>", html)
+        self.assertNotIn("__SNAPSHOT_NOTICE__", html)
+        del index["snapshot_context"]
+        self.assertNotIn("Scoped refresh:", self.mod.render_status(index))
+        self.assertNotIn("<aside", self.mod.render_scoreboard_html(index))
+
     def test_extract_scores_reads_beam_judged_results(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

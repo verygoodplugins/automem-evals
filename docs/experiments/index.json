@@ -1722,10 +1722,16 @@
       "kind": "session-note",
       "path": "docs/session_20260616_beam_judged_100k.md",
       "title": "Session 2026-06-16 \u2014 BEAM judged 100K (native, official scorer)"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/streammembench.md",
+      "title": "StreamMemBench \u2014 streaming evidence and feedback adapter plan"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-06-22T20:26:29+00:00",
+  "generated_at": "2026-10-18T19:46:46+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2386,9 +2392,21 @@
       "total_questions": 2
     }
   ],
+  "snapshot_context": {
+    "refresh_scope": [
+      "EXP-STREAMMEMBENCH"
+    ],
+    "retained_sections": [
+      "other threads and artifacts",
+      "scores",
+      "worktrees",
+      "prs"
+    ],
+    "retained_snapshot_generated_at": "2026-06-22T20:26:29+00:00"
+  },
   "status_counts": {
     "adopted": 10,
-    "in-progress": 2,
+    "in-progress": 3,
     "parked": 2,
     "superseded": 1
   },
@@ -2888,6 +2906,34 @@
       "updated": "2026-06-22",
       "worktree": null,
       "worktree_status": null
+    },
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/eval/streammembench.md"
+      ],
+      "artifacts": [
+        "docs/eval/streammembench.md"
+      ],
+      "branch": "agent/kernel-worker/48e22593",
+      "decision": "Track adapter implementation in #67; publish headline and strict scores with answerer/judge disclosure only after actual AutoMem runs.",
+      "hypothesis": "Write-time provenance and explicit feedback supersession may improve follow-up evidence use independently of retrieval quality.",
+      "id": "EXP-STREAMMEMBENCH",
+      "notes": "Issue: https://github.com/verygoodplugins/automem-evals/issues/67. Related: #50, #51, PR #66. Candidate: opportunity:automem-graph-rag-research-scout. Pin: b32965525da5f982599af9794954c616ddeb34ff. Saved-record fidelity is distinct from retrieval recall; cold/matured AutoMem comparison remains pending.",
+      "pr": 68,
+      "related": [
+        "EXP-CURRENT-STATE",
+        "EXP-MATURATION"
+      ],
+      "result": "Official harness pinned; MIT code and EgoLife text availability checked. Fresh deterministic rag_raw wiring smokes completed; no AutoMem adapter run or score.",
+      "started": "2026-10-18",
+      "status": "in-progress",
+      "title": "StreamMemBench streaming evidence-use and feedback-reuse adapter plan",
+      "updated": "2026-10-18",
+      "worktree": ".worktrees/agent-kernel-worker-48e22593",
+      "worktree_status": {
+        "state": "not-scanned"
+      }
     }
   ],
   "worktrees": [

@@ -326,5 +326,21 @@
     "pr": null,
     "related": ["EXP-METADATA"],
     "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill."
+  },
+  {
+    "id": "EXP-STREAMMEMBENCH",
+    "title": "StreamMemBench streaming evidence-use and feedback-reuse adapter plan",
+    "status": "in-progress",
+    "hypothesis": "Write-time provenance and explicit feedback supersession may improve follow-up evidence use independently of retrieval quality.",
+    "result": "Official harness pinned; MIT code and EgoLife text availability checked. Fresh deterministic rag_raw wiring smokes completed; no AutoMem adapter run or score.",
+    "decision": "Track adapter implementation in #67; publish headline and strict scores with answerer/judge disclosure only after actual AutoMem runs.",
+    "started": "2026-10-18",
+    "updated": "2026-10-18",
+    "artifacts": ["docs/eval/streammembench.md"],
+    "branch": "agent/kernel-worker/48e22593",
+    "worktree": ".worktrees/agent-kernel-worker-48e22593",
+    "pr": 68,
+    "related": ["EXP-CURRENT-STATE", "EXP-MATURATION"],
+    "notes": "Issue: https://github.com/verygoodplugins/automem-evals/issues/67. Related: #50, #51, PR #66. Candidate: opportunity:automem-graph-rag-research-scout. Pin: b32965525da5f982599af9794954c616ddeb34ff. Saved-record fidelity is distinct from retrieval recall; cold/matured AutoMem comparison remains pending."
   }
 ]
