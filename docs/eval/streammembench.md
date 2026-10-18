@@ -61,10 +61,42 @@ env -i PATH=/usr/bin:/bin PYTHONPATH=src ../../streammembench-py312/bin/python3 
 
 The mini run used `configs/evaluation/smoke.yaml` without `--max-items`, outputting to `.agent-drafts/streammembench-smoke/`. Raw outputs and diagnostic sidecars remain local; no dataset or raw participant text is committed. Registry source: `docs/experiments/registry.json`, experiment `EXP-STREAMMEMBENCH`.
 
-The native indexer generated and verified all three views locally, including VCS reconciliation and this plan's artifact link. Generated snapshots remain in the ignored preview directory to keep unrelated historical/worktree refreshes out of this tracking slice. Rebuild from the repository root:
+The canonical `STATUS.md`, `index.json`, and `scoreboard.html` include this thread. To keep this slice focused, their refresh uses the prior committed index as a captured input, adds the current registry record and plan artifact, and renders through the native indexer. Other experiments, scores, and VCS observations retain their **2026-06-22** snapshot; `snapshot_context` in the JSON discloses that boundary. This is a scoped registry refresh, not a new historical-results or worktree audit.
+
+Reproduce the scoped refresh with Python 3.11+ from the repository root:
 
 ```sh
-python3 scripts/experiment_index.py --status .agent-drafts/streammembench-index/STATUS.md \
-  --index-json .agent-drafts/streammembench-index/index.json \
-  --scoreboard .agent-drafts/streammembench-index/scoreboard.html
+python3 - <<'PYTHON'
+import json
+import subprocess
+from collections import Counter
+from datetime import UTC, datetime
+from pathlib import Path
+from scripts import experiment_index as indexer
+
+root = Path.cwd()
+index = json.loads(subprocess.check_output([
+    "git", "show", "e7b0d1ea3d:docs/experiments/index.json"
+], text=True))
+prior_generated_at = index["generated_at"]
+thread = next(t for t in indexer.load_registry(root)
+              if t["id"] == "EXP-STREAMMEMBENCH")
+artifact = indexer.summarize_artifact(root, root / "docs/eval/streammembench.md")
+thread.update(artifact_count=1, artifact_samples=[artifact["path"]],
+              worktree_status={"state": "not-scanned"})
+index["threads"].append(thread)
+index["artifacts"].append(artifact)
+index["status_counts"] = dict(Counter(t["status"] for t in index["threads"]))
+index["generated_at"] = datetime.now(UTC).replace(microsecond=0).isoformat()
+index["snapshot_context"] = {
+    "refresh_scope": ["EXP-STREAMMEMBENCH"],
+    "retained_snapshot_generated_at": prior_generated_at,
+    "retained_sections": ["other threads and artifacts", "scores", "worktrees", "prs"],
+}
+indexer.write_outputs(index, root / "docs/experiments/STATUS.md",
+                      root / "docs/experiments/index.json",
+                      root / "docs/experiments/scoreboard.html")
+PYTHON
 ```
+
+For a separate full data/VCS refresh, run `python3 scripts/experiment_index.py --data-root <checkout-with-run-results>`. A checkout without the historical result files cannot reproduce the captured score table; inspect that broader refresh separately.

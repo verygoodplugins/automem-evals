@@ -339,7 +339,7 @@
     "artifacts": ["docs/eval/streammembench.md"],
     "branch": "agent/kernel-worker/48e22593",
     "worktree": ".worktrees/agent-kernel-worker-48e22593",
-    "pr": null,
+    "pr": 68,
     "related": ["EXP-CURRENT-STATE", "EXP-MATURATION"],
     "notes": "Issue: https://github.com/verygoodplugins/automem-evals/issues/67. Related: #50, #51, PR #66. Candidate: opportunity:automem-graph-rag-research-scout. Pin: b32965525da5f982599af9794954c616ddeb34ff. Saved-record fidelity is distinct from retrieval recall; cold/matured AutoMem comparison remains pending."
   }
