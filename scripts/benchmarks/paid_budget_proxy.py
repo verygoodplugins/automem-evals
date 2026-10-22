@@ -9,6 +9,7 @@ benchmark harnesses may catch even nonretryable HTTP errors as empty evidence.
 from __future__ import annotations
 
 import argparse
+import hmac
 from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation, ROUND_CEILING
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -389,11 +390,16 @@ class _QuietServer(ThreadingHTTPServer):
 
 class BudgetProxy:
     def __init__(self, *, ledger_path, pricing, cap_usd="20", host="127.0.0.1", port=0,
-                 openai_upstream="https://api.openai.com/v1", voyage_upstream="https://api.voyageai.com/v1", timeout=120):
+                 openai_upstream="https://api.openai.com/v1", voyage_upstream="https://api.voyageai.com/v1", timeout=120,
+                 client_token=None):
         if host != "127.0.0.1":
             raise ConfigError("Listener must bind to 127.0.0.1")
         if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
             raise ConfigError("Positive finite timeout required")
+        if client_token is not None and (not isinstance(client_token, str) or not client_token
+                or not client_token.isascii() or any(ord(char) <= 32 or ord(char) == 127 for char in client_token)):
+            raise ConfigError("Invalid local client token")
+        self.client_auth_required = client_token is not None
         self.upstreams = {"openai": _upstream_url(openai_upstream), "voyage": _upstream_url(voyage_upstream)}
         if not isinstance(pricing, dict) or not isinstance(pricing.get("models"), dict):
             raise ConfigError("Explicit model pricing required")
@@ -429,6 +435,15 @@ class BudgetProxy:
                 except Exception:
                     self.reply(503, {"error": {"code": "accounting_unavailable", "message": "Accounting unavailable; abort run"}})
             def do_POST(self):
+                # Authenticate before route/body validation can mutate accounting.
+                # Never forward or record this local credential.
+                if client_token is not None:
+                    headers = self.headers.get_all("Authorization", [])
+                    scheme, _, supplied = headers[0].partition(" ") if len(headers) == 1 else ("", "", "")
+                    if (scheme.lower() != "bearer" or not supplied.isascii()
+                            or not hmac.compare_digest(supplied, client_token)):
+                        self.reply(401, {"error": {"code": "unauthorized", "message": "Local client authentication required"}})
+                        return
                 try:
                     lane = ROUTES.get(self.path)
                     if lane is None:
@@ -547,6 +562,7 @@ def main():
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--openai-upstream", default="https://api.openai.com/v1")
     parser.add_argument("--voyage-upstream", default="https://api.voyageai.com/v1")
+    parser.add_argument("--client-token-env", help="Require a local Bearer token from this environment variable on POSTs; unset preserves legacy behavior")
     parser.add_argument("--summary", action="store_true", help="Read an existing ledger without creating or changing it; no network")
     args = parser.parse_args()
     try:
@@ -555,11 +571,16 @@ def main():
             return 0
         if args.pricing is None:
             raise ConfigError("--pricing required")
+        client_token = None
+        if args.client_token_env is not None:
+            client_token = os.environ.get(args.client_token_env)
+            if not client_token:
+                raise ConfigError("Local client token environment variable required")
         pricing = json.loads(args.pricing.read_text())
         proxy = BudgetProxy(ledger_path=args.ledger, pricing=pricing, cap_usd=args.cap_usd, host=args.host,
                             port=args.port, timeout=args.timeout, openai_upstream=args.openai_upstream,
-                            voyage_upstream=args.voyage_upstream)
-        print(json.dumps({"openai_base_url": proxy.url + "/openai/v1", "voyage_base_url": proxy.url + "/voyage/v1", "status_url": proxy.url + "/status"}), flush=True)
+                            voyage_upstream=args.voyage_upstream, client_token=client_token)
+        print(json.dumps({"openai_base_url": proxy.url + "/openai/v1", "voyage_base_url": proxy.url + "/voyage/v1", "status_url": proxy.url + "/status", "client_auth_required": proxy.client_auth_required}), flush=True)
         try:
             proxy.server.serve_forever()
         except KeyboardInterrupt:

@@ -1,6 +1,7 @@
 """Offline contract/regression tests; every upstream is a loopback fake."""
 import contextlib
 import concurrent.futures
+import http.client
 import io
 import json
 import multiprocessing
@@ -19,6 +20,7 @@ import urllib.request
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paid_budget_proxy import BudgetLedger, BudgetProxy, ConfigError, quote_request, _safe_failure_details
+import paid_budget_proxy
 
 
 PRICES = {"models": {
@@ -88,9 +90,9 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.fake.close()
         self.env.stop()
         self.tmp.cleanup()
-    def start(self, cap="20", timeout=1):
+    def start(self, cap="20", timeout=1, client_token=None):
         self.proxy = BudgetProxy(ledger_path=self.path, pricing=PRICES, cap_usd=cap,
-            openai_upstream=self.fake.url, voyage_upstream=self.fake.url, timeout=timeout)
+            openai_upstream=self.fake.url, voyage_upstream=self.fake.url, timeout=timeout, client_token=client_token)
         self.proxy.start()
         return self.proxy
     def request(self, body=CHAT, route="/openai/v1/chat/completions", method="POST"):
@@ -109,6 +111,105 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertFalse(status["halted"])
         self.assertEqual(self.fake.calls[0][2], "Bearer private-api-key")
         self.assertEqual(self.request(route="/status", method="GET")[1], status)
+
+    def test_unrelated_unauthorized_posts_leave_accounting_untouched(self):
+        self.start(client_token="client-secret")
+        initial = self.proxy.ledger.status()
+        for headers in ([], ["Bearer wrong-private-token"], ["Bearer client-secret", "Bearer client-secret"],
+                        ["Bearer nonascii-\u00e9"], ["Basic client-secret"]):
+            with self.subTest(headers=len(headers)):
+                connection = http.client.HTTPConnection("127.0.0.1", self.proxy.server.server_port, timeout=5)
+                try:
+                    connection.putrequest("POST", "/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary")
+                    for value in headers:
+                        connection.putheader("Authorization", value)
+                    # Neither framing nor body is valid: authentication must run first.
+                    connection.endheaders()
+                    response = connection.getresponse()
+                    self.assertEqual(response.status, 401)
+                    self.assertEqual(json.loads(response.read())["error"]["code"], "unauthorized")
+                finally:
+                    connection.close()
+                self.assertEqual(self.proxy.ledger.status(), initial)
+        self.assertEqual(self.fake.calls, [])
+        self.assertFalse(self.proxy.ledger.rejection_path.exists())
+        with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(self.proxy.url + "/status", timeout=5) as response:
+            self.assertEqual(json.load(response), initial)
+        self.assertEqual(self.request()[0], 200)
+        self.assertEqual(self.proxy.ledger.status()["charged_nusd"], 15000)
+        self.assertEqual(self.fake.calls[0][2], "Bearer private-api-key")
+        status, result = self.request(dict(CHAT, max_completion_tokens=None))
+        self.assertEqual(status, 400)
+        self.assertEqual(result["error"]["failure_reason"], "invalid_output_cap")
+        state = self.proxy.ledger.status()
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["attempts"], 1)
+        self.assertEqual(self.request()[0], 402)
+        self.proxy.close()
+        self.start(client_token="client-secret")
+        self.assertEqual(self.proxy.ledger.status(), state)
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(len(self.fake.calls), 1)
+        self.assertNotIn("client-secret", self.proxy.ledger.rejection_path.read_text())
+
+    def test_authenticated_unsupported_route_still_halts(self):
+        self.start(client_token="client-secret")
+        status, result = self.request(route="/unsupported-private-route")
+        self.assertEqual(status, 400)
+        self.assertEqual(result["error"]["failure_reason"], "unsupported_route")
+        self.assertTrue(self.proxy.ledger.status()["halted"])
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(self.fake.calls, [])
+
+    def test_authenticated_embedding_lanes_use_only_provider_credentials(self):
+        self.start(client_token="client-secret")
+        self.fake.reply = {"usage": {"total_tokens": 5, "prompt_tokens": 5}, "data": []}
+        for model, route, key in (("voyage-4", "/voyage/v1/embeddings", "private-voyage-key"),
+                                  ("text-embedding-3-small", "/openai/v1/embeddings", "private-api-key")):
+            self.assertEqual(self.request({"model": model, "input": ["private embedding"]}, route)[0], 200)
+            self.assertEqual(self.fake.calls[-1][2], "Bearer " + key)
+        self.assertEqual(self.proxy.ledger.status()["attempts"], 2)
+        self.assertFalse(self.proxy.ledger.status()["halted"])
+
+    def test_invalid_client_token_configuration_creates_no_ledger(self):
+        for token in ("", 123, b"token", "with space", "newline\n", "nonascii-\u00e9", "delete\x7f"):
+            with self.subTest(token_type=type(token).__name__), self.assertRaises(ConfigError):
+                BudgetProxy(ledger_path=self.path, pricing=PRICES, client_token=token)
+            self.assertFalse(self.path.exists())
+
+    def test_cli_client_token_env_missing_or_empty_fails_before_accounting(self):
+        for value in (None, ""):
+            with unittest.mock.patch.dict(os.environ, {}, clear=True):
+                if value is not None:
+                    os.environ["TEST_LOCAL_CLIENT_TOKEN"] = value
+                output, errors = io.StringIO(), io.StringIO()
+                with unittest.mock.patch.object(sys, "argv", ["proxy", "--ledger", str(self.path),
+                        "--pricing", "unused-pricing.json", "--client-token-env", "TEST_LOCAL_CLIENT_TOKEN"]), \
+                        contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+                    self.assertEqual(paid_budget_proxy.main(), 2)
+                self.assertEqual(output.getvalue(), "")
+                self.assertNotIn("TEST_LOCAL_CLIENT_TOKEN", errors.getvalue())
+                self.assertFalse(self.path.exists())
+
+    def test_cli_receipt_labels_auth_without_recording_token(self):
+        pricing_path = Path(self.tmp.name) / "prices.json"
+        pricing_path.write_text(json.dumps(PRICES))
+        for enabled in (False, True):
+            argv = ["proxy", "--ledger", str(self.path), "--pricing", str(pricing_path)]
+            if enabled:
+                argv += ["--client-token-env", "TEST_LOCAL_CLIENT_TOKEN"]
+            output = io.StringIO()
+            with unittest.mock.patch.dict(os.environ, {"TEST_LOCAL_CLIENT_TOKEN": "private-local-token"}), \
+                    unittest.mock.patch.object(sys, "argv", argv), \
+                    unittest.mock.patch.object(paid_budget_proxy, "BudgetProxy") as factory, \
+                    contextlib.redirect_stdout(output):
+                factory.return_value.url = "http://127.0.0.1:12345"
+                factory.return_value.client_auth_required = enabled
+                self.assertEqual(paid_budget_proxy.main(), 0)
+                self.assertEqual(factory.call_args.kwargs["client_token"], "private-local-token" if enabled else None)
+            self.assertEqual(json.loads(output.getvalue())["client_auth_required"], enabled)
+            self.assertNotIn("private-local-token", output.getvalue())
+            self.assertNotIn("TEST_LOCAL_CLIENT_TOKEN", output.getvalue())
     def test_standard_service_tier_is_injected_before_quote_and_forward(self):
         self.start()
         self.assertEqual(self.request()[0], 200)
