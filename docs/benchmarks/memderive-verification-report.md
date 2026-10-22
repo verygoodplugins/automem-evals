@@ -79,3 +79,21 @@ benchmark suite passes all 11 tests, including a failed-first-deletion regressio
 focused flake8 and `git diff --check` pass after the fix. The original pilot
 was not repeated, and its recorded scores and checksums remain historical evidence.
 PR, hosted review and CI disposition are reported separately by the finalizer.
+
+Hosted Codex then identified two P2 correctness findings. The cleanup/report
+seam now writes `status=cleanup_failed`, `cleanup=failed` and `cleanup_error`
+before propagating a deletion failure; a regression verifies that scored arms
+remain available without a false completed status. The benchmark suite now
+passes 12 tests; the 30 script tests and focused flake8 also pass.
+
+Live dashboard regeneration used `scripts/experiment_index.py --data-root
+/Users/jgarturo/Projects/OpenAI/automem-evals --amb-outputs
+/Users/jgarturo/Projects/OpenAI/agent-memory-benchmark/outputs`, with outputs
+under `tmp/memderive/finalizer-*`. The BEAM artifacts were reachable, but canonical
+AMB `automem-sub` runs are absent from those outputs. The remediation rendered
+`STATUS.md` through the existing indexer using the checked-in historical score
+snapshot, merged artifact inventories and live VCS reconciliation. Assertions
+confirmed all 16 historical scores and prior artifact counts were preserved,
+the false no-scores message was absent, and PR #70 appeared. The dashboard
+explicitly identifies its 2026-06-22 historical score provenance. Intermediate
+indexes remain under `tmp/memderive/`; no new historical scores were fabricated.

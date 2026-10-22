@@ -66,3 +66,16 @@ class MemDeriveTests(unittest.TestCase):
     def test_timestamp_precision_and_timezone(self):
         self.assertEqual(pilot.instant("2026-01-01 09:00"),
                          pilot.instant("2026-01-01T10:00:00+01:00"))
+
+    def test_cleanup_failure_cannot_leave_a_completed_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bank = pilot.AutoMem("http://localhost:8001", "test", Path(directory))
+            report = {"status": "completed", "arms": {"bm25": {"queries": 1}}}
+            with patch.object(bank, "cleanup", side_effect=TimeoutError("DELETE")):
+                with self.assertRaises(TimeoutError):
+                    pilot.cleanup_run(bank, report)
+            saved = json.loads((Path(directory) / "report.json").read_text())
+            self.assertEqual(saved["status"], "cleanup_failed")
+            self.assertEqual(saved["cleanup"], "failed")
+            self.assertEqual(saved["cleanup_error"], "TimeoutError: DELETE")
+            self.assertEqual(saved["arms"], report["arms"])

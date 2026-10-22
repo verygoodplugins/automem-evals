@@ -112,6 +112,19 @@ class AutoMem:
                                "see cleanup.json and memories.json")
 
 
+def cleanup_run(bank, report):
+    try:
+        bank.cleanup()
+        report["cleanup"] = "completed"
+    except Exception as exc:
+        report["status"] = "cleanup_failed"
+        report["cleanup"] = "failed"
+        report["cleanup_error"] = f"{type(exc).__name__}: {exc}"
+        raise
+    finally:
+        save(bank.output / "report.json", report)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, required=True, help="DeriveMem root")
@@ -231,11 +244,7 @@ def main():
         report["error"] = f"{type(exc).__name__}: {exc}"
         raise
     finally:
-        try:
-            bank.cleanup()
-            report["cleanup"] = "completed"
-        finally:
-            save(args.output / "report.json", report)
+        cleanup_run(bank, report)
     print(json.dumps(report, indent=2))
 
 
