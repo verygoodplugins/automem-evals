@@ -147,7 +147,8 @@ def quote_request(lane, body, pricing):
         for message in messages:
             if not isinstance(message, dict) or set(message) - {"role", "content", "name"}:
                 raise ConfigError("Only text messages supported")
-            if message.get("role") not in {"system", "developer", "user", "assistant"}:
+            role = message.get("role")
+            if not isinstance(role, str) or role not in {"system", "developer", "user", "assistant"}:
                 raise ConfigError("Unsupported message role")
             content = message.get("content")
             if isinstance(content, list):
@@ -162,7 +163,7 @@ def quote_request(lane, body, pricing):
             raise ConfigError("Unsupported embedding request fields")
         if body.get("output_dimension", 1024) != 1024 or body.get("output_dtype", "float") != "float":
             raise ConfigError("Only 1024-dimensional float embeddings supported")
-        if "input_type" in body and body["input_type"] not in {"query", "document"}:
+        if "input_type" in body and (not isinstance(body["input_type"], str) or body["input_type"] not in {"query", "document"}):
             raise ConfigError("Unsupported embedding input type")
         texts = body.get("input")
         if isinstance(texts, str):
@@ -173,7 +174,8 @@ def quote_request(lane, body, pricing):
     else:
         if set(body) - {"model", "input", "encoding_format", "dimensions", "user"}:
             raise ConfigError("Unsupported OpenAI embedding fields")
-        if body.get("encoding_format", "float") not in {"float", "base64"}:
+        encoding_format = body.get("encoding_format", "float")
+        if not isinstance(encoding_format, str) or encoding_format not in {"float", "base64"}:
             raise ConfigError("Unsupported embedding encoding")
         if "dimensions" in body and not _integer(body["dimensions"], 1, 1536):
             raise ConfigError("Unsupported embedding dimensions")
@@ -386,6 +388,7 @@ class BudgetProxy:
                     quote = quote_request(lane, body, owner.pricing)
                     key = os.environ.get("VOYAGE_API_KEY" if lane == "voyage" else "OPENAI_API_KEY")
                     if not key:
+                        owner.ledger.halt("request_rejected")
                         self.reply(503, {"error": {"code": "credentials_unavailable", "message": "Provider credentials unavailable"}})
                         return
                     # This durable commit MUST happen before any network activity.

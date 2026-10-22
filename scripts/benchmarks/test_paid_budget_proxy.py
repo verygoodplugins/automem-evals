@@ -247,6 +247,44 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertEqual(self.path.read_bytes(), b"")
         self.assertEqual(result.stdout, "")
 
+    def test_unhashable_admission_fields_halt_without_spend(self):
+        cases = []
+        for value in ([], {}):
+            cases.extend([
+                ({"model": "gpt-5-mini", "messages": [{"role": value, "content": "text"}], "max_completion_tokens": 20}, "/openai/v1/chat/completions"),
+                ({"model": "voyage-4", "input": ["text"], "input_type": value, "output_dimension": 1024}, "/voyage/v1/embeddings"),
+                ({"model": "text-embedding-3-small", "input": "text", "encoding_format": value}, "/openai/v1/embeddings"),
+            ])
+        for index, (body, route) in enumerate(cases):
+            with self.subTest(case=index):
+                self.path = Path(self.tmp.name) / f"admission-{index}.sqlite3"
+                self.start()
+                try:
+                    self.assertEqual(self.request(body, route)[0], 400)
+                    state = self.request(route="/status", method="GET")[1]
+                    self.assertTrue(state["halted"])
+                    self.assertEqual(state["halt_reason"], "request_rejected")
+                    self.assertEqual(state["attempts"], 0)
+                    self.assertEqual(state["charged_nusd"], 0)
+                    self.assertEqual(self.request()[0], 402)
+                    self.assertEqual(self.fake.calls, [])
+                finally:
+                    self.proxy.close()
+                    self.proxy = None
+
+    def test_missing_voyage_key_halts_without_spend(self):
+        self.start()
+        body = {"model": "voyage-4", "input": ["text"], "output_dimension": 1024}
+        with unittest.mock.patch.dict(os.environ, {"VOYAGE_API_KEY": ""}):
+            self.assertEqual(self.request(body, "/voyage/v1/embeddings")[0], 503)
+        state = self.request(route="/status", method="GET")[1]
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["halt_reason"], "request_rejected")
+        self.assertEqual(state["attempts"], 0)
+        self.assertEqual(state["charged_nusd"], 0)
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(self.fake.calls, [])
+
     def test_invalid_usage_remains_charged(self):
         self.start()
         expected = quote_request("openai", CHAT, PRICES)["reservation_nusd"]
@@ -449,8 +487,13 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.start()
         with unittest.mock.patch.dict(os.environ, {"OPENAI_API_KEY": ""}):
             self.assertEqual(self.request()[0], 503)
+        state = self.request(route="/status", method="GET")[1]
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["halt_reason"], "request_rejected")
+        self.assertEqual(state["charged_nusd"], 0)
+        self.assertEqual(self.request()[0], 402)
         self.assertEqual(self.fake.calls, [])
-        self.assertEqual(self.proxy.ledger.status()["attempts"], 0)
+        self.assertEqual(state["attempts"], 0)
 
 
 if __name__ == "__main__":
