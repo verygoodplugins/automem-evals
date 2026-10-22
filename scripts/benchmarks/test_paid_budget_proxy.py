@@ -163,12 +163,20 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertEqual(self.fake.calls, [])
 
     def test_authenticated_stalled_body_halts_durably_before_reservation(self):
+        self._assert_incomplete_body_halts()
+
+    def test_authenticated_reset_body_halts_durably_before_reservation(self):
+        self._assert_incomplete_body_halts(ConnectionResetError)
+
+    def _assert_incomplete_body_halts(self, read_error=None):
         self.start(client_token="client-secret")
         handler_class = self.proxy.server.RequestHandlerClass
         original_setup = handler_class.setup
         def short_read_timeout(handler):
             original_setup(handler)
             handler.connection.settimeout(0.05)
+            if read_error:
+                handler.rfile.read = unittest.mock.Mock(side_effect=read_error("private read failure"))
         with unittest.mock.patch.object(handler_class, "setup", short_read_timeout):
             connection = http.client.HTTPConnection("127.0.0.1", self.proxy.server.server_port, timeout=5)
             try:
@@ -192,6 +200,39 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertEqual(self.proxy.ledger.status(), state)
         self.assertEqual(self.request()[0], 402)
         self.assertEqual(self.fake.calls, [])
+
+    def test_failed_success_delivery_halts_and_retains_only_actual_charge(self):
+        for index, write_error in enumerate((BrokenPipeError, ConnectionResetError)):
+            with self.subTest(error=write_error.__name__):
+                self.path = Path(self.tmp.name) / f"delivery-{index}.sqlite3"
+                self.start(client_token="client-secret")
+                self.addCleanup(self.proxy.close)
+                handler_class = self.proxy.server.RequestHandlerClass
+                original_setup = handler_class.setup
+                def broken_writer(handler):
+                    original_setup(handler)
+                    original_write = handler.wfile.write
+                    def fail_body(data):
+                        if data.startswith(b"HTTP/"):
+                            return original_write(data)
+                        raise write_error("private write failure")
+                    handler.wfile.write = fail_body
+                with unittest.mock.patch.object(handler_class, "setup", broken_writer):
+                    with self.assertRaises(http.client.IncompleteRead):
+                        self.request()
+                state = self.proxy.ledger.status()
+                self.assertTrue(state["halted"])
+                self.assertEqual(state["halt_reason"], "accounting_error")
+                self.assertEqual(state["charged_nusd"], 15000)
+                self.assertEqual(state["pending_or_ambiguous"], 0)
+                self.assertEqual(state["attempts"], 1)
+                self.proxy.close()
+                self.start(client_token="client-secret")
+                self.assertEqual(self.proxy.ledger.status(), state)
+                self.assertEqual(self.request()[0], 402)
+                self.proxy.close()
+                self.proxy = None
+        self.assertEqual(len(self.fake.calls), 2)
 
     def test_unencodable_upstream_fields_retain_reservation_and_halt(self):
         for index, literal in enumerate(("NaN", "Infinity", "-Infinity", "1e999", '"\\ud800"')):

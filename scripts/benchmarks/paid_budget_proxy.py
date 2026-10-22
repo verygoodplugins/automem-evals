@@ -462,7 +462,7 @@ class BudgetProxy:
                         raise ConfigError("Invalid request size")
                     try:
                         raw = self.rfile.read(length)
-                    except (TimeoutError, socket.timeout):
+                    except OSError:
                         raise ConfigError("Incomplete request") from None
                     if len(raw) != length:
                         raise ConfigError("Incomplete request")
@@ -548,7 +548,12 @@ class BudgetProxy:
                     details = _safe_failure_details(exc)
                     self.reply(502, {"error": {"code": "upstream_or_accounting_error", "message": "Upstream or usage validation failed; reservation retained", **details}})
                     return
-                self.reply(200, result)
+                try:
+                    self.reply(200, result)
+                except OSError:
+                    # Usage is settled, but failed delivery can trigger a hidden
+                    # harness fallback. Retain the actual charge and stop the run.
+                    owner.ledger.halt()
         self.server = _QuietServer((host, port), Handler)
         self.url = f"http://127.0.0.1:{self.server.server_port}"
         self.thread = None
