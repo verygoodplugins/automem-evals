@@ -456,7 +456,10 @@ class BudgetProxy:
                         raise ConfigError("Content-Length required") from None
                     if not 0 < length <= MAX_BODY_BYTES:
                         raise ConfigError("Invalid request size")
-                    raw = self.rfile.read(length)
+                    try:
+                        raw = self.rfile.read(length)
+                    except (TimeoutError, socket.timeout):
+                        raise ConfigError("Incomplete request") from None
                     if len(raw) != length:
                         raise ConfigError("Incomplete request")
                     try:
@@ -502,6 +505,9 @@ class BudgetProxy:
                             raise _ResponseValidationError("response_too_large")
                         try:
                             result = json.loads(encoded)
+                            # Validate the exact response encoding before settling:
+                            # nonfinite numbers and lone surrogates cannot be sent.
+                            json.dumps(result, ensure_ascii=False, allow_nan=False).encode("utf-8")
                         except (ValueError, UnicodeError):
                             raise _ResponseValidationError("invalid_upstream_json") from None
                     usage = result.get("usage") if isinstance(result, dict) and "error" not in result else None

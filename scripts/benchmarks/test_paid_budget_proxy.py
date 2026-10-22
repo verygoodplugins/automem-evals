@@ -49,6 +49,7 @@ class FakeUpstream:
         self.reply = {"model": "gpt-5-mini", "service_tier": "default", "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15}, "choices": [{"message": {"content": "private-answer"}}]}
         self.status = 200
         self.delay = 0
+        self.raw_reply = None
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *args):
                 pass
@@ -56,7 +57,7 @@ class FakeUpstream:
                 body = self.rfile.read(int(self.headers["Content-Length"]))
                 owner.calls.append((self.path, json.loads(body), self.headers.get("Authorization")))
                 time.sleep(owner.delay)
-                encoded = json.dumps(owner.reply).encode()
+                encoded = owner.raw_reply if owner.raw_reply is not None else json.dumps(owner.reply).encode()
                 self.send_response(owner.status)
                 if owner.status == 302:
                     self.send_header("Location", owner.url + "/redirect-target")
@@ -160,6 +161,62 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertTrue(self.proxy.ledger.status()["halted"])
         self.assertEqual(self.request()[0], 402)
         self.assertEqual(self.fake.calls, [])
+
+    def test_authenticated_stalled_body_halts_durably_before_reservation(self):
+        self.start(client_token="client-secret")
+        handler_class = self.proxy.server.RequestHandlerClass
+        original_setup = handler_class.setup
+        def short_read_timeout(handler):
+            original_setup(handler)
+            handler.connection.settimeout(0.05)
+        with unittest.mock.patch.object(handler_class, "setup", short_read_timeout):
+            connection = http.client.HTTPConnection("127.0.0.1", self.proxy.server.server_port, timeout=5)
+            try:
+                connection.putrequest("POST", "/openai/v1/chat/completions")
+                connection.putheader("Authorization", "Bearer client-secret")
+                connection.putheader("Content-Length", "100")
+                connection.endheaders(b"{")
+                response = connection.getresponse()
+                self.assertEqual(response.status, 400)
+                self.assertEqual(json.loads(response.read())["error"]["failure_reason"], "incomplete_request")
+            finally:
+                connection.close()
+        state = self.proxy.ledger.status()
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["halt_reason"], "request_rejected")
+        self.assertEqual(state["attempts"], 0)
+        self.assertEqual(state["charged_nusd"], 0)
+        self.assertEqual(json.loads(self.proxy.ledger.rejection_path.read_text())["reason"], "incomplete_request")
+        self.proxy.close()
+        self.start(client_token="client-secret")
+        self.assertEqual(self.proxy.ledger.status(), state)
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(self.fake.calls, [])
+
+    def test_unencodable_upstream_fields_retain_reservation_and_halt(self):
+        for index, literal in enumerate(("NaN", "Infinity", "-Infinity", "1e999", '"\\ud800"')):
+            with self.subTest(literal=literal):
+                self.path = Path(self.tmp.name) / f"unencodable-{index}.sqlite3"
+                self.start(client_token="client-secret")
+                self.addCleanup(self.proxy.close)
+                self.fake.reply["choices"][0]["message"]["invalid_field"] = "INVALID_LITERAL"
+                self.fake.raw_reply = json.dumps(self.fake.reply).replace('"INVALID_LITERAL"', literal).encode()
+                expected = quote_request("openai", CHAT, PRICES)["reservation_nusd"]
+                status, result = self.request()
+                self.assertEqual(status, 502)
+                self.assertEqual(result["error"]["failure_reason"], "invalid_upstream_json")
+                state = self.proxy.ledger.status()
+                self.assertTrue(state["halted"])
+                self.assertEqual(state["charged_nusd"], expected)
+                self.assertEqual(state["pending_or_ambiguous"], 1)
+                self.assertEqual(state["attempts"], 1)
+                self.proxy.close()
+                self.start(client_token="client-secret")
+                self.assertEqual(self.proxy.ledger.status(), state)
+                self.assertEqual(self.request()[0], 402)
+                self.proxy.close()
+                self.proxy = None
+        self.assertEqual(len(self.fake.calls), 5)
 
     def test_authenticated_embedding_lanes_use_only_provider_credentials(self):
         self.start(client_token="client-secret")
