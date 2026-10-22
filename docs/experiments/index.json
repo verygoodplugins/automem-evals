@@ -2349,20 +2349,30 @@
   "schema": "automem-evals.experiment-index.v1",
   "scores": [
     {
-      "accuracy": null,
-      "answer_llm": null,
-      "avg_context_tokens": null,
-      "avg_retrieve_time_ms": null,
+      "accuracy": 85.12987012987013,
+      "answer_llm": "gemini:gemini-3.1-pro-preview",
+      "avg_context_tokens": 4768.2,
+      "avg_retrieve_time_ms": 132.0,
       "benchmark": "amb",
-      "ci": null,
+      "ci": 1.7770272071541817,
       "dataset": "locomo",
       "label": "LoCoMo",
-      "n": 0,
+      "n": 1540,
       "repeats": 1,
       "run_name": "automem-sub",
+      "score_provenance": {
+        "kind": "historical_snapshot_retained",
+        "reason": "Raw archives unavailable; retained historical value, not a fresh AMB result.",
+        "source_commit": "35fa73d78703b4af6387762df7b74884520dc29f",
+        "source_commit_date": "2026-10-05T16:49:46+02:00",
+        "source_generated_at": "2026-06-22T20:26:29+00:00",
+        "source_index_sha256": "91ab7b31c053df20fac695065b9119f222441b21d4268303d58e2c43185a40da",
+        "source_path": "docs/experiments/index.json",
+        "source_ref": "origin/main"
+      },
       "split": "locomo10",
       "spread": null,
-      "status": "missing"
+      "status": "ok"
     },
     {
       "accuracy": null,
@@ -2381,20 +2391,30 @@
       "status": "missing"
     },
     {
-      "accuracy": null,
-      "answer_llm": null,
-      "avg_context_tokens": null,
-      "avg_retrieve_time_ms": null,
+      "accuracy": 76.06112054329371,
+      "answer_llm": "gemini:gemini-3.1-pro-preview",
+      "avg_context_tokens": 2588.2,
+      "avg_retrieve_time_ms": 202.2,
       "benchmark": "amb",
-      "ci": null,
+      "ci": 3.4461302855363813,
       "dataset": "personamem",
       "label": "PersonaMem",
-      "n": 0,
+      "n": 589,
       "repeats": 1,
       "run_name": "automem-sub",
+      "score_provenance": {
+        "kind": "historical_snapshot_retained",
+        "reason": "Raw archives unavailable; retained historical value, not a fresh AMB result.",
+        "source_commit": "35fa73d78703b4af6387762df7b74884520dc29f",
+        "source_commit_date": "2026-10-05T16:49:46+02:00",
+        "source_generated_at": "2026-06-22T20:26:29+00:00",
+        "source_index_sha256": "91ab7b31c053df20fac695065b9119f222441b21d4268303d58e2c43185a40da",
+        "source_path": "docs/experiments/index.json",
+        "source_ref": "origin/main"
+      },
       "split": "32k",
       "spread": null,
-      "status": "missing"
+      "status": "ok"
     },
     {
       "accuracy": null,
@@ -2445,21 +2465,31 @@
       "status": "missing"
     },
     {
-      "accuracy": null,
-      "answer_llm": null,
-      "avg_context_tokens": null,
-      "avg_retrieve_time_ms": null,
+      "accuracy": 67.3948796731692,
+      "answer_llm": "gemini:gemini-3.1-pro-preview",
+      "avg_context_tokens": 3843.4,
+      "avg_retrieve_time_ms": 229.5,
       "benchmark": "amb",
       "ci": null,
       "dataset": "beam",
       "expected_repeats": 3,
       "label": "BEAM-100K",
-      "n": 0,
-      "repeats": 0,
+      "n": 1120,
+      "repeats": 3,
       "run_name": "automem-sub-rep1+automem-sub-rep2+automem-sub-rep3",
+      "score_provenance": {
+        "kind": "historical_snapshot_retained",
+        "reason": "Raw archives unavailable; retained historical value, not a fresh AMB result.",
+        "source_commit": "35fa73d78703b4af6387762df7b74884520dc29f",
+        "source_commit_date": "2026-10-05T16:49:46+02:00",
+        "source_generated_at": "2026-06-22T20:26:29+00:00",
+        "source_index_sha256": "91ab7b31c053df20fac695065b9119f222441b21d4268303d58e2c43185a40da",
+        "source_path": "docs/experiments/index.json",
+        "source_ref": "origin/main"
+      },
       "split": "100k",
-      "spread": null,
-      "status": "missing"
+      "spread": 1.6203100600775344,
+      "status": "ok"
     },
     {
       "accuracy": 70.0,
