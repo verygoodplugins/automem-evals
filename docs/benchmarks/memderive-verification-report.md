@@ -90,13 +90,15 @@ Live dashboard regeneration used `scripts/experiment_index.py --data-root
 /Users/jgarturo/Projects/OpenAI/automem-evals --amb-outputs
 /Users/jgarturo/Projects/OpenAI/agent-memory-benchmark/outputs`, with outputs
 under `tmp/memderive/finalizer-*`. The BEAM artifacts were reachable, but canonical
-AMB `automem-sub` runs are absent from those outputs. That full-machine scan
-remains under `tmp/memderive/`. A subsequent hosted P2 finding required updating
-all three committed views, so the final scoped regeneration uses the existing
-indexer's renderers for `STATUS.md`, `index.json` and `scoreboard.html`. It adds
-the MemDerive thread, manifest and PR #70 row to the checked-in snapshot while
-retaining its 16 historical score records and existing experiment inventories.
-Assertions confirm all three views contain `EXP-MEMDERIVE`, prior thread records
-are unchanged, the false no-scores message is absent, and PR #70 appears. The
-dashboard explicitly identifies its historical score and worktree provenance;
-no fresh full-machine inventory or rerun of historical benchmarks is implied.
+AMB `automem-sub` runs are absent from those outputs. Hosted follow-up findings
+required updating all three committed views and retaining the full current VCS
+inventory. The final regeneration uses the existing indexer's renderers for
+`STATUS.md`, `index.json` and `scoreboard.html`, with all 33 live worktrees and
+current PR reconciliation. It preserves the 16 historical score records
+separately and merges artifact inventories without reducing prior counts.
+Assertions confirm all three views contain `EXP-MEMDERIVE`, all 33 live
+worktrees are present, historical scores are unchanged, the false no-scores
+message is absent, and PR #70 appears. The dashboard explicitly distinguishes
+historical score provenance from live VCS data. The 30 script tests pass after
+regeneration. Chrome DOM and screenshot evidence confirms the MemDerive row and
+preserved score display; no historical benchmark was rerun.

@@ -1727,10 +1727,16 @@
       "kind": "artifact",
       "path": "data/results/memderive-pilot/MANIFEST.json",
       "schema": "automem-evals.memderive-pilot.v1"
+    },
+    {
+      "created_at": null,
+      "kind": "curated-summary",
+      "path": "data/results/SUMMARY-amb-submission-2026-06.md",
+      "title": "SUMMARY \u2014 AutoMem on the Agent Memory Benchmark (Core-3 + BEAM)"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-22T07:18:12+00:00",
+  "generated_at": "2026-10-22T07:31:16+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -1937,16 +1943,265 @@
       "kind": "session-note",
       "path": "docs/session_20260423_overnight_strategy.md",
       "title": "Session 2026-04-23 \u2014 Overnight strategy (apples-to-apples)"
+    },
+    {
+      "created_at": null,
+      "kind": "curated-summary",
+      "path": "data/results/SUMMARY-amb-submission-2026-06.md",
+      "title": "SUMMARY \u2014 AutoMem on the Agent Memory Benchmark (Core-3 + BEAM)"
     }
   ],
   "prs": [
     {
-      "headRefName": "feat/experiment-registry",
+      "headRefName": "agent/kernel-worker/328d6b09",
       "mergedAt": null,
-      "number": 20,
+      "number": 70,
       "state": "OPEN",
+      "title": "eval: add MemDerive adapter plan and cold pilot",
+      "updatedAt": "2026-10-22T07:28:04Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/70"
+    },
+    {
+      "headRefName": "agent/kernel-worker/9c74a3e8",
+      "mergedAt": null,
+      "number": 69,
+      "state": "OPEN",
+      "title": "docs(eval): track DolphinBench implicit recall follow-up",
+      "updatedAt": "2026-10-20T07:16:32Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/69"
+    },
+    {
+      "headRefName": "agent/kernel-worker/48e22593",
+      "mergedAt": null,
+      "number": 68,
+      "state": "OPEN",
+      "title": "docs(eval): track StreamMemBench adapter and scoring plan",
+      "updatedAt": "2026-10-18T19:51:35Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/68"
+    },
+    {
+      "headRefName": "agent/kernel-worker/92ebad9f",
+      "mergedAt": null,
+      "number": 66,
+      "state": "OPEN",
+      "title": "eval(precisionmembench): add retrieval-precision protocol adapter",
+      "updatedAt": "2026-10-11T23:18:19Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/66"
+    },
+    {
+      "headRefName": "agent/kernel-worker/da882528",
+      "mergedAt": null,
+      "number": 63,
+      "state": "OPEN",
+      "title": "docs(eval): track Veracium validity and provenance evaluation",
+      "updatedAt": "2026-10-09T07:12:59Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/63"
+    },
+    {
+      "headRefName": "agent/kernel-worker/b05bc304",
+      "mergedAt": null,
+      "number": 61,
+      "state": "OPEN",
+      "title": "feat(eval): add EvalMem-style operation diagnostic",
+      "updatedAt": "2026-10-08T19:16:45Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/61"
+    },
+    {
+      "headRefName": "agent/kernel-worker/a5b095e4",
+      "mergedAt": null,
+      "number": 60,
+      "state": "OPEN",
+      "title": "feat(eval): add isolated ForgetEval-Adv adapter and exploratory results",
+      "updatedAt": "2026-10-08T07:22:32Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/60"
+    },
+    {
+      "headRefName": "agent/kernel-worker/66975d0c",
+      "mergedAt": null,
+      "number": 59,
+      "state": "OPEN",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. Candidate fingerprint opportunity:automem-g",
+      "updatedAt": "2026-10-06T15:02:31Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/59"
+    },
+    {
+      "headRefName": "agent/kernel-worker/a5ddec0a",
+      "mergedAt": "2026-10-05T14:49:47Z",
+      "number": 58,
+      "state": "MERGED",
+      "title": "docs: track A-TMA LTP eval",
+      "updatedAt": "2026-10-08T06:53:24Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/58"
+    },
+    {
+      "headRefName": "agent/kernel-worker/36a58aae",
+      "mergedAt": null,
+      "number": 56,
+      "state": "OPEN",
+      "title": "docs(eval): scope shared-memory governance track",
+      "updatedAt": "2026-10-04T05:26:12Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/56"
+    },
+    {
+      "headRefName": "agent/kernel-worker/5d7d2e96",
+      "mergedAt": null,
+      "number": 55,
+      "state": "OPEN",
+      "title": "feat(eval): scaffold MERIT AutoMem adapter",
+      "updatedAt": "2026-10-03T13:53:23Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/55"
+    },
+    {
+      "headRefName": "agent/kernel-worker/cf3bbbef",
+      "mergedAt": null,
+      "number": 52,
+      "state": "OPEN",
+      "title": "docs(eval): track artifact-blocked MemTrace adapter",
+      "updatedAt": "2026-10-02T04:23:05Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/52"
+    },
+    {
+      "headRefName": "agent/kernel-worker/f5dc6287",
+      "mergedAt": null,
+      "number": 49,
+      "state": "OPEN",
+      "title": "feat(protocol): add MemDelta controlled baselines",
+      "updatedAt": "2026-09-30T17:00:22Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/49"
+    },
+    {
+      "headRefName": "agent/kernel-worker/22144d5a",
+      "mergedAt": "2026-10-03T13:48:28Z",
+      "number": 47,
+      "state": "MERGED",
+      "title": "ci: arm babysit-ready bot PR auto-merge",
+      "updatedAt": "2026-10-04T04:38:13Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/47"
+    },
+    {
+      "headRefName": "agent/kernel-worker/ebecf64b",
+      "mergedAt": "2026-10-03T13:48:10Z",
+      "number": 46,
+      "state": "MERGED",
+      "title": "feat(bench): add DolphinBench AutoMem protocol smoke",
+      "updatedAt": "2026-10-04T04:38:20Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/46"
+    },
+    {
+      "headRefName": "agent/kernel-worker/60e2c548",
+      "mergedAt": "2026-10-03T13:47:48Z",
+      "number": 44,
+      "state": "MERGED",
+      "title": "feat(bench): add MemoryArena AutoMem protocol smoke",
+      "updatedAt": "2026-10-04T04:38:28Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/44"
+    },
+    {
+      "headRefName": "agent/kernel-worker/4edda3e0",
+      "mergedAt": "2026-10-03T13:47:15Z",
+      "number": 42,
+      "state": "MERGED",
+      "title": "feat(bench): add Memora FAMA AutoMem adapter",
+      "updatedAt": "2026-10-04T04:38:36Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/42"
+    },
+    {
+      "headRefName": "agent/kernel-worker/5d85ec21",
+      "mergedAt": null,
+      "number": 41,
+      "state": "CLOSED",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. Implement the AMA-Bench AutoMem adapter tra",
+      "updatedAt": "2026-09-27T10:22:08Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/41"
+    },
+    {
+      "headRefName": "agent/kernel-worker/33c1eade",
+      "mergedAt": null,
+      "number": 40,
+      "state": "CLOSED",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. AML (Agent Memory Leaderboard) Cycle 2 open",
+      "updatedAt": "2026-09-28T18:53:06Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/40"
+    },
+    {
+      "headRefName": "agent/kernel-worker/d228f052",
+      "mergedAt": null,
+      "number": 39,
+      "state": "CLOSED",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. AML (Agent Memory Leaderboard) Cycle 2 open",
+      "updatedAt": "2026-09-28T18:53:03Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/39"
+    },
+    {
+      "headRefName": "agent/kernel-worker/d228f052-streaming",
+      "mergedAt": null,
+      "number": 38,
+      "state": "OPEN",
+      "title": "test(aml): verify Cycle 2 Streaming Memory behavior",
+      "updatedAt": "2026-09-28T18:53:11Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/38"
+    },
+    {
+      "headRefName": "agent/kernel-worker/d228f052",
+      "mergedAt": null,
+      "number": 37,
+      "state": "CLOSED",
+      "title": "test(aml): verify Cycle 2 Streaming Memory behavior",
+      "updatedAt": "2026-09-20T04:51:37Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/37"
+    },
+    {
+      "headRefName": "agent/kernel-worker/9398bea5",
+      "mergedAt": null,
+      "number": 36,
+      "state": "CLOSED",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. AML Cycle 2 opens 2026-09-20 (tomorrow) wit",
+      "updatedAt": "2026-09-28T18:53:01Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/36"
+    },
+    {
+      "headRefName": "feat/memorycd-adapter",
+      "mergedAt": null,
+      "number": 35,
+      "state": "OPEN",
+      "title": "feat(memorycd): AutoMem adapter overlay for the MemoryCD harness",
+      "updatedAt": "2026-09-28T18:53:11Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/35"
+    },
+    {
+      "headRefName": "feat/mem2actbench-pilot",
+      "mergedAt": null,
+      "number": 34,
+      "state": "OPEN",
+      "title": "feat(mem2actbench): port AutoMem evidence-retrieval pilot",
+      "updatedAt": "2026-09-30T15:59:42Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/34"
+    },
+    {
+      "headRefName": "feat/aml-cycle2-adapter",
+      "mergedAt": null,
+      "number": 29,
+      "state": "OPEN",
+      "title": "feat(aml): AML Cycle 2 Add/Search adapter for AutoMem",
+      "updatedAt": "2026-09-28T18:53:07Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/29"
+    },
+    {
+      "headRefName": "feat/beam-judged-harness",
+      "mergedAt": "2026-06-26T00:38:19Z",
+      "number": 21,
+      "state": "MERGED",
+      "title": "feat(amb): judged BEAM harness + AMB results aggregator + Core-3/BEAM submission summary",
+      "updatedAt": "2026-06-26T00:38:21Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/21"
+    },
+    {
+      "headRefName": "feat/experiment-registry",
+      "mergedAt": "2026-06-22T21:01:11Z",
+      "number": 20,
+      "state": "MERGED",
       "title": "feat(registry): experiment scoreboard with AMB cross-benchmark family",
-      "updatedAt": "2026-06-22T20:20:14Z",
+      "updatedAt": "2026-06-22T21:01:13Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
     },
     {
@@ -2065,18 +2320,9 @@
       "title": "Pin benchmark judge to gpt-5.4-mini snapshot",
       "updatedAt": "2026-04-24T15:30:15Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
-    },
-    {
-      "headRefName": "agent/kernel-worker/328d6b09",
-      "mergedAt": null,
-      "number": 70,
-      "state": "OPEN",
-      "title": "eval: add MemDerive adapter plan and cold pilot",
-      "updatedAt": "2026-10-22T07:08:53Z",
-      "url": "https://github.com/verygoodplugins/automem-evals/pull/70"
     }
   ],
-  "root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
+  "root": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-328d6b09",
   "schema": "automem-evals.experiment-index.v1",
   "scores": [
     {
@@ -2533,10 +2779,10 @@
       "updated": "2026-06-22",
       "worktree": "../automem-evals",
       "worktree_status": {
-        "branch": "feat/beam-judged-harness",
+        "branch": "main",
         "cleanup_candidate": false,
         "path": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-        "state": "in-flight"
+        "state": "primary"
       }
     },
     {
@@ -2933,13 +3179,13 @@
   ],
   "worktrees": [
     {
-      "branch": "feat/beam-judged-harness",
+      "branch": "main",
       "cleanup_candidate": false,
       "dirty_entries": 1,
-      "head": "6bf5444",
+      "head": "22613fd",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals",
       "pr": null,
-      "status": "in-flight"
+      "status": "primary"
     },
     {
       "branch": "feat/amb-adapter",
@@ -2951,27 +3197,105 @@
       "status": "in-flight"
     },
     {
-      "branch": "feat/experiment-registry",
+      "branch": "feat/aml-cycle2-adapter",
       "cleanup_candidate": false,
-      "dirty_entries": 5,
-      "head": "62a3d01",
-      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
+      "dirty_entries": 0,
+      "head": "e2b2aeb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/aml-cycle2-adapter",
       "pr": {
-        "headRefName": "feat/experiment-registry",
+        "headRefName": "feat/aml-cycle2-adapter",
         "mergedAt": null,
-        "number": 20,
+        "number": 29,
         "state": "OPEN",
-        "title": "feat(registry): experiment scoreboard with AMB cross-benchmark family",
-        "updatedAt": "2026-06-22T20:20:14Z",
-        "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
+        "title": "feat(aml): AML Cycle 2 Add/Search adapter for AutoMem",
+        "updatedAt": "2026-09-28T18:53:07Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/29"
       },
       "status": "open-pr"
     },
     {
-      "branch": "agent/kernel-worker/328d6b09",
+      "branch": "feat/experiment-registry",
+      "cleanup_candidate": true,
+      "dirty_entries": 0,
+      "head": "da7ae39",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
+      "pr": {
+        "headRefName": "feat/experiment-registry",
+        "mergedAt": "2026-06-22T21:01:11Z",
+        "number": 20,
+        "state": "MERGED",
+        "title": "feat(registry): experiment scoreboard with AMB cross-benchmark family",
+        "updatedAt": "2026-06-22T21:01:13Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
+      },
+      "status": "merged"
+    },
+    {
+      "branch": "feat/mem2actbench-pilot",
       "cleanup_candidate": false,
       "dirty_entries": 0,
-      "head": "26edb2c",
+      "head": "5d23e29",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/mem2actbench-pilot",
+      "pr": {
+        "headRefName": "feat/mem2actbench-pilot",
+        "mergedAt": null,
+        "number": 34,
+        "state": "OPEN",
+        "title": "feat(mem2actbench): port AutoMem evidence-retrieval pilot",
+        "updatedAt": "2026-09-30T15:59:42Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/34"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "feat/memorycd-adapter",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "f37a49a",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-adapter",
+      "pr": {
+        "headRefName": "feat/memorycd-adapter",
+        "mergedAt": null,
+        "number": 35,
+        "state": "OPEN",
+        "title": "feat(memorycd): AutoMem adapter overlay for the MemoryCD harness",
+        "updatedAt": "2026-09-28T18:53:11Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/35"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "feat/memorycd-automem-adapter",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "4927125",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-automem-adapter",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/082439ff",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "93aa7e4",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-082439ff",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/2fa9b7a0",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "d9367c0",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-2fa9b7a0",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/328d6b09",
+      "cleanup_candidate": false,
+      "dirty_entries": 1,
+      "head": "f83fa4a",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-328d6b09",
       "pr": {
         "headRefName": "agent/kernel-worker/328d6b09",
@@ -2979,10 +3303,353 @@
         "number": 70,
         "state": "OPEN",
         "title": "eval: add MemDerive adapter plan and cold pilot",
-        "updatedAt": "2026-10-22T07:08:53Z",
+        "updatedAt": "2026-10-22T07:28:04Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/70"
       },
       "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/33c1eade",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "70de84d",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-33c1eade",
+      "pr": {
+        "headRefName": "agent/kernel-worker/33c1eade",
+        "mergedAt": null,
+        "number": 40,
+        "state": "CLOSED",
+        "title": "[preserved] Repo: verygoodplugins/automem-evals. AML (Agent Memory Leaderboard) Cycle 2 open",
+        "updatedAt": "2026-09-28T18:53:06Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/40"
+      },
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/36a58aae",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "7e4370f",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-36a58aae",
+      "pr": {
+        "headRefName": "agent/kernel-worker/36a58aae",
+        "mergedAt": null,
+        "number": 56,
+        "state": "OPEN",
+        "title": "docs(eval): scope shared-memory governance track",
+        "updatedAt": "2026-10-04T05:26:12Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/56"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/48e22593",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "8494403",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-48e22593",
+      "pr": {
+        "headRefName": "agent/kernel-worker/48e22593",
+        "mergedAt": null,
+        "number": 68,
+        "state": "OPEN",
+        "title": "docs(eval): track StreamMemBench adapter and scoring plan",
+        "updatedAt": "2026-10-18T19:51:35Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/68"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/4edda3e0",
+      "cleanup_candidate": true,
+      "dirty_entries": 0,
+      "head": "e1b4617",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-4edda3e0",
+      "pr": {
+        "headRefName": "agent/kernel-worker/4edda3e0",
+        "mergedAt": "2026-10-03T13:47:15Z",
+        "number": 42,
+        "state": "MERGED",
+        "title": "feat(bench): add Memora FAMA AutoMem adapter",
+        "updatedAt": "2026-10-04T04:38:36Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/42"
+      },
+      "status": "merged"
+    },
+    {
+      "branch": "agent/kernel-worker/5d7d2e96",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "85db956",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-5d7d2e96",
+      "pr": {
+        "headRefName": "agent/kernel-worker/5d7d2e96",
+        "mergedAt": null,
+        "number": 55,
+        "state": "OPEN",
+        "title": "feat(eval): scaffold MERIT AutoMem adapter",
+        "updatedAt": "2026-10-03T13:53:23Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/55"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/5d85ec21",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "3fe8621",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-5d85ec21",
+      "pr": {
+        "headRefName": "agent/kernel-worker/5d85ec21",
+        "mergedAt": null,
+        "number": 41,
+        "state": "CLOSED",
+        "title": "[preserved] Repo: verygoodplugins/automem-evals. Implement the AMA-Bench AutoMem adapter tra",
+        "updatedAt": "2026-09-27T10:22:08Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/41"
+      },
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/5e36f253",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "832a3fb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-5e36f253",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/66975d0c",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "7c1db36",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-66975d0c",
+      "pr": {
+        "headRefName": "agent/kernel-worker/66975d0c",
+        "mergedAt": null,
+        "number": 59,
+        "state": "OPEN",
+        "title": "[preserved] Repo: verygoodplugins/automem-evals. Candidate fingerprint opportunity:automem-g",
+        "updatedAt": "2026-10-06T15:02:31Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/59"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/6937fb10",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "832a3fb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-6937fb10",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/7271d230",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "832a3fb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7271d230",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/92ebad9f",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "9b3e7cb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-92ebad9f",
+      "pr": {
+        "headRefName": "agent/kernel-worker/92ebad9f",
+        "mergedAt": null,
+        "number": 66,
+        "state": "OPEN",
+        "title": "eval(precisionmembench): add retrieval-precision protocol adapter",
+        "updatedAt": "2026-10-11T23:18:19Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/66"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/9398bea5",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "185e2d8",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-9398bea5",
+      "pr": {
+        "headRefName": "agent/kernel-worker/9398bea5",
+        "mergedAt": null,
+        "number": 36,
+        "state": "CLOSED",
+        "title": "[preserved] Repo: verygoodplugins/automem-evals. AML Cycle 2 opens 2026-09-20 (tomorrow) wit",
+        "updatedAt": "2026-09-28T18:53:01Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/36"
+      },
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/9c74a3e8",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "f1614d6",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-9c74a3e8",
+      "pr": {
+        "headRefName": "agent/kernel-worker/9c74a3e8",
+        "mergedAt": null,
+        "number": 69,
+        "state": "OPEN",
+        "title": "docs(eval): track DolphinBench implicit recall follow-up",
+        "updatedAt": "2026-10-20T07:16:32Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/69"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/a5b095e4",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "4723034",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-a5b095e4",
+      "pr": {
+        "headRefName": "agent/kernel-worker/a5b095e4",
+        "mergedAt": null,
+        "number": 60,
+        "state": "OPEN",
+        "title": "feat(eval): add isolated ForgetEval-Adv adapter and exploratory results",
+        "updatedAt": "2026-10-08T07:22:32Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/60"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/a5ddec0a",
+      "cleanup_candidate": true,
+      "dirty_entries": 0,
+      "head": "b3155a5",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-a5ddec0a",
+      "pr": {
+        "headRefName": "agent/kernel-worker/a5ddec0a",
+        "mergedAt": "2026-10-05T14:49:47Z",
+        "number": 58,
+        "state": "MERGED",
+        "title": "docs: track A-TMA LTP eval",
+        "updatedAt": "2026-10-08T06:53:24Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/58"
+      },
+      "status": "merged"
+    },
+    {
+      "branch": "agent/kernel-worker/b05bc304",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "db52106",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-b05bc304",
+      "pr": {
+        "headRefName": "agent/kernel-worker/b05bc304",
+        "mergedAt": null,
+        "number": 61,
+        "state": "OPEN",
+        "title": "feat(eval): add EvalMem-style operation diagnostic",
+        "updatedAt": "2026-10-08T19:16:45Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/61"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/b8927603",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "832a3fb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-b8927603",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/b8eb5888",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "832a3fb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-b8eb5888",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/cf3bbbef",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "2f16b5f",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-cf3bbbef",
+      "pr": {
+        "headRefName": "agent/kernel-worker/cf3bbbef",
+        "mergedAt": null,
+        "number": 52,
+        "state": "OPEN",
+        "title": "docs(eval): track artifact-blocked MemTrace adapter",
+        "updatedAt": "2026-10-02T04:23:05Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/52"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/d228f052",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "567ad3b",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-d228f052",
+      "pr": {
+        "headRefName": "agent/kernel-worker/d228f052",
+        "mergedAt": null,
+        "number": 37,
+        "state": "CLOSED",
+        "title": "test(aml): verify Cycle 2 Streaming Memory behavior",
+        "updatedAt": "2026-09-20T04:51:37Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/37"
+      },
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/da882528",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "4e72845",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-da882528",
+      "pr": {
+        "headRefName": "agent/kernel-worker/da882528",
+        "mergedAt": null,
+        "number": 63,
+        "state": "OPEN",
+        "title": "docs(eval): track Veracium validity and provenance evaluation",
+        "updatedAt": "2026-10-09T07:12:59Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/63"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/f5dc6287",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "07e50e2",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-f5dc6287",
+      "pr": {
+        "headRefName": "agent/kernel-worker/f5dc6287",
+        "mergedAt": null,
+        "number": 49,
+        "state": "OPEN",
+        "title": "feat(protocol): add MemDelta controlled baselines",
+        "updatedAt": "2026-09-30T17:00:22Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/49"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "feat/memora-fama-eval",
+      "cleanup_candidate": false,
+      "dirty_entries": 2,
+      "head": "832a3fb",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/memora-fama-eval",
+      "pr": null,
+      "status": "in-flight"
     }
   ]
 }
