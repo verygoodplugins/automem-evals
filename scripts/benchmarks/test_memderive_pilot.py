@@ -1,5 +1,6 @@
 """Boundary checks for the MemDerive HTTP seam; no external services needed."""
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -46,6 +47,21 @@ class MemDeriveTests(unittest.TestCase):
                 bank.cleanup()
                 call.assert_called_once_with("/memory/m1", method="DELETE")
             self.assertTrue((Path(directory) / "cleanup.json").exists())
+
+    def test_cleanup_attempts_all_ids_and_preserves_failure_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            bank = pilot.AutoMem("http://localhost:8001", "test", Path(directory))
+            bank.events = {"m1": {}, "m2": {}, "m3": {}}
+            with patch.object(bank, "call", side_effect=[
+                    TimeoutError("delete timed out"), {}, {}]) as call:
+                with self.assertRaisesRegex(RuntimeError, "cleanup failed for 1"):
+                    bank.cleanup()
+                self.assertEqual([c.args[0] for c in call.call_args_list],
+                                 ["/memory/m1", "/memory/m2", "/memory/m3"])
+            receipt = json.loads((Path(directory) / "cleanup.json").read_text())
+            self.assertEqual(receipt["deleted_ids"], ["m2", "m3"])
+            self.assertEqual(receipt["failed_ids"],
+                             {"m1": "TimeoutError: delete timed out"})
 
     def test_timestamp_precision_and_timezone(self):
         self.assertEqual(pilot.instant("2026-01-01 09:00"),

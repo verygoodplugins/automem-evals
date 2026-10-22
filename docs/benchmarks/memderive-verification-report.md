@@ -60,3 +60,22 @@ Shell fetches returning 403 were not treated as evidence of missing artifacts.
 Remaining work: full Q2 frontier/recovery execution, matched-token dev sweeps,
 Q3 implicit-change maintenance, and the frozen narrative-time maturation profile.
 Repository-wide lint remains an existing blocker to an all-green lint claim.
+
+## Finalizer verification
+
+The Codex CLI finalizer repeated the listed test suites: runners 233 tests
+(13 skipped), scripts 30 tests, matrix 12 tests, and benchmarks initially 10
+tests all passed. Focused flake8, byte compilation and the branch diff whitespace
+check passed. Repository-wide flake8 reproduced the same 1,361 findings, with
+none in the new adapter or its tests. All eight raw-artifact checksums in the
+pilot manifest and both official archive hashes were verified; the captured
+release screenshot and dataset/framework DOM receipts were inspected.
+
+The bounded local Codex review (`gpt-6.1-sol`, medium effort) found one P2 cleanup
+defect: an individual failed deletion prevented later IDs from being attempted.
+Cleanup now attempts every manifested ID, persists successful and failed IDs
+after each attempt, and raises an aggregate failure for recovery. The focused
+benchmark suite passes all 11 tests, including a failed-first-deletion regression;
+focused flake8 and `git diff --check` pass after the fix. The original pilot
+was not repeated, and its recorded scores and checksums remain historical evidence.
+PR, hosted review and CI disposition are reported separately by the finalizer.

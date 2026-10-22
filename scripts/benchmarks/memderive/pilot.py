@@ -97,10 +97,19 @@ class AutoMem:
         return selected[:k]
 
     def cleanup(self):
+        deleted, failed = [], {}
         for memory_id in list(self.events):
-            self.call("/memory/" + urllib.parse.quote(memory_id, safe=""),
-                      method="DELETE")
-        save(self.output / "cleanup.json", {"deleted_ids": list(self.events)})
+            try:
+                self.call("/memory/" + urllib.parse.quote(memory_id, safe=""),
+                          method="DELETE")
+                deleted.append(memory_id)
+            except Exception as exc:
+                failed[memory_id] = f"{type(exc).__name__}: {exc}"
+            save(self.output / "cleanup.json", {
+                "deleted_ids": deleted, "failed_ids": failed})
+        if failed:
+            raise RuntimeError(f"cleanup failed for {len(failed)} memories; "
+                               "see cleanup.json and memories.json")
 
 
 def main():
