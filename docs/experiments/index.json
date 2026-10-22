@@ -1722,10 +1722,15 @@
       "kind": "session-note",
       "path": "docs/session_20260616_beam_judged_100k.md",
       "title": "Session 2026-06-16 \u2014 BEAM judged 100K (native, official scorer)"
+    },
+    {
+      "kind": "artifact",
+      "path": "data/results/memderive-pilot/MANIFEST.json",
+      "schema": "automem-evals.memderive-pilot.v1"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-06-22T20:26:29+00:00",
+  "generated_at": "2026-10-22T07:18:12+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2060,6 +2065,15 @@
       "title": "Pin benchmark judge to gpt-5.4-mini snapshot",
       "updatedAt": "2026-04-24T15:30:15Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
+    },
+    {
+      "headRefName": "agent/kernel-worker/328d6b09",
+      "mergedAt": null,
+      "number": 70,
+      "state": "OPEN",
+      "title": "eval: add MemDerive adapter plan and cold pilot",
+      "updatedAt": "2026-10-22T07:08:53Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/70"
     }
   ],
   "root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry",
@@ -2388,11 +2402,38 @@
   ],
   "status_counts": {
     "adopted": 10,
-    "in-progress": 2,
+    "in-progress": 3,
     "parked": 2,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "data/results/memderive-pilot/MANIFEST.json"
+      ],
+      "artifacts": [
+        "docs/benchmarks/memderive-automem-plan.md",
+        "docs/benchmarks/memderive-verification-report.md",
+        "scripts/benchmarks/memderive/**",
+        "data/results/memderive-pilot/**"
+      ],
+      "branch": "agent/kernel-worker/328d6b09",
+      "decision": "Proceed with dev-world diagnostics; defer server changes and benchmark claims until broader matched-budget and maintenance evidence exists.",
+      "hypothesis": "Following recorded derivation dependencies can gather intermediate state missed by ordinary recall.",
+      "id": "EXP-MEMDERIVE",
+      "pr": null,
+      "related": [
+        "EXP-CURRENT-STATE",
+        "EXP-MATURATION"
+      ],
+      "result": "Official formal-set-v1.16 archives are public; a cold real-data AutoMem versus BM25 plumbing pilot is implemented. See the plan for scoped results and release pins.",
+      "started": "2026-10-22",
+      "status": "in-progress",
+      "title": "MemDerive dependency-following recall pilot",
+      "updated": "2026-10-22",
+      "worktree_status": null
+    },
     {
       "artifact_count": 0,
       "artifact_samples": [],
@@ -2923,6 +2964,23 @@
         "title": "feat(registry): experiment scoreboard with AMB cross-benchmark family",
         "updatedAt": "2026-06-22T20:20:14Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/328d6b09",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "26edb2c",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-328d6b09",
+      "pr": {
+        "headRefName": "agent/kernel-worker/328d6b09",
+        "mergedAt": null,
+        "number": 70,
+        "state": "OPEN",
+        "title": "eval: add MemDerive adapter plan and cold pilot",
+        "updatedAt": "2026-10-22T07:08:53Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/70"
       },
       "status": "open-pr"
     }
