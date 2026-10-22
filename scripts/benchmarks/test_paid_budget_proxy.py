@@ -174,6 +174,79 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertEqual(self.fake.calls, [])
         self.assertEqual(self.proxy.ledger.status()["attempts"], 0)
 
+    def test_uncapped_extractor_request_halts_campaign_before_network(self):
+        self.start()
+        uncapped = {"model": "gpt-5-mini", "messages": CHAT["messages"]}
+        self.assertEqual(self.request(uncapped)[0], 400)
+        state = self.request(route="/status", method="GET")[1]
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["halt_reason"], "request_rejected")
+        self.assertEqual(state["attempts"], 0)
+        self.assertEqual(state["charged_nusd"], 0)
+        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(self.fake.calls, [])
+        self.proxy.close()
+        self.proxy = None
+        self.start()
+        self.assertTrue(self.proxy.ledger.status()["halted"])
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(self.fake.calls, [])
+
+    def test_summary_missing_path_does_not_create_parent_or_ledger(self):
+        missing = Path(self.tmp.name) / "not-created" / "budget.sqlite3"
+        result = subprocess.run([sys.executable, str(Path(__file__).with_name("paid_budget_proxy.py")),
+            "--ledger", str(missing), "--summary"], capture_output=True, text=True, timeout=5)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertFalse(missing.exists())
+        self.assertFalse(missing.parent.exists())
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_summary_ignores_cap_and_preserves_existing_ledger(self):
+        ledger = BudgetLedger(self.path, "20")
+        ledger.reserve("openai", "gpt-5-mini", 1000000)
+        expected = ledger.status()
+        before = self.path.read_bytes()
+        before_stat = self.path.stat()
+        for cap in ("0.0001", "20.01", "not-a-price"):
+            with self.subTest(cap=cap):
+                result = subprocess.run([sys.executable, str(Path(__file__).with_name("paid_budget_proxy.py")),
+                    "--ledger", str(self.path), "--summary", "--cap-usd", cap], capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(json.loads(result.stdout), expected)
+                self.assertEqual(self.path.read_bytes(), before)
+                self.assertEqual(self.path.stat().st_mtime_ns, before_stat.st_mtime_ns)
+                self.assertEqual(ledger.status(), expected)
+
+    def test_summary_reads_committed_live_wal_with_uri_characters(self):
+        path = Path(self.tmp.name) / "budget #?.sqlite3"
+        ledger = BudgetLedger(path, "20")
+        writer = sqlite3.connect(path)
+        try:
+            self.assertEqual(writer.execute("PRAGMA journal_mode").fetchone()[0], "wal")
+            ledger.reserve("openai", "gpt-5-mini", 1000000)
+            expected = ledger.status()
+            wal = Path(str(path) + "-wal")
+            self.assertGreater(wal.stat().st_size, 0)
+            before_db, before_wal = path.read_bytes(), wal.read_bytes()
+            result = subprocess.run([sys.executable, str(Path(__file__).with_name("paid_budget_proxy.py")),
+                "--ledger", str(path), "--summary", "--cap-usd", "0.0001"], capture_output=True, text=True, timeout=5)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(result.stdout), expected)
+            self.assertEqual(path.read_bytes(), before_db)
+            self.assertEqual(wal.read_bytes(), before_wal)
+        finally:
+            writer.close()
+
+    def test_summary_empty_existing_file_is_not_initialized(self):
+        self.path.touch()
+        result = subprocess.run([sys.executable, str(Path(__file__).with_name("paid_budget_proxy.py")),
+            "--ledger", str(self.path), "--summary"], capture_output=True, text=True, timeout=5)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(self.path.read_bytes(), b"")
+        self.assertEqual(result.stdout, "")
+
     def test_invalid_usage_remains_charged(self):
         self.start()
         expected = quote_request("openai", CHAT, PRICES)["reservation_nusd"]

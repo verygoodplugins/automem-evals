@@ -194,6 +194,27 @@ def quote_request(lane, body, pricing):
             "reservation_nusd": _charge(pricing, model, input_tokens, output_tokens, lane)}
 
 
+def _read_ledger_status(db):
+    # A single read transaction keeps cap/halt and attempt totals consistent.
+    db.execute("BEGIN")
+    cap, halted = db.execute("SELECT cap_nusd, halted FROM budget WHERE id=1").fetchone()
+    count, charged, pending = db.execute("SELECT count(*), coalesce(sum(charged_nusd),0), coalesce(sum(state='reserved'),0) FROM attempts").fetchone()
+    return {"cap_nusd": cap, "charged_nusd": charged, "remaining_nusd": max(0, cap - charged),
+            "attempts": count, "pending_or_ambiguous": pending, "halted": bool(halted), "halt_reason": halted}
+
+
+def read_ledger_status(path):
+    """Inspect an existing ledger without initialization or cap changes."""
+    # mode=ro refuses missing paths and prevents SQLite database writes. Do not
+    # use immutable=1: summaries must include a live writer's WAL transactions.
+    uri = Path(path).resolve().as_uri() + "?mode=ro"
+    db = sqlite3.connect(uri, uri=True, timeout=30)
+    try:
+        return _read_ledger_status(db)
+    finally:
+        db.close()
+
+
 class BudgetLedger:
     """SQLite transactions serialize admission across threads AND processes.
 
@@ -244,7 +265,7 @@ class BudgetLedger:
                        (attempt_id, lane, model, amount, amount))
         return attempt_id
     def halt(self, reason="accounting_error"):
-        if reason not in {"accounting_error", "reservation_exceeded"}:
+        if reason not in {"accounting_error", "reservation_exceeded", "request_rejected"}:
             reason = "accounting_error"
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -267,11 +288,7 @@ class BudgetLedger:
             raise BudgetHalted("Usage exceeded reservation")
     def status(self):
         with self._connect() as db:
-            db.execute("BEGIN")
-            cap, halted = db.execute("SELECT cap_nusd, halted FROM budget WHERE id=1").fetchone()
-            count, charged, pending = db.execute("SELECT count(*), coalesce(sum(charged_nusd),0), coalesce(sum(state='reserved'),0) FROM attempts").fetchone()
-        return {"cap_nusd": cap, "charged_nusd": charged, "remaining_nusd": max(0, cap - charged),
-                "attempts": count, "pending_or_ambiguous": pending, "halted": bool(halted), "halt_reason": halted}
+            return _read_ledger_status(db)
 
 
 def _upstream_url(base):
@@ -374,6 +391,13 @@ class BudgetProxy:
                     # This durable commit MUST happen before any network activity.
                     attempt = owner.ledger.reserve(lane, quote["model"], quote["reservation_nusd"])
                 except ConfigError:
+                    # A harness can swallow this 400 and silently fall back.
+                    # Persist the rejection so its monitor still stops the run.
+                    try:
+                        owner.ledger.halt("request_rejected")
+                    except Exception:
+                        self.reply(503, {"error": {"code": "accounting_unavailable", "message": "Accounting unavailable; abort run"}})
+                        return
                     self.reply(400, {"error": {"code": "invalid_request", "message": "Unsupported, invalid, or unpriced request"}})
                     return
                 except BudgetHalted:
@@ -450,17 +474,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ledger", type=Path, required=True, help="One shared SQLite ledger for ALL paid lanes/processes")
     parser.add_argument("--pricing", type=Path, help="JSON models with input_usd_per_million/output_usd_per_million rates")
-    parser.add_argument("--cap-usd", default="20", help="May only lower the total $20 cap, including across restarts")
+    parser.add_argument("--cap-usd", default="20", help="May only lower the total $20 cap, including across restarts; ignored by --summary")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8099)
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--openai-upstream", default="https://api.openai.com/v1")
     parser.add_argument("--voyage-upstream", default="https://api.voyageai.com/v1")
-    parser.add_argument("--summary", action="store_true", help="Print safe durable accounting and exit without network")
+    parser.add_argument("--summary", action="store_true", help="Read an existing ledger without creating or changing it; no network")
     args = parser.parse_args()
     try:
         if args.summary:
-            print(json.dumps(BudgetLedger(args.ledger, args.cap_usd).status(), sort_keys=True))
+            print(json.dumps(read_ledger_status(args.ledger), sort_keys=True))
             return 0
         if args.pricing is None:
             raise ConfigError("--pricing required")
