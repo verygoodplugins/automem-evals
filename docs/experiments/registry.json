@@ -1,5 +1,27 @@
 [
   {
+    "id": "EXP-MEMDERIVE",
+    "title": "MemDerive dependency-following recall pilot",
+    "status": "in-progress",
+    "hypothesis": "Following recorded derivation dependencies can gather intermediate state missed by ordinary recall.",
+    "result": "Official formal-set-v1.16 archives are public; a cold real-data AutoMem versus BM25 plumbing pilot is implemented. See the plan for scoped results and release pins.",
+    "decision": "Proceed with dev-world diagnostics; defer server changes and benchmark claims until broader matched-budget and maintenance evidence exists.",
+    "started": "2026-10-22",
+    "updated": "2026-10-22",
+    "artifacts": [
+      "docs/benchmarks/memderive-automem-plan.md",
+      "docs/benchmarks/memderive-verification-report.md",
+      "scripts/benchmarks/memderive/**",
+      "data/results/memderive-pilot/**"
+    ],
+    "branch": "agent/kernel-worker/328d6b09",
+    "pr": null,
+    "related": [
+      "EXP-CURRENT-STATE",
+      "EXP-MATURATION"
+    ]
+  },
+  {
     "id": "EXP-AMB",
     "title": "Agent Memory Benchmark adapter and submission",
     "status": "in-progress",

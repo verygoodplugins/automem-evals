@@ -1,0 +1,66 @@
+{
+  "schema": "automem-evals.memderive-pilot.v1",
+  "qualification": "experimental cold plumbing smoke; no comparative claim",
+  "date": "2026-10-22",
+  "status": "completed",
+  "world": "tripops_w1",
+  "query_id": "q055",
+  "events": 452,
+  "nodes": 5,
+  "edges": 5,
+  "reader": "qwen3.5:9b",
+  "reader_digest": "d63f830f28d515fefea546f213fca7a75e9dd5176ef51a6deabc952d1c99a911",
+  "reader_options": {
+    "temperature": 0,
+    "seed": 0,
+    "num_predict": 2048
+  },
+  "top_k": 15,
+  "prompt": "answering_v9_checkpoint_safe_persona",
+  "scorer": "derivemem_deterministic_v2",
+  "matured": "not_run",
+  "arms": {
+    "bm25": {
+      "answer_correct": 1,
+      "answer_denominator": 1,
+      "witnessed_correct": 1,
+      "citation_precision": 0.5,
+      "citation_recall": 1.0,
+      "targeted_correct": 4,
+      "inherited_correct": 3,
+      "answer": "Trip-Tanit receipt export",
+      "witness_ids": [
+        "w1_e239",
+        "w1_e240"
+      ]
+    },
+    "automem": {
+      "answer_correct": 1,
+      "answer_denominator": 1,
+      "witnessed_correct": 1,
+      "citation_precision": 0.5,
+      "citation_recall": 1.0,
+      "targeted_correct": 4,
+      "inherited_correct": 4,
+      "answer": "Trip-Tanit receipt export",
+      "witness_ids": [
+        "w1_e239",
+        "w1_e240"
+      ]
+    }
+  },
+  "cleanup": {
+    "deleted": 452,
+    "remaining_scoped_results": 0
+  },
+  "raw_artifact_sha256": {
+    "automem-predictions.jsonl": "16b2b81035b0654f4b5d54bf89eeca8ce85439ede987575a2d3edf0f46d3b844",
+    "automem-traces.json": "e69c659a74dbe149e91b309a127c2cd2f0814f4617a0f4d482648b4f6c20e4a7",
+    "bm25-predictions.jsonl": "1e4802fc48c1c1f632ca74b60f0c40bce0e74080c670a391d8619c01a46f6cb9",
+    "bm25-traces.json": "738095e6851b405f2e788959cbd77a142da6bfa63aefb279ea373a8476b7f711",
+    "cleanup-check.json": "dc1d3c77f4a3da885051c9eefabb3eb43a4f7ce6b025320427322a3b83272bee",
+    "cleanup.json": "0e2facd9f20a05c91f435721427fb6723f24aaad2d77ab3218bef5d6e76df22d",
+    "memories.json": "bf79033dfcb4fedc90249cc926fc7ad9a5d78952a655f5d69cfb8d929f5d46dc",
+    "report.json": "1db40922bfe4a99434e06e79ede30d1698027acc1848c1c3683d7556d9171598"
+  }
+}
