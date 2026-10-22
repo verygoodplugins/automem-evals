@@ -574,6 +574,52 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.start()
         self.assertEqual(self.proxy.ledger.status()["charged_nusd"], 17000)
         self.assertEqual(self.proxy.ledger.status()["attempts"], 2)
+
+    def test_proxy_startup_halts_orphan_reservation_without_sending(self):
+        ledger = BudgetLedger(self.path, "20")
+        expected = quote_request("openai", CHAT, PRICES)["reservation_nusd"]
+        ledger.reserve("openai", "gpt-5-mini", expected)
+        self.assertFalse(ledger.status()["halted"])
+        self.start()
+        state = self.proxy.ledger.status()
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["halt_reason"], "accounting_error")
+        self.assertEqual(state["charged_nusd"], expected)
+        self.assertEqual(state["pending_or_ambiguous"], 1)
+        self.assertEqual(state["attempts"], 1)
+        self.assertEqual(self.request()[0], 402)
+        self.proxy.close()
+        self.start()
+        self.assertEqual(self.proxy.ledger.status(), state)
+        self.assertEqual(self.request()[0], 402)
+        self.assertEqual(self.fake.calls, [])
+
+    def test_live_pending_reservation_remains_healthy_and_settles(self):
+        self.start()
+        entered, release = threading.Event(), threading.Event()
+        original_open = self.proxy.opener.open
+        def blocked_open(*args, **kwargs):
+            entered.set()
+            if not release.wait(5):
+                raise TimeoutError("Fake request release timed out")
+            return original_open(*args, **kwargs)
+        with unittest.mock.patch.object(self.proxy.opener, "open", side_effect=blocked_open), \
+                concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(self.request)
+            try:
+                self.assertTrue(entered.wait(5))
+                state = BudgetLedger(self.path, "20").status()
+                self.assertFalse(state["halted"])
+                self.assertEqual(state["pending_or_ambiguous"], 1)
+                self.assertEqual(paid_budget_proxy.read_ledger_status(self.path), state)
+                self.assertEqual(self.proxy.ledger.status(), state)
+            finally:
+                release.set()
+            self.assertEqual(future.result(timeout=5)[0], 200)
+        self.assertFalse(self.proxy.ledger.status()["halted"])
+        self.assertEqual(self.proxy.ledger.status()["pending_or_ambiguous"], 0)
+        self.assertEqual(self.proxy.ledger.status()["charged_nusd"], 15000)
+
     def test_concurrent_processes_cannot_overspend(self):
         BudgetLedger(self.path, "0.01")
         ctx = multiprocessing.get_context("spawn")

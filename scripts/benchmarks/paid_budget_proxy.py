@@ -406,6 +406,10 @@ class BudgetProxy:
         self.pricing = json.loads(json.dumps(pricing))
         self.timeout = timeout
         self.ledger = BudgetLedger(ledger_path, cap_usd)
+        # Only proxy startup treats existing reservations as orphaned; ordinary
+        # ledger opens and summaries must not halt a live in-flight request.
+        if self.ledger.status()["pending_or_ambiguous"]:
+            self.ledger.halt()
         self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
         owner = self
         class Handler(BaseHTTPRequestHandler):
