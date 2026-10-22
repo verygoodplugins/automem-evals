@@ -7,6 +7,7 @@ The three retained AMB values are historical snapshot records, never fresh runs.
 Requires Python 3.11+ like the existing dashboard generator.
 """
 import copy
+from functools import partial
 import html
 import json
 import math
@@ -57,11 +58,12 @@ def _complete_historical(row):
     return True
 
 
-def retain_historical_scores(index, snapshot):
+def retain_historical_scores(index, snapshot, *, restore_absent=False):
     """Copy the index, filling only exact, freshly missing AMB placeholders.
 
-    No rows are added; valid current zero scores, failures and unmatched runs are
-    left intact. A retained row copies every original score/model field unchanged.
+    By default no rows are added; CLI-only restore_absent seeds just the three
+    curated keys when raw archives are absent. Current scores/failures stay intact.
+    A retained row copies every original score/model field unchanged.
     """
     retained = copy.deepcopy(index)
     source = snapshot.get("source", {})
@@ -71,6 +73,12 @@ def retain_historical_scores(index, snapshot):
             or source["index_path"] != "docs/experiments/index.json"):
         return retained
     historical = {_score_key(row): row for row in snapshot.get("scores", []) if _complete_historical(row)}
+    if restore_absent:
+        rows = retained.setdefault("scores", [])
+        existing = {_score_key(row) for row in rows}
+        for key in historical:
+            if key not in existing:
+                rows.append(dict(zip(KEY_FIELDS, key), status="missing", accuracy=None, n=0))
     for position, row in enumerate(retained.get("scores", [])):
         old = historical.get(_score_key(row))
         if (old is None or row.get("status") != "missing" or row.get("accuracy") is not None
@@ -135,9 +143,9 @@ def discover_with_overlay(data_root):
     return list(artifacts.values())
 
 
-def write_with_provenance(index, status_path, index_path, scoreboard_path=None):
+def write_with_provenance(index, status_path, index_path, scoreboard_path=None, *, restore_absent=False):
     """Write captured index/views directly; never rediscover artifacts or VCS."""
-    retained = retain_historical_scores(index, load_snapshot())
+    retained = retain_historical_scores(index, load_snapshot(), restore_absent=restore_absent)
     retained["artifact_overlay_root"] = str(ROOT)
     outputs = [(status_path, render_status(retained)),
                (index_path, json.dumps(retained, indent=2, sort_keys=True, allow_nan=False) + "\n")]
@@ -150,13 +158,25 @@ def write_with_provenance(index, status_path, index_path, scoreboard_path=None):
 
 
 def main():
-    # Importing this one-off wrapper must not alter the normal generator.
-    previous_discover, previous_write = dashboard.discover_artifacts, dashboard.write_outputs
-    dashboard.discover_artifacts, dashboard.write_outputs = discover_with_overlay, write_with_provenance
+    args = dashboard.parse_args()
+    root = args.root.resolve()
+    data_root = args.data_root.resolve() if args.data_root else root
+    amb_outputs = None if args.no_amb else args.amb_outputs
+    if amb_outputs is not None and not amb_outputs.is_absolute():
+        amb_outputs = (data_root / amb_outputs).resolve()
+    restore_absent = amb_outputs is not None and not amb_outputs.exists()
+    # Reuse parsed arguments so the generator and restoration share one decision.
+    # All hooks are restored even when the underlying generator raises.
+    previous_discover, previous_write, previous_parse = (
+        dashboard.discover_artifacts, dashboard.write_outputs, dashboard.parse_args)
+    dashboard.discover_artifacts = discover_with_overlay
+    dashboard.write_outputs = partial(write_with_provenance, restore_absent=restore_absent)
+    dashboard.parse_args = lambda: args
     try:
         return dashboard.main()
     finally:
-        dashboard.discover_artifacts, dashboard.write_outputs = previous_discover, previous_write
+        dashboard.discover_artifacts, dashboard.write_outputs, dashboard.parse_args = (
+            previous_discover, previous_write, previous_parse)
 
 
 if __name__ == "__main__":

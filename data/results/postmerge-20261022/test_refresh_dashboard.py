@@ -1,9 +1,12 @@
 """Offline retention tests; no artifact scan, VCS scan or provider requests."""
+import contextlib
 import copy
 import importlib.util
+import io
 import json
 from pathlib import Path
 import tempfile
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -55,6 +58,8 @@ class HistoricalScoreRetentionTests(unittest.TestCase):
                 index = {"scores": [dict(self.index["scores"][0], **{field: "new-value"})]}
                 self.assertEqual(refresh.retain_historical_scores(index, self.snapshot), index)
         self.assertEqual(refresh.retain_historical_scores({"scores": []}, self.snapshot), {"scores": []})
+        restored = refresh.retain_historical_scores({"scores": []}, self.snapshot, restore_absent=True)
+        self.assertEqual({refresh._score_key(row) for row in restored["scores"]}, refresh.RETAINABLE_KEYS)
 
     def test_invalid_or_incomplete_historical_rows_are_ignored(self):
         for change in ({"status": "partial"}, {"status": "missing"}, {"n": 0}, {"n": True},
@@ -102,6 +107,42 @@ class HistoricalScoreRetentionTests(unittest.TestCase):
         index = dict(self.index, scores=[])
         self.assertNotIn("Historical AMB snapshot", refresh.render_status(index))
         self.assertNotIn("Historical AMB snapshot", refresh.render_scoreboard_html(index))
+
+    def test_real_cli_missing_archives_restores_three_but_no_amb_restores_none(self):
+        hooks = {name: getattr(refresh.dashboard, name) for name in ("parse_args", "discover_artifacts", "write_outputs")}
+        for no_amb in (False, True):
+            with self.subTest(no_amb=no_amb), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                argv = ["refresh_dashboard.py", "--root", str(root), "--data-root", str(root),
+                        "--amb-outputs", "unavailable-archives", "--no-vcs"]
+                if no_amb:
+                    argv.append("--no-amb")
+                with patch.object(sys, "argv", argv), patch.object(refresh, "original_discover", return_value=[]), \
+                     patch.object(refresh.dashboard, "run_command", side_effect=AssertionError("must not scan VCS")), \
+                     contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(refresh.main(), 0)
+                self.assertFalse((root / "unavailable-archives").exists())
+                captured = json.loads((root / "docs/experiments/index.json").read_text())
+                rows = [row for row in captured["scores"] if row.get("benchmark") == "amb"]
+                self.assertEqual(len(rows), 0 if no_amb else 3)
+                if not no_amb:
+                    self.assertEqual({refresh._score_key(row) for row in rows}, refresh.RETAINABLE_KEYS)
+                    self.assertTrue(all(row["score_provenance"]["source_generated_at"] == "2026-06-22T20:26:29+00:00" for row in rows))
+                for name in ("STATUS.md", "scoreboard.html"):
+                    text = (root / "docs/experiments" / name).read_text()
+                    self.assertEqual("Historical AMB snapshot" in text, not no_amb)
+                for name, original in hooks.items():
+                    self.assertIs(getattr(refresh.dashboard, name), original)
+
+    def test_cli_restores_generator_hooks_after_failure(self):
+        hooks = {name: getattr(refresh.dashboard, name) for name in ("parse_args", "discover_artifacts", "write_outputs")}
+        with tempfile.TemporaryDirectory() as tmp, \
+             patch.object(sys, "argv", ["refresh_dashboard.py", "--root", tmp, "--no-vcs"]), \
+             patch.object(refresh.dashboard, "main", side_effect=RuntimeError("test generator failure")):
+            with self.assertRaisesRegex(RuntimeError, "test generator failure"):
+                refresh.main()
+        for name, original in hooks.items():
+            self.assertIs(getattr(refresh.dashboard, name), original)
 
     def test_write_existing_captured_index_requires_no_scans(self):
         before = copy.deepcopy(self.index)
