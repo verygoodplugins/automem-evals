@@ -285,6 +285,75 @@ class PaidBudgetProxyTests(unittest.TestCase):
         self.assertEqual(self.request()[0], 402)
         self.assertEqual(self.fake.calls, [])
 
+    def test_fixed_rejection_reasons_and_durable_safe_ledger_sidecar(self):
+        cases = [
+            (dict(CHAT), "/private-api-key?private-prompt=private-answer", "unsupported_route", "unsupported_route"),
+            (dict(CHAT, model="private-api-key"), "/openai/v1/chat/completions", "unsupported_model", "openai"),
+            (dict(CHAT, **{"private-prompt": "private-answer"}), "/openai/v1/chat/completions", "unsupported_fields", "openai"),
+            (dict(CHAT, max_completion_tokens=None), "/openai/v1/chat/completions", "invalid_output_cap", "openai"),
+            (dict(CHAT, service_tier="priority"), "/openai/v1/chat/completions", "unsupported_service_tier", "openai"),
+        ]
+        for index, (body, route, reason, classification) in enumerate(cases):
+            with self.subTest(reason=reason):
+                self.path = Path(self.tmp.name) / f"diagnostic-{index}.sqlite3"
+                self.start()
+                buffer = io.StringIO()
+                try:
+                    with contextlib.redirect_stdout(buffer), contextlib.redirect_stderr(buffer):
+                        status, result = self.request(body, route)
+                    self.assertEqual(status, 400)
+                    self.assertEqual(result["error"].get("failure_reason"), reason)
+                    state = self.proxy.ledger.status()
+                    self.assertTrue(state["halted"])
+                    self.assertEqual(state["halt_reason"], "request_rejected")
+                    self.assertEqual(state["attempts"], 0)
+                    self.assertEqual(state["charged_nusd"], 0)
+                    sidecar = Path(str(self.path) + ".rejections.jsonl")
+                    recorded = sidecar.read_bytes()
+                    rows = [json.loads(line) for line in recorded.splitlines()]
+                    self.assertEqual(rows[0]["reason"], reason)
+                    self.assertEqual(rows[0]["route"], classification)
+                    for secret in ("private-api-key", "private-prompt", "private-answer", "client-secret"):
+                        self.assertNotIn(secret, recorded.decode() + json.dumps(result) + buffer.getvalue())
+                    self.proxy.close()
+                    self.proxy = None
+                    self.start()
+                    self.assertTrue(self.proxy.ledger.status()["halted"])
+                    self.assertEqual(sidecar.read_bytes(), recorded)
+                    self.assertEqual(self.request()[0], 402)
+                    self.assertEqual(self.fake.calls, [])
+                finally:
+                    self.proxy.close()
+                    self.proxy = None
+
+    def test_rejection_sidecar_write_failure_still_commits_halt(self):
+        self.start()
+        self.proxy.ledger.rejection_path = Path(self.tmp.name) / "unavailable-directory" / "rejections.jsonl"
+        status, result = self.request(dict(CHAT, max_completion_tokens=None))
+        self.assertEqual(status, 503)
+        self.assertEqual(result["error"]["code"], "accounting_unavailable")
+        state = self.proxy.ledger.status()
+        self.assertTrue(state["halted"])
+        self.assertEqual(state["halt_reason"], "request_rejected")
+        self.assertEqual(state["charged_nusd"], 0)
+        self.assertEqual(state["attempts"], 0)
+        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(self.request()[0], 402)
+
+    def test_shared_ledger_serializes_safe_rejection_sidecar_rows(self):
+        ledger = BudgetLedger(self.path)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+            list(pool.map(lambda _: BudgetLedger(self.path).reject_request("unsupported_fields", "openai"), range(8)))
+        rows = [json.loads(line) for line in ledger.rejection_path.read_text().splitlines()]
+        self.assertEqual(len(rows), 8)
+        self.assertTrue(all(row["reason"] == "unsupported_fields" and row["route"] == "openai" for row in rows))
+        self.assertTrue(ledger.status()["halted"])
+        self.assertEqual(ledger.status()["charged_nusd"], 0)
+        self.assertEqual(ledger.status()["attempts"], 0)
+
+    def test_unknown_config_message_never_becomes_a_diagnostic_value(self):
+        self.assertEqual(getattr(ConfigError("private-api-key private-prompt"), "reason", None), "invalid_request")
+
     def test_invalid_usage_remains_charged(self):
         self.start()
         expected = quote_request("openai", CHAT, PRICES)["reservation_nusd"]

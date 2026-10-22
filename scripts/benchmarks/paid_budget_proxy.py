@@ -21,6 +21,7 @@ import socket
 import sys
 import sqlite3
 import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -42,8 +43,50 @@ ROUTES = {"/openai/v1/chat/completions": "openai", "/voyage/v1/embeddings": "voy
           "/openai/v1/embeddings": "openai_embeddings"}
 
 
+CONFIG_REASON_CODES = {
+    "Positive finite amount required": "invalid_price",
+    "Explicit model pricing required": "missing_price",
+    "Only standard service tier supported": "unsupported_service_tier",
+    "Unsupported lane or request": "unsupported_request",
+    "Unsupported model": "unsupported_model",
+    "Unsupported chat request fields": "unsupported_fields",
+    "Exactly one positive output token cap required": "invalid_output_cap",
+    "Nonempty text messages required": "invalid_messages",
+    "Only text messages supported": "invalid_messages",
+    "Unsupported message role": "invalid_message_role",
+    "Only text content parts supported": "invalid_text_content",
+    "Only text content supported": "invalid_text_content",
+    "Unsupported embedding request fields": "unsupported_fields",
+    "Only 1024-dimensional float embeddings supported": "unsupported_dimensions",
+    "Unsupported embedding input type": "invalid_embedding_input_type",
+    "One to 128 text inputs required": "invalid_embedding_input",
+    "Unsupported OpenAI embedding fields": "unsupported_fields",
+    "Unsupported embedding encoding": "unsupported_encoding",
+    "Unsupported embedding dimensions": "unsupported_dimensions",
+    "Invalid JSON text request": "invalid_json",
+    "Request too large": "invalid_request_size",
+    "Cap must not exceed 20 USD": "invalid_budget_cap",
+    "Invalid reservation": "invalid_reservation",
+    "Upstream must be a /v1 base URL without credentials": "invalid_upstream",
+    "Invalid upstream URL": "invalid_upstream",
+    "Plain HTTP upstream must be loopback": "invalid_upstream",
+    "Listener must bind to 127.0.0.1": "invalid_listener",
+    "Positive finite timeout required": "invalid_timeout",
+    "Unsupported route": "unsupported_route",
+    "Unsupported request framing": "invalid_framing",
+    "Content-Length required": "invalid_framing",
+    "Invalid request size": "invalid_request_size",
+    "Incomplete request": "incomplete_request",
+    "Invalid JSON request": "invalid_json",
+    "--pricing required": "missing_price",
+}
+
+
 class ConfigError(ValueError):
-    """Invalid or unpriced request. Messages never include supplied values."""
+    """Only exact hardcoded messages select a public diagnostic reason."""
+    def __init__(self, message):
+        self.reason = CONFIG_REASON_CODES.get(message, "invalid_request") if isinstance(message, str) else "invalid_request"
+        super().__init__(message)
 
 
 class BudgetHalted(RuntimeError):
@@ -230,6 +273,7 @@ class BudgetLedger:
             raise ConfigError("Cap must not exceed 20 USD")
         self.cap_nusd = int((cap_decimal * NUSD_PER_USD).to_integral_value(rounding=ROUND_CEILING))
         self.path = Path(path).resolve()
+        self.rejection_path = Path(str(self.path) + ".rejections.jsonl")
         self.path.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(self.path, os.O_CREAT | os.O_WRONLY, 0o600)
         os.close(fd)
@@ -272,6 +316,24 @@ class BudgetLedger:
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE budget SET halted=coalesce(halted, ?) WHERE id=1", (reason,))
+    def reject_request(self, reason, route):
+        # Serialize sidecar appends with the shared ledger's write lock. The
+        # diagnostic is fsynced before the halt becomes visible to the monitor.
+        reason = reason if reason in CONFIG_REASON_CODES.values() else "invalid_request"
+        route = route if route in ROUTES.values() else "unsupported_route"
+        record = {"reason": reason, "route": route, "at_ns": time.time_ns()}
+        with self._connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            db.execute("UPDATE budget SET halted=coalesce(halted, 'request_rejected') WHERE id=1")
+            try:
+                fd = os.open(self.rejection_path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+                with os.fdopen(fd, "a") as stream:
+                    stream.write(json.dumps(record) + "\n")
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            except Exception:
+                db.commit()  # Diagnostic I/O failure must never roll back a halt.
+                raise
     def settle(self, attempt_id, actual_nusd, input_tokens, output_tokens, bound_exceeded=False):
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
@@ -369,8 +431,10 @@ class BudgetProxy:
             def do_POST(self):
                 try:
                     lane = ROUTES.get(self.path)
-                    if lane is None or self.headers.get("Transfer-Encoding") or len(self.headers.get_all("Content-Length", [])) != 1:
-                        raise ConfigError("Unsupported route or framing")
+                    if lane is None:
+                        raise ConfigError("Unsupported route")
+                    if self.headers.get("Transfer-Encoding") or len(self.headers.get_all("Content-Length", [])) != 1:
+                        raise ConfigError("Unsupported request framing")
                     try:
                         length = int(self.headers["Content-Length"])
                     except (ValueError, TypeError):
@@ -393,15 +457,15 @@ class BudgetProxy:
                         return
                     # This durable commit MUST happen before any network activity.
                     attempt = owner.ledger.reserve(lane, quote["model"], quote["reservation_nusd"])
-                except ConfigError:
+                except ConfigError as exc:
                     # A harness can swallow this 400 and silently fall back.
                     # Persist the rejection so its monitor still stops the run.
                     try:
-                        owner.ledger.halt("request_rejected")
+                        owner.ledger.reject_request(exc.reason, lane)
                     except Exception:
                         self.reply(503, {"error": {"code": "accounting_unavailable", "message": "Accounting unavailable; abort run"}})
                         return
-                    self.reply(400, {"error": {"code": "invalid_request", "message": "Unsupported, invalid, or unpriced request"}})
+                    self.reply(400, {"error": {"code": "invalid_request", "message": "Unsupported, invalid, or unpriced request", "failure_reason": exc.reason}})
                     return
                 except BudgetHalted:
                     self.reply(402, {"error": {"code": "budget_halted", "message": "Paid budget halted; abort benchmark run"}})
