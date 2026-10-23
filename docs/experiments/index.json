@@ -1762,7 +1762,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-23T02:26:19+00:00",
+  "generated_at": "2026-10-23T02:32:13+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -1775,12 +1775,6 @@
       "kind": "artifact",
       "path": "data/results/20260501-173242-graph-diagnostics.md",
       "title": "Local AutoMem graph diagnostics - 2026-05-01T17:32:42"
-    },
-    {
-      "created_at": null,
-      "kind": "curated-summary",
-      "path": "data/results/SUMMARY-amb-submission-2026-06.md",
-      "title": "SUMMARY \u2014 AutoMem on the Agent Memory Benchmark (Core-3 + BEAM)"
     },
     {
       "kind": "summary-json",
@@ -1908,24 +1902,6 @@
       "row_count": 22
     },
     {
-      "created_at": "2026-10-22T18:39:45.572244+00:00",
-      "kind": "artifact",
-      "path": "data/sweep_runs/postmerge-20261022/MANIFEST.json"
-    },
-    {
-      "kind": "summary-json",
-      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/candidate/forgeteval/summary.json"
-    },
-    {
-      "kind": "summary-json",
-      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/control/forgeteval/summary.json"
-    },
-    {
-      "created_at": "2026-10-22T18:39:45.572244+00:00",
-      "kind": "artifact",
-      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/manifest.json"
-    },
-    {
       "kind": "summary-json",
       "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v1/summary.json"
     },
@@ -2008,7 +1984,7 @@
       "number": 73,
       "state": "OPEN",
       "title": "docs(eval): refresh dashboard for completed post-merge baseline",
-      "updatedAt": "2026-10-23T02:25:20Z",
+      "updatedAt": "2026-10-23T02:30:02Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
     },
     {
@@ -2017,7 +1993,7 @@
       "number": 72,
       "state": "OPEN",
       "title": "docs(eval): publish post-merge baseline and next product fix",
-      "updatedAt": "2026-10-23T02:26:14Z",
+      "updatedAt": "2026-10-23T02:32:10Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/72"
     },
     {
@@ -2761,13 +2737,18 @@
   },
   "threads": [
     {
-      "artifact_count": 1,
+      "artifact_count": 5,
       "artifact_samples": [
+        "data/sweep_runs/postmerge-20261022/MANIFEST.json",
+        "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/candidate/forgeteval/summary.json",
+        "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/control/forgeteval/summary.json",
+        "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/manifest.json",
         "docs/session_20261022_postmerge_baseline.md"
       ],
       "artifacts": [
         "docs/session_20261022_postmerge_baseline.md",
-        "data/results/postmerge-20261022/*"
+        "data/results/postmerge-20261022/*",
+        "data/sweep_runs/postmerge-20261022/**"
       ],
       "branch": "test/postmerge-baseline",
       "decision": "Baseline complete: LongMemEval 85.4% (six-task average 83.60%); LoCoMo 85.10%. Next #31: suppress obsolete inline-relation content, then one controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
@@ -2790,12 +2771,15 @@
       "worktree_status": null
     },
     {
-      "artifact_count": 0,
-      "artifact_samples": [],
+      "artifact_count": 1,
+      "artifact_samples": [
+        "data/results/SUMMARY-amb-submission-2026-06.md"
+      ],
       "artifacts": [
         "docs/superpowers/specs/2026-06-19-amb-throughput-runbook-design.md",
         "docs/superpowers/plans/2026-06-20-amb-throughput-runbook-plan.md",
-        "data/results/amb/**"
+        "data/results/amb/**",
+        "data/results/SUMMARY-amb-submission-2026-06.md"
       ],
       "branch": "feat/amb-adapter",
       "decision": "Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result.",
@@ -3300,7 +3284,7 @@
       "branch": "docs/postmerge-baseline-index",
       "cleanup_candidate": false,
       "dirty_entries": 1,
-      "head": "c825979",
+      "head": "7931986",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
       "pr": {
         "headRefName": "docs/postmerge-baseline-index",
@@ -3308,7 +3292,7 @@
         "number": 73,
         "state": "OPEN",
         "title": "docs(eval): refresh dashboard for completed post-merge baseline",
-        "updatedAt": "2026-10-23T02:25:20Z",
+        "updatedAt": "2026-10-23T02:30:02Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
       },
       "status": "open-pr"
