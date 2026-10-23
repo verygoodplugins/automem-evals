@@ -1,23 +1,51 @@
 [
   {
+    "id": "EXP-POSTMERGE-20261022",
+    "title": "Combined post-merge baseline and lifecycle follow-up",
+    "status": "completed",
+    "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
+    "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
+    "decision": "Baseline complete: LongMemEval 85.4% (six-task average 83.60%); LoCoMo 85.10%. Next #31: suppress obsolete inline-relation content, then one controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
+    "started": "2026-10-22",
+    "updated": "2026-10-23",
+    "artifacts": [
+      "docs/session_20261022_postmerge_baseline.md",
+      "data/results/postmerge-20261022/*",
+      "data/sweep_runs/postmerge-20261022/**"
+    ],
+    "branch": "test/postmerge-baseline",
+    "worktree": null,
+    "pr": 72,
+    "related": [
+      "EXP-CURRENT-STATE",
+      "EXP-NEG-CONTROL",
+      "EXP-AMB",
+      "EXP-BEAM-JUDGED"
+    ],
+    "notes": "Final batch 2026-10-23T02:15:56.210223+00:00: $9.809397650 accounted, $0.073130570 retained ambiguous/reserved, $10.190602350 remaining of original $20; no reset/refund. LoCoMo storage interruption: 497 rows retained unchanged, 260 conversation 42 rows quarantined/rerun; both finalized accepted-window audits passed. Official benchmark metadata stays in automem; exploratory decision here."
+  },
+  {
     "id": "EXP-AMB",
     "title": "Agent Memory Benchmark adapter and submission",
-    "status": "in-progress",
+    "status": "parked",
     "hypothesis": "AutoMem can be evaluated against external AMB datasets by adapting benchmark memory and recall calls into the server's native API.",
     "result": "Adapter work exists with multiple LoCoMo, LongMemEval, PersonaMem, and BEAM runs, but the current long stability run is still active and no PR has been opened.",
-    "decision": "Keep in progress until the active AMB run finishes, aggregate its outputs, and decide whether to PR the amb-adapter worktree.",
+    "decision": "Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result.",
     "started": "2026-06-16",
-    "updated": "2026-06-22",
+    "updated": "2026-10-22",
     "artifacts": [
       "docs/superpowers/specs/2026-06-19-amb-throughput-runbook-design.md",
       "docs/superpowers/plans/2026-06-20-amb-throughput-runbook-plan.md",
-      "data/results/amb/**"
+      "data/results/amb/**",
+      "data/results/SUMMARY-amb-submission-2026-06.md"
     ],
     "branch": "feat/amb-adapter",
     "worktree": "../automem-evals.worktrees/amb-adapter",
     "pr": null,
-    "related": ["EXP-BEAM-JUDGED"],
-    "notes": "The active omb job runs from ../agent-memory-benchmark and writes to that repo's outputs directory; copy or summarize final AMB outputs here only after review."
+    "related": [
+      "EXP-BEAM-JUDGED"
+    ],
+    "notes": "The active omb job runs from ../agent-memory-benchmark and writes to that repo's outputs directory; copy or summarize final AMB outputs here only after review. Scheduling updated by the approved post-merge plan; historical run results/configurations remain unchanged. June references to active runs are historical."
   },
   {
     "id": "EXP-MATRIX",
@@ -43,12 +71,12 @@
   {
     "id": "EXP-BEAM-JUDGED",
     "title": "Native judged BEAM harness",
-    "status": "in-progress",
+    "status": "parked",
     "hypothesis": "AutoMem should be measured with BEAM's judged answer task, not only proxy retrieval metrics, to make leaderboard-comparable claims.",
     "result": "A native judged harness exists on the beam-judged branch with 100K results and an active longer stability run pending.",
-    "decision": "Park promotion decisions until the active judged/AMB runs complete and the branch lands.",
+    "decision": "Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result.",
     "started": "2026-06-15",
-    "updated": "2026-06-22",
+    "updated": "2026-10-22",
     "artifacts": [
       "docs/eval/beam.md",
       "docs/session_20260616_beam_judged_100k.md",
@@ -59,8 +87,11 @@
     "branch": "feat/beam-judged-harness",
     "worktree": "../automem-evals",
     "pr": null,
-    "related": ["EXP-BEAM-RETRIEVAL", "EXP-AMB"],
-    "notes": "This experiment is referenced before it lands on main; the first real index from main should be rerun after the branch merges."
+    "related": [
+      "EXP-BEAM-RETRIEVAL",
+      "EXP-AMB"
+    ],
+    "notes": "This experiment is referenced before it lands on main; the first real index from main should be rerun after the branch merges. Scheduling updated by the approved post-merge plan; historical run results/configurations remain unchanged. June references to active runs are historical."
   },
   {
     "id": "EXP-BEAM-RETRIEVAL",

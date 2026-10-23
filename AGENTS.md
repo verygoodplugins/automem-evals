@@ -94,7 +94,7 @@ There is no built-in `--scenario-id` filter. Either:
 
 ## Session notes & results
 
-- `docs/experiments/STATUS.md` — generated experiment dashboard; start here when orienting across hypotheses, results, decisions, active worktrees, and undocumented run artifacts. Update `docs/experiments/registry.json`, then run `python3 scripts/experiment_index.py` before ending a substantial experiment session.
+- `docs/experiments/STATUS.md` — generated experiment dashboard; start here when orienting across hypotheses, results, decisions, active worktrees, and undocumented run artifacts. Update `docs/experiments/registry.json`, then run `python3 data/results/postmerge-20261022/refresh_dashboard.py` before ending a substantial experiment session. This wrapper preserves the three historical AMB scores when their raw sources are absent.
 - `docs/session_*.md` — dated narrative notes per session; read these for context when revisiting an old result.
 - `data/results/SUMMARY-*.md` — headline writeups per major experiment.
 - `data/results/<timestamp>-comparison.md` — raw per-run report produced by `compare_rulesets.py`. These accumulate; the SUMMARY files are the curated view.
