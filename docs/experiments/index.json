@@ -1584,6 +1584,24 @@
       "row_count": 22
     },
     {
+      "created_at": "2026-10-22T18:39:45.572244+00:00",
+      "kind": "artifact",
+      "path": "data/sweep_runs/postmerge-20261022/MANIFEST.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/candidate/forgeteval/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/control/forgeteval/summary.json"
+    },
+    {
+      "created_at": "2026-10-22T18:39:45.572244+00:00",
+      "kind": "artifact",
+      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/manifest.json"
+    },
+    {
       "kind": "summary-json",
       "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v1/summary.json"
     },
@@ -1744,7 +1762,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-22T19:03:36+00:00",
+  "generated_at": "2026-10-23T02:19:51+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -1890,6 +1908,24 @@
       "row_count": 22
     },
     {
+      "created_at": "2026-10-22T18:39:45.572244+00:00",
+      "kind": "artifact",
+      "path": "data/sweep_runs/postmerge-20261022/MANIFEST.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/candidate/forgeteval/summary.json"
+    },
+    {
+      "kind": "summary-json",
+      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/diagnostics/control/forgeteval/summary.json"
+    },
+    {
+      "created_at": "2026-10-22T18:39:45.572244+00:00",
+      "kind": "artifact",
+      "path": "data/sweep_runs/postmerge-20261022/tmp/postmerge-20261022/manifest.json"
+    },
+    {
       "kind": "summary-json",
       "path": "data/sweep_runs/prod-rollout-20260610/canonicalize-v1/summary.json"
     },
@@ -1967,12 +2003,30 @@
   ],
   "prs": [
     {
+      "headRefName": "docs/postmerge-baseline-index",
+      "mergedAt": null,
+      "number": 73,
+      "state": "OPEN",
+      "title": "docs(eval): refresh machine index for post-merge baseline",
+      "updatedAt": "2026-10-22T19:36:57Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
+    },
+    {
+      "headRefName": "test/postmerge-baseline",
+      "mergedAt": null,
+      "number": 72,
+      "state": "OPEN",
+      "title": "docs(eval): record paired post-merge diagnostics and next fix",
+      "updatedAt": "2026-10-23T02:19:42Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/72"
+    },
+    {
       "headRefName": "test/paid-baseline-budget",
       "mergedAt": null,
       "number": 71,
       "state": "OPEN",
       "title": "test(benchmarks): cap shared paid API spend before requests",
-      "updatedAt": "2026-10-22T19:02:59Z",
+      "updatedAt": "2026-10-22T22:20:56Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/71"
     },
     {
@@ -2701,7 +2755,7 @@
   ],
   "status_counts": {
     "adopted": 10,
-    "in-progress": 1,
+    "completed": 1,
     "parked": 4,
     "superseded": 1
   },
@@ -2716,22 +2770,22 @@
         "data/results/postmerge-20261022/*"
       ],
       "branch": "test/postmerge-baseline",
-      "decision": "One active evaluation batch: restore provider capacity and finish capped canonical runs. Selected next product fix: suppress obsolete content throughout inline relation payloads. Keep #270 tracked and additional adapters/AMB/BEAM/maturation/architecture parked.",
+      "decision": "Baseline COMPLETE; next #31 inline obsolete-response filtering: one change, one matched full-response evaluation. Then one supported-preference/support-miss precision experiment with the answer prompt fixed and prompt/context snapshots, followed by graph on/off. A preference-evidence prompt condition is a separate later ablation. Keep #270 OPEN/separate and AMB/BEAM/adapters/architecture parked.",
       "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
       "id": "EXP-POSTMERGE-20261022",
-      "notes": "Control01a17aa38e678924c07a51015ef705b8474e2193; candidate3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876. Fresh local384d diagnostics are exploratory; official Voyage4/1024d paid metadata remains in automem. Reserved liability$0.00168975 of$20. All paid accuracy fields remain null.",
-      "pr": null,
+      "notes": "Final batch 2026-10-23T02:15:56.210223+00:00: $9.809397650 accounted, $0.073130570 retained ambiguous/reserved, $10.190602350 remaining of original $20; no reset/refund. LoCoMo storage interruption: 497 rows retained unchanged, 260 conversation 42 rows quarantined/rerun; both finalized accepted-window audits passed. Official benchmark metadata stays in automem; exploratory decision here.",
+      "pr": 72,
       "related": [
         "EXP-CURRENT-STATE",
         "EXP-NEG-CONTROL",
         "EXP-AMB",
         "EXP-BEAM-JUDGED"
       ],
-      "result": "Paired free suites: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Targeted lifecycle/tag/enrichment fixes verified. Paid preflight blocked by OpenAI HTTP 429 before questions; no new answer-quality score.",
+      "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
       "started": "2026-10-22",
-      "status": "in-progress",
+      "status": "completed",
       "title": "Combined post-merge baseline and lifecycle follow-up",
-      "updated": "2026-10-22",
+      "updated": "2026-10-23",
       "worktree": null,
       "worktree_status": null
     },
@@ -3243,19 +3297,27 @@
       "status": "primary"
     },
     {
-      "branch": "test/postmerge-baseline",
+      "branch": "docs/postmerge-baseline-index",
       "cleanup_candidate": false,
-      "dirty_entries": 7,
-      "head": "35fa73d",
+      "dirty_entries": 1,
+      "head": "55ee86c",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
-      "pr": null,
-      "status": "in-flight"
+      "pr": {
+        "headRefName": "docs/postmerge-baseline-index",
+        "mergedAt": null,
+        "number": 73,
+        "state": "OPEN",
+        "title": "docs(eval): refresh machine index for post-merge baseline",
+        "updatedAt": "2026-10-22T19:36:57Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
+      },
+      "status": "open-pr"
     },
     {
       "branch": "test/paid-baseline-budget",
       "cleanup_candidate": false,
-      "dirty_entries": 1,
-      "head": "908acbd",
+      "dirty_entries": 0,
+      "head": "9872563",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-budget-review/automem-evals",
       "pr": {
         "headRefName": "test/paid-baseline-budget",
@@ -3263,7 +3325,7 @@
         "number": 71,
         "state": "OPEN",
         "title": "test(benchmarks): cap shared paid API spend before requests",
-        "updatedAt": "2026-10-22T19:02:59Z",
+        "updatedAt": "2026-10-22T22:20:56Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/71"
       },
       "status": "open-pr"
