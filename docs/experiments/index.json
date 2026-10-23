@@ -1762,7 +1762,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-23T02:19:51+00:00",
+  "generated_at": "2026-10-23T02:21:05+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2017,7 +2017,7 @@
       "number": 72,
       "state": "OPEN",
       "title": "docs(eval): record paired post-merge diagnostics and next fix",
-      "updatedAt": "2026-10-23T02:19:42Z",
+      "updatedAt": "2026-10-23T02:20:50Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/72"
     },
     {
@@ -2770,7 +2770,7 @@
         "data/results/postmerge-20261022/*"
       ],
       "branch": "test/postmerge-baseline",
-      "decision": "Baseline COMPLETE; next #31 inline obsolete-response filtering: one change, one matched full-response evaluation. Then one supported-preference/support-miss precision experiment with the answer prompt fixed and prompt/context snapshots, followed by graph on/off. A preference-evidence prompt condition is a separate later ablation. Keep #270 OPEN/separate and AMB/BEAM/adapters/architecture parked.",
+      "decision": "Baseline complete: LongMemEval 85.4% (six-task average 83.60%); LoCoMo 85.10%. Next #31: suppress obsolete inline-relation content, then one controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
       "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
       "id": "EXP-POSTMERGE-20261022",
       "notes": "Final batch 2026-10-23T02:15:56.210223+00:00: $9.809397650 accounted, $0.073130570 retained ambiguous/reserved, $10.190602350 remaining of original $20; no reset/refund. LoCoMo storage interruption: 497 rows retained unchanged, 260 conversation 42 rows quarantined/rerun; both finalized accepted-window audits passed. Official benchmark metadata stays in automem; exploratory decision here.",
@@ -3300,7 +3300,7 @@
       "branch": "docs/postmerge-baseline-index",
       "cleanup_candidate": false,
       "dirty_entries": 1,
-      "head": "55ee86c",
+      "head": "927bdaa",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
       "pr": {
         "headRefName": "docs/postmerge-baseline-index",
