@@ -5,7 +5,7 @@
     "status": "completed",
     "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
     "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
-    "decision": "Baseline COMPLETE; next #31 inline obsolete-response filtering: one change, one matched full-response evaluation. Then one supported-preference/support-miss precision experiment with the answer prompt fixed and prompt/context snapshots, followed by graph on/off. A preference-evidence prompt condition is a separate later ablation. Keep #270 OPEN/separate and AMB/BEAM/adapters/architecture parked.",
+    "decision": "Baseline complete: LongMemEval 85.4% (six-task average 83.60%); LoCoMo 85.10%. Next #31: suppress obsolete inline-relation content, then one controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
     "started": "2026-10-22",
     "updated": "2026-10-23",
     "artifacts": [
