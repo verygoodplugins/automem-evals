@@ -108,6 +108,13 @@ class HistoricalScoreRetentionTests(unittest.TestCase):
         self.assertNotIn("Historical AMB snapshot", refresh.render_status(index))
         self.assertNotIn("Historical AMB snapshot", refresh.render_scoreboard_html(index))
 
+    def test_status_refresh_hint_uses_wrapper_with_or_without_retained_scores(self):
+        for index in (dict(self.index, scores=[]), refresh.retain_historical_scores(self.index, self.snapshot)):
+            with self.subTest(retained=bool(index["scores"])):
+                rendered = refresh.render_status(index)
+                self.assertIn("Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.", rendered)
+                self.assertNotIn("`python3 scripts/experiment_index.py`", rendered)
+
     def test_real_cli_missing_archives_restores_three_but_no_amb_restores_none(self):
         hooks = {name: getattr(refresh.dashboard, name) for name in ("parse_args", "discover_artifacts", "write_outputs")}
         for no_amb in (False, True):
