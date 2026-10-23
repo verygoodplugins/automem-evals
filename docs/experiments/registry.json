@@ -10,7 +10,8 @@
     "updated": "2026-10-23",
     "artifacts": [
       "docs/session_20261022_postmerge_baseline.md",
-      "data/results/postmerge-20261022/*"
+      "data/results/postmerge-20261022/*",
+      "data/sweep_runs/postmerge-20261022/**"
     ],
     "branch": "test/postmerge-baseline",
     "worktree": null,
@@ -35,7 +36,8 @@
     "artifacts": [
       "docs/superpowers/specs/2026-06-19-amb-throughput-runbook-design.md",
       "docs/superpowers/plans/2026-06-20-amb-throughput-runbook-plan.md",
-      "data/results/amb/**"
+      "data/results/amb/**",
+      "data/results/SUMMARY-amb-submission-2026-06.md"
     ],
     "branch": "feat/amb-adapter",
     "worktree": "../automem-evals.worktrees/amb-adapter",
