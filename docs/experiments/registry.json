@@ -2,26 +2,26 @@
   {
     "id": "EXP-POSTMERGE-20261022",
     "title": "Combined post-merge baseline and lifecycle follow-up",
-    "status": "in-progress",
+    "status": "completed",
     "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
-    "result": "Paired free suites: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Targeted lifecycle/tag/enrichment fixes verified. Paid preflight blocked by OpenAI HTTP 429 before questions; no new answer-quality score.",
-    "decision": "One active evaluation batch: restore provider capacity and finish capped canonical runs. Selected next product fix: suppress obsolete content throughout inline relation payloads. Keep #270 tracked and additional adapters/AMB/BEAM/maturation/architecture parked.",
+    "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
+    "decision": "Baseline COMPLETE; next #31 inline obsolete-response filtering: one change, one matched full-response evaluation. Then one supported-preference/support-miss precision experiment with the answer prompt fixed and prompt/context snapshots, followed by graph on/off. A preference-evidence prompt condition is a separate later ablation. Keep #270 OPEN/separate and AMB/BEAM/adapters/architecture parked.",
     "started": "2026-10-22",
-    "updated": "2026-10-22",
+    "updated": "2026-10-23",
     "artifacts": [
       "docs/session_20261022_postmerge_baseline.md",
       "data/results/postmerge-20261022/*"
     ],
     "branch": "test/postmerge-baseline",
     "worktree": null,
-    "pr": null,
+    "pr": 72,
     "related": [
       "EXP-CURRENT-STATE",
       "EXP-NEG-CONTROL",
       "EXP-AMB",
       "EXP-BEAM-JUDGED"
     ],
-    "notes": "Control01a17aa38e678924c07a51015ef705b8474e2193; candidate3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876. Fresh local384d diagnostics are exploratory; official Voyage4/1024d paid metadata remains in automem. Reserved liability$0.00168975 of$20. All paid accuracy fields remain null."
+    "notes": "Final batch 2026-10-23T02:15:56.210223+00:00: $9.809397650 accounted, $0.073130570 retained ambiguous/reserved, $10.190602350 remaining of original $20; no reset/refund. LoCoMo storage interruption: 497 rows retained unchanged, 260 conversation 42 rows quarantined/rerun; both finalized accepted-window audits passed. Official benchmark metadata stays in automem; exploratory decision here."
   },
   {
     "id": "EXP-AMB",
