@@ -144,6 +144,38 @@ class HistoricalScoreRetentionTests(unittest.TestCase):
         for name, original in hooks.items():
             self.assertIs(getattr(refresh.dashboard, name), original)
 
+    def test_real_cli_restores_only_absent_canonical_sources(self):
+        for historical in self.snapshot["scores"]:
+            for present in (True, False):
+                with self.subTest(dataset=historical["dataset"], present=present), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    outputs = root / "amb-outputs"
+                    # For BEAM, one malformed repeat must block replacement of
+                    # the aggregate even when the other repeat files are absent.
+                    source = outputs / historical["dataset"] / historical["run_name"].split("+")[0] / "rag" / (historical["split"] + ".json")
+                    source.parent.mkdir(parents=True)
+                    if present:
+                        source.write_text("{malformed current result")
+                    argv = ["refresh_dashboard.py", "--root", str(root), "--data-root", str(root),
+                            "--amb-outputs", "amb-outputs", "--no-vcs"]
+                    with patch.object(sys, "argv", argv), patch.object(refresh, "original_discover", return_value=[]), \
+                         patch.object(refresh.dashboard, "run_command", side_effect=AssertionError("must not scan VCS")), \
+                         contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(refresh.main(), 0)
+                    captured = json.loads((root / "docs/experiments/index.json").read_text())
+                    row = next(row for row in captured["scores"] if refresh._score_key(row) == refresh._score_key(historical))
+                    self.assertEqual(source.exists(), present)
+                    if present:
+                        self.assertEqual(row["status"], "missing")
+                        self.assertIsNone(row["accuracy"])
+                        self.assertEqual(row["n"], 0)
+                        self.assertNotIn("score_provenance", row)
+                    else:
+                        self.assertEqual(row["accuracy"], historical["accuracy"])
+                        self.assertEqual(row["score_provenance"]["kind"], "historical_snapshot_retained")
+                    retained = [row for row in captured["scores"] if "score_provenance" in row]
+                    self.assertEqual(len(retained), 2 if present else 3)
+
     def test_write_existing_captured_index_requires_no_scans(self):
         before = copy.deepcopy(self.index)
         with tempfile.TemporaryDirectory() as tmp:

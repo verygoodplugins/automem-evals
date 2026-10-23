@@ -58,11 +58,27 @@ def _complete_historical(row):
     return True
 
 
-def retain_historical_scores(index, snapshot, *, restore_absent=False):
+def _amb_sources_absent(outputs, key):
+    _, dataset, split, run_name = key
+    for run in run_name.split("+"):
+        path = outputs / dataset / run / "rag" / f"{split}.json"
+        try:
+            path.lstat()
+        except FileNotFoundError:
+            continue
+        except OSError:
+            return False  # Inaccessible is not evidence of absence.
+        return False  # Includes malformed files and dangling symlinks.
+    return True
+
+
+def retain_historical_scores(index, snapshot, *, restore_absent=False, amb_outputs=None):
     """Copy the index, filling only exact, freshly missing AMB placeholders.
 
     By default no rows are added; CLI-only restore_absent seeds just the three
     curated keys when raw archives are absent. Current scores/failures stay intact.
+    CLI supplies amb_outputs to verify actual source absence; a loader's missing
+    placeholder alone cannot distinguish absence from a malformed current file.
     A retained row copies every original score/model field unchanged.
     """
     retained = copy.deepcopy(index)
@@ -83,6 +99,8 @@ def retain_historical_scores(index, snapshot, *, restore_absent=False):
         old = historical.get(_score_key(row))
         if (old is None or row.get("status") != "missing" or row.get("accuracy") is not None
                 or type(row.get("n")) is not int or row["n"] != 0):
+            continue
+        if amb_outputs is not None and not _amb_sources_absent(amb_outputs, _score_key(row)):
             continue
         replacement = copy.deepcopy(old)
         replacement["score_provenance"] = {
@@ -143,9 +161,9 @@ def discover_with_overlay(data_root):
     return list(artifacts.values())
 
 
-def write_with_provenance(index, status_path, index_path, scoreboard_path=None, *, restore_absent=False):
+def write_with_provenance(index, status_path, index_path, scoreboard_path=None, *, restore_absent=False, amb_outputs=None):
     """Write captured index/views directly; never rediscover artifacts or VCS."""
-    retained = retain_historical_scores(index, load_snapshot(), restore_absent=restore_absent)
+    retained = retain_historical_scores(index, load_snapshot(), restore_absent=restore_absent, amb_outputs=amb_outputs)
     retained["artifact_overlay_root"] = str(ROOT)
     outputs = [(status_path, render_status(retained)),
                (index_path, json.dumps(retained, indent=2, sort_keys=True, allow_nan=False) + "\n")]
@@ -170,7 +188,7 @@ def main():
     previous_discover, previous_write, previous_parse = (
         dashboard.discover_artifacts, dashboard.write_outputs, dashboard.parse_args)
     dashboard.discover_artifacts = discover_with_overlay
-    dashboard.write_outputs = partial(write_with_provenance, restore_absent=restore_absent)
+    dashboard.write_outputs = partial(write_with_provenance, restore_absent=restore_absent, amb_outputs=amb_outputs)
     dashboard.parse_args = lambda: args
     try:
         return dashboard.main()
