@@ -1762,7 +1762,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-23T02:21:05+00:00",
+  "generated_at": "2026-10-23T02:26:19+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2007,8 +2007,8 @@
       "mergedAt": null,
       "number": 73,
       "state": "OPEN",
-      "title": "docs(eval): refresh machine index for post-merge baseline",
-      "updatedAt": "2026-10-22T19:36:57Z",
+      "title": "docs(eval): refresh dashboard for completed post-merge baseline",
+      "updatedAt": "2026-10-23T02:25:20Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
     },
     {
@@ -2016,8 +2016,8 @@
       "mergedAt": null,
       "number": 72,
       "state": "OPEN",
-      "title": "docs(eval): record paired post-merge diagnostics and next fix",
-      "updatedAt": "2026-10-23T02:20:50Z",
+      "title": "docs(eval): publish post-merge baseline and next product fix",
+      "updatedAt": "2026-10-23T02:26:14Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/72"
     },
     {
@@ -3300,15 +3300,15 @@
       "branch": "docs/postmerge-baseline-index",
       "cleanup_candidate": false,
       "dirty_entries": 1,
-      "head": "927bdaa",
+      "head": "c825979",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
       "pr": {
         "headRefName": "docs/postmerge-baseline-index",
         "mergedAt": null,
         "number": 73,
         "state": "OPEN",
-        "title": "docs(eval): refresh machine index for post-merge baseline",
-        "updatedAt": "2026-10-22T19:36:57Z",
+        "title": "docs(eval): refresh dashboard for completed post-merge baseline",
+        "updatedAt": "2026-10-23T02:25:20Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
       },
       "status": "open-pr"
