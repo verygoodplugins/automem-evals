@@ -326,5 +326,28 @@
     "pr": null,
     "related": ["EXP-METADATA"],
     "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill."
+  },
+  {
+    "id": "EXP-FEB30",
+    "title": "FEB-30 intrinsic store-state evaluation",
+    "status": "parked",
+    "hypothesis": "Store inspection after each fact-evolution step can distinguish memory-writing failures from retrieval and answer-generation failures.",
+    "result": "Official release API returned HTTP 404 on 2026-10-24. Release preflight executed; no AutoMem trajectories, cold smoke, intrinsic scores, or extrinsic QA executed.",
+    "decision": "Track in #74; retain release-gated inspection scaffold and implement the official loader/scorer only when revision and license are verifiable.",
+    "started": "2026-10-24",
+    "updated": "2026-10-24",
+    "artifacts": [
+      "docs/eval/feb30.md",
+      "scripts/benchmarks/feb30_adapter.py",
+      "scripts/test_feb30_adapter.py",
+      "data/results/feb30/**"
+    ],
+    "branch": "agent/kernel-worker/8329d251",
+    "worktree": null,
+    "pr": null,
+    "related": [
+      "EXP-CURRENT-STATE"
+    ],
+    "notes": "https://github.com/verygoodplugins/automem-evals/issues/74; answerer/judge none; upstream_commit null; requested cold label is not an executed run."
   }
 ]

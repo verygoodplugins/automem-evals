@@ -1,0 +1,20 @@
+{
+  "benchmark": "FEB-30",
+  "checked_at": "2026-10-24T00:29:59.320204+00:00",
+  "status": "blocked",
+  "upstream": "https://github.com/amazon-science/feb-30-benchmark",
+  "upstream_commit": null,
+  "reason": "Official revision, license, loader and scorer are not verified.",
+  "release_probe": {
+    "url": "https://api.github.com/repos/amazon-science/feb-30-benchmark",
+    "status": 404,
+    "body": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/repos#get-a-repository\",\"status\":\"404\"}"
+  },
+  "requested_maturation": "cold",
+  "automem_executed": false,
+  "trajectories_executed": 0,
+  "intrinsic": null,
+  "extrinsic_qa": null,
+  "answerer_model": null,
+  "judge_model": null
+}
