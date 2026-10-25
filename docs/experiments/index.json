@@ -1722,10 +1722,28 @@
       "kind": "session-note",
       "path": "docs/session_20260616_beam_judged_100k.md",
       "title": "Session 2026-06-16 \u2014 BEAM judged 100K (native, official scorer)"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/memsyco-handoff.md",
+      "title": "MemSyco-Bench issue and PR handoff"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/memsyco-verification.md",
+      "title": "MemSyco-Bench verification \u2014 2026-10-25"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/memsyco.md",
+      "title": "MemSyco-Bench \u2014 memory-use authority evaluation"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-06-22T20:26:29+00:00",
+  "generated_at": "2026-10-25T11:54:37+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2389,10 +2407,42 @@
   "status_counts": {
     "adopted": 10,
     "in-progress": 2,
-    "parked": 2,
+    "parked": 3,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 3,
+      "artifact_samples": [
+        "docs/eval/memsyco-handoff.md",
+        "docs/eval/memsyco-verification.md",
+        "docs/eval/memsyco.md"
+      ],
+      "artifacts": [
+        "docs/eval/memsyco*.md"
+      ],
+      "branch": "agent/kernel-worker/7b268a6f",
+      "decision": "Resolve upstream artifact integrity, then implement the dialogue-only adapter plan and pin reader/judge settings before a scored local smoke.",
+      "hypothesis": "AutoMem must reject, constrain, update, reconcile, or leverage memory appropriately, beyond retrieving semantically relevant preferences.",
+      "id": "EXP-MEMSYCO",
+      "notes": "Candidate fingerprint: opportunity:automem-graph-rag-research-scout. Issue/PR drafts are local; orchestrator owns publication. Scores/rates null; official claims remain in automem.",
+      "pr": null,
+      "related": [
+        "EXP-MATURATION"
+      ],
+      "result": "not_scored; public data loads 1550 rows and five-task harness dry run succeeds, but upstream integrity tests fail the Objective Fact Judgment manifest checksum. No AutoMem answers or scores.",
+      "started": "2026-10-25",
+      "status": "parked",
+      "title": "MemSyco-Bench memory-use authority and sycophancy",
+      "updated": "2026-10-25",
+      "worktree": ".worktrees/agent-kernel-worker-7b268a6f",
+      "worktree_status": {
+        "branch": "agent/kernel-worker/7b268a6f",
+        "cleanup_candidate": false,
+        "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7b268a6f",
+        "state": "in-flight"
+      }
+    },
     {
       "artifact_count": 0,
       "artifact_samples": [],
@@ -2925,6 +2975,15 @@
         "url": "https://github.com/verygoodplugins/automem-evals/pull/20"
       },
       "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/7b268a6f",
+      "cleanup_candidate": false,
+      "dirty_entries": 5,
+      "head": "35fa73d",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7b268a6f",
+      "pr": null,
+      "status": "in-flight"
     }
   ]
 }

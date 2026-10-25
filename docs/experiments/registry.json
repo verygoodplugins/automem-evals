@@ -1,5 +1,21 @@
 [
   {
+    "id": "EXP-MEMSYCO",
+    "title": "MemSyco-Bench memory-use authority and sycophancy",
+    "status": "parked",
+    "hypothesis": "AutoMem must reject, constrain, update, reconcile, or leverage memory appropriately, beyond retrieving semantically relevant preferences.",
+    "result": "not_scored; public data loads 1550 rows and five-task harness dry run succeeds, but upstream integrity tests fail the Objective Fact Judgment manifest checksum. No AutoMem answers or scores.",
+    "decision": "Resolve upstream artifact integrity, then implement the dialogue-only adapter plan and pin reader/judge settings before a scored local smoke.",
+    "started": "2026-10-25",
+    "updated": "2026-10-25",
+    "artifacts": ["docs/eval/memsyco*.md"],
+    "branch": "agent/kernel-worker/7b268a6f",
+    "worktree": ".worktrees/agent-kernel-worker-7b268a6f",
+    "pr": null,
+    "related": ["EXP-MATURATION"],
+    "notes": "Candidate fingerprint: opportunity:automem-graph-rag-research-scout. Issue/PR drafts are local; orchestrator owns publication. Scores/rates null; official claims remain in automem."
+  },
+  {
     "id": "EXP-AMB",
     "title": "Agent Memory Benchmark adapter and submission",
     "status": "in-progress",
