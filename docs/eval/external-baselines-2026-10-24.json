@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-24",
+  "scope": "External reference only; no AutoMem measurements or cross-harness ranking.",
+  "owner_definition": "Entity administering/reporting the run or claim; system_owner is separate where available.",
+  "unknowns": "null means not disclosed by the cited claim; never inferred from current harness defaults.",
+  "source_revisions": {
+    "amb": "3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91",
+    "past": "a712cd993e249cadd214168c3c3ee674f89bd5e4"
+  },
+  "rows": [
+    {
+      "id": "past-dolphin-hermes", "benchmark": "DolphinBench", "system": "past.dev", "owner": "past.dev",
+      "score": 81.7, "unit": "percent", "metric": "all-checks task pass rate", "configuration": {"agent":"Hermes Agent","passed":490,"total":600},
+      "answer_model": "GPT 5.6 Luna (high reasoning)", "judge": "GPT 5.6 Sol (medium reasoning) + deterministic checks", "status": "unverified field report",
+      "source_url": "https://past.dev/benchmarks/dolphinbench", "method_url": "https://github.com/pastdotdev/benchmarks/blob/a712cd993e249cadd214168c3c3ee674f89bd5e4/dolphin/README.md"
+    },
+    {
+      "id": "past-dolphin-own", "benchmark": "DolphinBench", "system": "past.dev", "owner": "past.dev",
+      "score": 86.7, "unit": "percent", "metric": "all-checks task pass rate", "configuration": {"agent":"past.dev own agent","passed":520,"total":600},
+      "answer_model": "GPT 5.6 Luna (high reasoning)", "judge": "GPT 5.6 Sol (medium reasoning) + deterministic checks", "status": "unverified field report",
+      "source_url": "https://past.dev/benchmarks/dolphinbench", "method_url": "https://github.com/pastdotdev/benchmarks/blob/a712cd993e249cadd214168c3c3ee674f89bd5e4/dolphin/README.md"
+    },
+    {
+      "id": "past-beam-100k", "benchmark": "BEAM", "system": "past.dev", "owner": "past.dev",
+      "score": 92.08, "unit": "percent", "metric": "reported mean judge score", "configuration": {"history_tokens":"100K","questions":400,"prompts":"ExaBase-derived; includes question-annotation guidance"},
+      "answer_model": "openai/gpt-5.6-luna (reasoning off)", "judge": "openai/gpt-5.6-luna (reasoning off)", "status": "unverified field report",
+      "source_url": "https://past.dev/benchmarks/beam", "method_url": "https://github.com/pastdotdev/benchmarks/blob/a712cd993e249cadd214168c3c3ee674f89bd5e4/beam/README.md"
+    },
+    {
+      "id": "past-beam-500k", "benchmark": "BEAM", "system": "past.dev", "owner": "past.dev",
+      "score": 89.63, "unit": "percent", "metric": "reported mean judge score", "configuration": {"history_tokens":"500K","questions":700,"prompts":"ExaBase-derived; includes question-annotation guidance"},
+      "answer_model": "openai/gpt-5.6-luna (reasoning off)", "judge": "openai/gpt-5.6-luna (reasoning off)", "status": "unverified field report",
+      "source_url": "https://past.dev/benchmarks/beam", "method_url": "https://github.com/pastdotdev/benchmarks/blob/a712cd993e249cadd214168c3c3ee674f89bd5e4/beam/README.md"
+    },
+    {
+      "id": "past-beam-1m", "benchmark": "BEAM", "system": "past.dev", "owner": "past.dev",
+      "score": 90.65, "unit": "percent", "metric": "reported mean judge score", "configuration": {"history_tokens":"1M","questions":700,"prompts":"ExaBase-derived; includes question-annotation guidance"},
+      "answer_model": "openai/gpt-5.6-luna (reasoning off)", "judge": "openai/gpt-5.6-luna (reasoning off)", "status": "unverified field report",
+      "source_url": "https://past.dev/benchmarks/beam", "method_url": "https://github.com/pastdotdev/benchmarks/blob/a712cd993e249cadd214168c3c3ee674f89bd5e4/beam/README.md"
+    },
+    {
+      "id": "past-beam-10m", "benchmark": "BEAM", "system": "past.dev", "owner": "past.dev",
+      "score": 85.03, "unit": "percent", "metric": "reported mean judge score", "configuration": {"history_tokens":"10M","questions":200,"prompts":"ExaBase-derived; includes question-annotation guidance"},
+      "answer_model": "openai/gpt-5.6-luna (reasoning off)", "judge": "openai/gpt-5.6-luna (reasoning off)", "status": "unverified field report",
+      "source_url": "https://past.dev/benchmarks/beam", "method_url": "https://github.com/pastdotdev/benchmarks/blob/a712cd993e249cadd214168c3c3ee674f89bd5e4/beam/README.md"
+    },
+    {
+      "id": "mem0-locomo", "benchmark": "LoCoMo", "system": "Mem0", "owner": "Mem0",
+      "score": 92.5, "unit": "source score (0-100; exact aggregation unspecified)", "metric": "2026 algorithm headline", "configuration": {"tokens_per_query":6956,"dataset_revision":null},
+      "answer_model": null, "judge": null, "status": "unverified field report",
+      "source_url": "https://mem0.ai/blog/state-of-ai-agent-memory-2026", "method_url": null
+    },
+    {
+      "id": "mem0-longmemeval", "benchmark": "LongMemEval", "system": "Mem0", "owner": "Mem0",
+      "score": 94.4, "unit": "source score (0-100; exact aggregation unspecified)", "metric": "2026 algorithm headline", "configuration": {"tokens_per_query":6787,"dataset_revision":null},
+      "answer_model": null, "judge": null, "status": "unverified field report",
+      "source_url": "https://mem0.ai/blog/state-of-ai-agent-memory-2026", "method_url": null
+    },
+    {
+      "id": "mem0-beam-1m", "benchmark": "BEAM (1M)", "system": "Mem0", "owner": "Mem0",
+      "score": 64.1, "unit": "source score (0-100; exact aggregation unspecified)", "metric": "2026 algorithm headline", "configuration": {"tokens_per_query":6719,"dataset_revision":null},
+      "answer_model": null, "judge": null, "status": "unverified field report",
+      "source_url": "https://mem0.ai/blog/state-of-ai-agent-memory-2026", "method_url": null
+    },
+    {
+      "id": "mem0-beam-10m", "benchmark": "BEAM (10M)", "system": "Mem0", "owner": "Mem0",
+      "score": 48.6, "unit": "source score (0-100; exact aggregation unspecified)", "metric": "2026 algorithm headline", "configuration": {"tokens_per_query":6914,"dataset_revision":null},
+      "answer_model": null, "judge": null, "status": "unverified field report",
+      "source_url": "https://mem0.ai/blog/state-of-ai-agent-memory-2026", "method_url": null
+    },
+    {
+      "id": "amb-locomo-everos-k10", "benchmark": "locomo", "system": "everos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.706, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"EverMind-AI","version":"1.4.2","k":10,"questions":1986,"hits_per_query":8.1,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-everos-k5", "benchmark": "locomo", "system": "everos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.707, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"EverMind-AI","version":"1.4.2","k":5,"questions":1986,"hits_per_query":4.437,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-everos-k1", "benchmark": "locomo", "system": "everos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.603, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"EverMind-AI","version":"1.4.2","k":1,"questions":1986,"hits_per_query":1.865,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-everos-k3", "benchmark": "locomo", "system": "everos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.694, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"EverMind-AI","version":"1.4.2","k":3,"questions":1986,"hits_per_query":2.947,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-memos-k10", "benchmark": "locomo", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.668, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":10,"questions":1986,"hits_per_query":18.749,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-memos-k1", "benchmark": "locomo", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.487, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":1,"questions":1986,"hits_per_query":2.714,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-memos-k5", "benchmark": "locomo", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.626, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":5,"questions":1986,"hits_per_query":10.237,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-locomo-memos-k3", "benchmark": "locomo", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.602, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":3,"questions":1986,"hits_per_query":6.704,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-longmemeval-memos-k10", "benchmark": "longmemeval (xs-shared)", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.775, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":10,"questions":151,"hits_per_query":22.298,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-longmemeval-memos-k5", "benchmark": "longmemeval (xs-shared)", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.755, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":5,"questions":151,"hits_per_query":12.603,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-longmemeval-memos-k3", "benchmark": "longmemeval (xs-shared)", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.742, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":3,"questions":151,"hits_per_query":8.119,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    },
+    {
+      "id": "amb-longmemeval-memos-k1", "benchmark": "longmemeval (xs-shared)", "system": "memos", "owner": "RonsenbergVI (René-Jean Corneille)",
+      "score": 0.609, "unit": "fraction", "metric": "binary judge_accuracy", "configuration": {"system_owner":"MemTensor","version":"2.0.33","k":1,"questions":151,"hits_per_query":3.351,"ingestion_model":"anthropic:claude-haiku-5-5","embedding_model":"openai:text-embedding-3-small"},
+      "answer_model": "anthropic:claude-haiku-5-5", "judge": "anthropic:claude-haiku-5-5", "status": "upstream published result; not independently rerun",
+      "source_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/RESULTS.md", "method_url": "https://github.com/RonsenbergVI/agent-memory-benchmarks/blob/3c2aeeafd5fea0ebf00c63db81fb92f6b46dfe91/METHODOLOGY.md"
+    }
+  ]
+}
