@@ -1,0 +1,21 @@
+# Capped benchmark API calls
+
+Start one loopback proxy for every server, answerer, judge and auxiliary scorer:
+
+```bash
+python3 scripts/benchmarks/paid_budget_proxy.py --ledger /absolute/shared.sqlite3 --pricing prices.json --cap-usd 20
+```
+
+Supply provider keys in the proxy process environment only. Pricing JSON is `{"models":{"gpt-5-mini":{"input_usd_per_million":"0.25","output_usd_per_million":"2"}}}`; supply verified prices for every requested model. Prices have no defaults. Supported models are `gpt-5-mini`, `gpt-5.4-mini-2026-03-17`, `voyage-4` (1024d) and `text-embedding-3-small`. Reverify official pricing before each campaign.
+
+Use the printed OpenAI base URL for SDK clients. Redirect the frozen server's Voyage URL to the printed Voyage base plus `/embeddings` at launch. All paid callers must use the same proxy/absolute ledger. Direct calls bypass protection.
+
+For a shared local machine, add `--client-token-env AUTOMEM_BUDGET_CLIENT_TOKEN` and set that environment variable in the proxy process. Configure every caller to send the matching local `Authorization: Bearer ...` token (for OpenAI SDK clients, use it as their API key). The proxy replaces it with the provider credential upstream. Missing, wrong or multiple authorization headers return 401 before POST validation and leave accounting untouched; authenticated invalid requests still halt the campaign. Missing or empty configured token variables fail startup. Omitting the option preserves existing behavior. The startup receipt labels `client_auth_required` without recording the token or environment variable name. `/status` and `/health` remain readable without authentication.
+
+**Monitor `/status` and terminate owned benchmark processes if `halted` is true or accounting is unavailable.** Harnesses can swallow provider exceptions. Unsupported, invalid or unpriced POSTs that pass any configured client authentication persist a `request_rejected` halt before returning HTTP 400, so silent extraction/scoring fallbacks cannot leave the campaign healthy; they make no upstream call or reservation, and later valid requests are denied. Chat calls must specify an output cap; the proxy pins standard service tier. Admission reserves a conservative byte-based input bound plus the complete output cap before network. Successful usage reconciles the charge; errors, timeouts or missing usage retain the reservation and halt persistently. The proxy performs no retries and never logs keys, prompts or raw provider errors.
+
+POSTs rejected by admission also return a fixed `error.failure_reason` (for example `unsupported_fields`, `invalid_output_cap`, or `unsupported_service_tier`). The same fixed reason, a route classification (`openai`, `openai_embeddings`, `voyage`, or `unsupported_route`) and a timestamp are appended to `<absolute-ledger-path>.rejections.jsonl`. The shared ledger lock serializes appends, and the sidecar is flushed/fsynced before the `request_rejected` halt becomes visible, so monitoring can abort the harness without losing the cause. No request values, raw route strings, bodies, headers, prompts or keys are recorded. Unknown error messages map to `invalid_request`; diagnostic write failure still commits the halt and returns sanitized 503. Spend/reservation and admission rules after client authentication are unchanged.
+
+`--summary --ledger /absolute/shared.sqlite3` opens an existing ledger through SQLite read-only mode and reads accounting without network. It never creates a ledger or initializes schema, and rejects missing paths or uninitialized files. `--cap-usd` is ignored in summary mode: inspecting accounting cannot change a stored cap, halt flag or liabilities. Summaries include committed transactions from an active WAL writer. One USD is 1,000,000,000 nUSD. Never delete/reset a campaign ledger or raise its cap. Any reviewed rollover must retain all prior liabilities and lower the new cap by their total, with only one active proxy.
+
+Run fake-only verification with `python3 -m unittest discover -s scripts/benchmarks -p test_paid_budget_proxy.py`. The guard is an experiment-specific accounting boundary; it cannot protect calls sent elsewhere or incorrect configured prices.
