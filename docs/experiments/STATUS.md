@@ -2,7 +2,7 @@
 
 Historical AMB snapshot: LoCoMo, PersonaMem, BEAM-100K values retained from the index generated 2026-06-22T20:26:29+00:00 because the raw archives are unavailable. These are historical values, not fresh AMB results. Source: origin/main@35fa73d, docs/experiments/index.json; full source commit/hash recorded per retained row in index.json.
 
-Generated: `2026-10-26T01:40:00+00:00`
+Generated: `2026-10-26T02:27:13+00:00`
 
 Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.
 Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
@@ -14,8 +14,9 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 - `EXP-BEAM-JUDGED` **Native judged BEAM harness** - `parked`; AutoMem should be measured with BEAM's judged answer task, not only proxy retrieval metrics, to make leaderboard-comparable claims. Decision: Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result. Artifacts: 29. Updated: `2026-10-22`.
 - `EXP-ORPHAN-FAMA-MEMORA-RELCHAIN` **Undocumented FAMA, Memora, and relation-chain result clusters** - `parked`; These result clusters likely represent real experiments, but the hypothesis and decision are not recorded in session notes. Decision: Keep parked until someone reviews the raw outputs and either backfills records or deletes the artifacts. Artifacts: 6. Updated: `2026-06-22`.
 - `EXP-MATURATION` **Memory maturation evaluation concept** - `parked`; Recall quality may improve through maturation or consolidation processes beyond immediate ingestion. Decision: Parked until a concrete maturation runner is prioritized. Artifacts: 1. Updated: `2026-06-17`.
-- `EXP-INLINE-OBSOLETE-20261026` **Suppress obsolete payloads in inline recall relations** - `completed`; Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access. Decision: Focused inline leak fix verified in automem#273; clean hosted Codex review and all six required CI checks pass. Merge the fix, then run one controlled precision experiment and matched graph on/off. Keep #270 and broader #31 work parked. Artifacts: 8. Updated: `2026-10-26`.
-- `EXP-POSTMERGE-20261022` **Combined post-merge baseline and lifecycle follow-up** - `completed`; Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion. Decision: Baseline complete. Inline relation leak follow-up verified separately in EXP-INLINE-OBSOLETE-20261026 / automem#273; merge it before the controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked. Artifacts: 5. Updated: `2026-10-26`.
+- `EXP-PRECISION-CONTEXT-20261026` **Paired support-label context pruning diagnostic** - `in-progress`; Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support. Decision: Run only this paired context condition; keep retrieval, prompt templates, models and scoring fixed. This oracle diagnostic cannot establish true relevance precision or a deployable filter. Graph comparison and broader work stay parked. Artifacts: 4. Updated: `2026-10-26`.
+- `EXP-INLINE-OBSOLETE-20261026` **Suppress obsolete payloads in inline recall relations** - `completed`; Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access. Decision: Focused fix merged in automem#273 at fe0d5c3. EXP-PRECISION-CONTEXT-20261026 is now the one active evaluation batch. Evals#78 evidence review remains external/pending; #270 and broader #31 work stay parked. Artifacts: 4. Updated: `2026-10-26`.
+- `EXP-POSTMERGE-20261022` **Combined post-merge baseline and lifecycle follow-up** - `completed`; Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion. Decision: Baseline complete; inline relation leak fix merged in automem#273. Current batch: EXP-PRECISION-CONTEXT-20261026. Review its result before the matched graph comparison; keep #270, AMB/BEAM refresh, new adapters and architecture work parked. Artifacts: 5. Updated: `2026-10-26`.
 - `EXP-MATRIX` **Parallel matrix harness for AutoMem config sweeps** - `adopted`; A matrix runner with isolated stacks can compare many endpoints, rulesets, and scenarios without cross-run contamination. Decision: Adopted as infrastructure; no active worktree remains. Artifacts: 12. Updated: `2026-06-17`.
 - `EXP-BEAM-RETRIEVAL` **BEAM retrieval proxy harness** - `adopted`; A deterministic retrieval-only BEAM proxy can provide a cheap signal before running expensive judged BEAM. Decision: Use as a cheap preflight, not as the final benchmark claim. Artifacts: 4. Updated: `2026-06-13`.
 - `EXP-METADATA` **Server-side metadata signal diagnosis** - `adopted`; Better metadata treatment can improve /recall behavior on real-data probes without changing vectors. Decision: Adopt metadata A/B and vector identity checks as part of server-side recall diagnostics. Artifacts: 37. Updated: `2026-06-11`.
@@ -31,6 +32,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 
 ```mermaid
 flowchart LR
+  EXP_PRECISION_CONTEXT_20261026["EXP-PRECISION-CONTEXT-20261026: Paired support-label context pruning diagnostic"]
   EXP_INLINE_OBSOLETE_20261026["EXP-INLINE-OBSOLETE-20261026: Suppress obsolete payloads in inline recall relations"]
   EXP_POSTMERGE_20261022["EXP-POSTMERGE-20261022: Combined post-merge baseline and lifecycle follow-up"]
   EXP_AMB["EXP-AMB: Agent Memory Benchmark adapter and submission"]
@@ -48,6 +50,8 @@ flowchart LR
   EXP_WRIT["EXP-WRIT: WRIT adapter diagnostics"]
   EXP_MATURATION["EXP-MATURATION: Memory maturation evaluation concept"]
   EXP_ORPHAN_FAMA_MEMORA_RELCHAIN["EXP-ORPHAN-FAMA-MEMORA-RELCHAIN: Undocumented FAMA, Memora, and relation-chain result clusters"]
+  EXP_PRECISION_CONTEXT_20261026 --> EXP_POSTMERGE_20261022
+  EXP_PRECISION_CONTEXT_20261026 --> EXP_INLINE_OBSOLETE_20261026
   EXP_INLINE_OBSOLETE_20261026 --> EXP_POSTMERGE_20261022
   EXP_INLINE_OBSOLETE_20261026 --> EXP_CURRENT_STATE
   EXP_POSTMERGE_20261022 --> EXP_CURRENT_STATE
@@ -79,7 +83,7 @@ flowchart LR
 
 ## In Progress / Needs Decision
 
-- No in-progress experiment threads recorded.
+- `EXP-PRECISION-CONTEXT-20261026`: Run only this paired context condition; keep retrieval, prompt templates, models and scoring fixed. This oracle diagnostic cannot establish true relevance precision or a deployable filter. Graph comparison and broader work stay parked. (branch: `test/precision-context-ablation`, worktree: `../automem-evals.worktrees/precision-context-ablation`).
 
 ## Worktree & Branch Reconciliation
 
@@ -89,10 +93,11 @@ flowchart LR
 - `feat/amb-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/amb-adapter` - `in-flight`; no PR; dirty entries: `7`; keep/review.
 - `feat/aml-cycle2-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/aml-cycle2-adapter` - `open-pr`; PR #29 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/experiment-registry` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry` - `merged`; PR #20 `MERGED`; dirty entries: `0`; cleanup candidate.
-- `test/inline-obsolete-baseline` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/inline-obsolete-baseline` - `in-flight`; no PR; dirty entries: `6`; keep/review.
+- `test/inline-obsolete-baseline` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/inline-obsolete-baseline` - `open-pr`; PR #78 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/mem2actbench-pilot` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/mem2actbench-pilot` - `open-pr`; PR #34 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/memorycd-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-adapter` - `open-pr`; PR #35 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/memorycd-automem-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-automem-adapter` - `in-flight`; no PR; dirty entries: `0`; keep/review.
+- `test/precision-context-ablation` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation` - `in-flight`; no PR; dirty entries: `6`; keep/review.
 - `agent/kernel-worker/082439ff` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-082439ff` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/2fa9b7a0` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-2fa9b7a0` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/328d6b09` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-328d6b09` - `open-pr`; PR #70 `OPEN`; dirty entries: `0`; keep/review.

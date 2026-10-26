@@ -1,0 +1,24 @@
+{
+  "baseline_prior_accounted_usd": "9.809397650",
+  "completion_gate": "receipt.status=complete AND run/status.status=complete AND 34 complete paired cases; incomplete runs have no headline score",
+  "execution_helpers": "One-off helpers retained in ignored raw evidence; copies at original launch paths remain while active. No official harness/server source edits.",
+  "harness_revision": "3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876",
+  "original_total_api_cap_usd": "20.00",
+  "per_case_results": "run/<question_id>.json",
+  "preregistration_sha256": "d945394ec62469d8e92c851ccd6a9ce11b133ddd8b59bc9a46e7333d3dc452d8",
+  "raw_root": "data/sweep_runs/precision-context-20261026",
+  "receipt": "receipt.json",
+  "runtime_source_sha256": {
+    "budget_README.md": "cb164299a65fe2e49929df322c8d37502c6e8bd667dec9cd5da1818d069d5d8a",
+    "budget_control.py": "76ef07201df271347e068c37f37de16c61f9e2765038f48c4005ec2d427833a4",
+    "budget_offline_checks.json": "5c155fcb1bedec633d6c4206f04226366c1a096f0a0032baa987626a292aca0e",
+    "budget_prices.json": "ec2f1d4b5a4aba64b6421ae7025ab354ff8999f5925172a4a2e235ed9cde54da",
+    "budget_test.py": "d373ee68b18ed4864fe9b4a434dfdd1b7ba95f93b88eef654866c17bb1ace732",
+    "run_experiment.py": "0ca26dfd562c5cba117600d77f4f91fbe0171a61d8420a10c3871ca9a1370901",
+    "server_bootstrap.py": "970ccd064d536c0934c7bc554cabad43ee845e696cfe877d0e79977981a56f61",
+    "test_contexts.py": "66cb279bd536fce609cc77fbdba770289cbfa859da73eb49b30e2e3a50c1c4b6"
+  },
+  "server_revision": "fe0d5c374f1da65d30aaa9311e24647284d22793",
+  "stage_api_cap_usd": "3.00",
+  "status": "running"
+}
