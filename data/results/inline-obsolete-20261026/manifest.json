@@ -1,0 +1,60 @@
+{
+  "adapter": {
+    "file": "scripts/benchmarks/forgeteval_automem.py",
+    "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-a5b095e4",
+    "revision": "4723034d2d5fe7a29f448ee4fed9d93e838c2724",
+    "sha256": "29bfb22c154a0c7d427fbd7931197de58f80422482f2cad2c069b2a147158ba6"
+  },
+  "backend_images": {
+    "falkordb/falkordb:v4.18.10": "sha256:0d793d4b249a9cf0837faa9f30fea1b86fb50086fc8aa21e9447078a07f995bc",
+    "qdrant/qdrant:v1.11.3": "sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c"
+  },
+  "config": {
+    "consolidation": "stopped",
+    "embedding_provider": "local",
+    "enrichment": "stopped",
+    "hf_hub_offline": true,
+    "jit": false,
+    "paid_credentials": "empty",
+    "source_mount": "read-only"
+  },
+  "contract_probe": {
+    "checks_passed": 4,
+    "kind": "separate_real_store_contract_probe",
+    "status": "pass",
+    "summary_sha256": "b191b89a331de3c4f0acc13e8b4d14eb22d0aba3235f00e86b162eb9400ef9de"
+  },
+  "curated_files_sha256": {
+    "README.md": "887ce0f4d017edda38e1dc0142898b3ad47864fa313b7dc0bb624042c479db83",
+    "run_suite.py": "7663a1c0330eb7e62cb5502cc3978b99bde1ee70e94a98e12ca1fc6a3bc56118"
+  },
+  "ended_at": "2026-10-26T01:37:16.317492+00:00",
+  "evidence_sha256": {
+    "FILES.sha256": "6fa804f99bd12fd0bfb8bd2c7537f67f7d68f069db71f0bb8764dcc2489134ae",
+    "api-log-audit.json": "e8accd91cc22ae96367c9d28f69367640e0210e771c2eca2fd65754ad6e0bcb4",
+    "case-comparison.tsv": "e2e1e8800a7f528964ab2f03ae952504a8a3b0f95bc034766c11d3e1aea08fe7",
+    "case-input-equality.jsonl": "d6e9368032b57fb398e804f9863c09be9f6e34838401fd515ad413cd1599e510",
+    "compose.executed.yml": "9ea7f7d7996300fe092712978105d715a5ce828cf24456c6662f6efad09bb0aa",
+    "contract_probe.py": "106313c870830056f9bcd7c3d445548b2610f4b317077fac5a80411ffccc2fb5",
+    "execution-manifest.json": "45b27020d47aa99bfc65d6a2a773d2e22badc98ccc0459bd54c3228facfe0b49",
+    "graph-comparison.tsv": "87e86c7f1676cd59ea0dafd98ca64ab19222e17f8dba4fe1a04b22020f7450f7",
+    "run_eval.executed.py": "ef6aa3e2fab97f5d84f838d31d077be33df22156ba215f51833a342942772cff"
+  },
+  "id": "inline-obsolete-20261026",
+  "model": {
+    "dimensions": 384,
+    "name": "BAAI/bge-small-en-v1.5",
+    "snapshot": "aa8f8b060edb00e03bfdd08813a2949946c8ba55",
+    "source_volume": "pmb_92ebad9f_models"
+  },
+  "raw_root": "data/sweep_runs/inline-obsolete-20261026",
+  "runtime_image": "sha256:668fccdfd77afba9be262df8b1ef944da072b72834da098bdd5fc87c7feb722d",
+  "server_revisions": {
+    "baseline": "3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876",
+    "candidate": "f5d88f14393f51ddbc6027ecabcf316090b8d445"
+  },
+  "started_at": "2026-10-26T01:30:54.100584+00:00",
+  "status": "complete",
+  "summary_sha256": "4c0a3b9a11c4173299759dbe139889f4cdfc34e9152d4c6fc47fef561983ead2",
+  "upstream": "b6053b7bdacc78a91b9ea4bb25f32edad278c495"
+}
