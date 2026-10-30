@@ -1,5 +1,5 @@
 {
-  "artifact_overlay_root": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
+  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-53c29f42",
   "artifacts": [
     {
       "created_at": "2026-04-17T23:09:40",
@@ -1756,13 +1756,19 @@
     },
     {
       "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/paid-budget.md",
+      "title": "Capped benchmark API calls"
+    },
+    {
+      "created_at": null,
       "kind": "session-note",
       "path": "docs/session_20261022_postmerge_baseline.md",
       "title": "Post-merge baseline: 22 October 2026"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-23T02:32:13+00:00",
+  "generated_at": "2026-10-30T01:24:33+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -1975,34 +1981,67 @@
       "kind": "eval-doc",
       "path": "docs/eval/atma-ltp.md",
       "title": "A-TMA / LTP \u2014 state-aware ghost-memory evaluation"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/paid-budget.md",
+      "title": "Capped benchmark API calls"
     }
   ],
   "prs": [
     {
-      "headRefName": "docs/postmerge-baseline-index",
+      "headRefName": "test/inline-obsolete-baseline",
       "mergedAt": null,
-      "number": 73,
+      "number": 78,
       "state": "OPEN",
+      "title": "test(eval): verify inline obsolete suppression against baseline",
+      "updatedAt": "2026-10-26T02:03:22Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/78"
+    },
+    {
+      "headRefName": "agent/kernel-worker/7b268a6f",
+      "mergedAt": null,
+      "number": 77,
+      "state": "OPEN",
+      "title": "docs(eval): add MemSyco-Bench track and public-artifact preflight",
+      "updatedAt": "2026-10-25T12:14:20Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/77"
+    },
+    {
+      "headRefName": "agent/kernel-worker/34f6a055",
+      "mergedAt": null,
+      "number": 75,
+      "state": "OPEN",
+      "title": "docs(eval): add sourced external baseline reference matrix",
+      "updatedAt": "2026-10-24T13:34:28Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/75"
+    },
+    {
+      "headRefName": "docs/postmerge-baseline-index",
+      "mergedAt": "2026-10-26T01:25:49Z",
+      "number": 73,
+      "state": "MERGED",
       "title": "docs(eval): refresh dashboard for completed post-merge baseline",
-      "updatedAt": "2026-10-23T02:30:02Z",
+      "updatedAt": "2026-10-26T01:30:24Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
     },
     {
       "headRefName": "test/postmerge-baseline",
-      "mergedAt": null,
+      "mergedAt": "2026-10-26T01:27:10Z",
       "number": 72,
-      "state": "OPEN",
+      "state": "MERGED",
       "title": "docs(eval): publish post-merge baseline and next product fix",
-      "updatedAt": "2026-10-23T02:32:10Z",
+      "updatedAt": "2026-10-26T01:30:26Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/72"
     },
     {
       "headRefName": "test/paid-baseline-budget",
-      "mergedAt": null,
+      "mergedAt": "2026-10-26T01:25:39Z",
       "number": 71,
-      "state": "OPEN",
+      "state": "MERGED",
       "title": "test(benchmarks): cap shared paid API spend before requests",
-      "updatedAt": "2026-10-22T22:20:56Z",
+      "updatedAt": "2026-10-26T01:30:28Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/71"
     },
     {
@@ -2375,7 +2414,7 @@
       "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
     }
   ],
-  "root": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
+  "root": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-53c29f42",
   "schema": "automem-evals.experiment-index.v1",
   "scores": [
     {
@@ -2732,10 +2771,36 @@
   "status_counts": {
     "adopted": 10,
     "completed": 1,
-    "parked": 4,
+    "parked": 5,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 0,
+      "artifact_samples": [],
+      "artifacts": [
+        "docs/experiments/memory-tax-raw-history-rag.md",
+        "runners/memory_tax/**",
+        "data/results/memory-tax/**"
+      ],
+      "branch": "agent/kernel-worker/53c29f42",
+      "decision": "Awaiting owner approval of a Stage 1 canary cap; no paid run authorized. Reuses the #48 controlled-baseline contract. Slices: raw/fused backend, pairing analyzer, cause probes, BEAM switch.",
+      "hypothesis": "AutoMem's write-time processing, lifecycle suppression (t_invalid, INVALIDATED_BY, EVOLVED_INTO) and graph expansion cost answer accuracy versus plain retrieval over the same raw history, and fusing raw-history retrieval with AutoMem recovers part of that cost (He et al., arXiv:2610.34073).",
+      "id": "EXP-MEMORY-TAX",
+      "notes": "Paper figures are the paper's own and must be labelled as paper baselines. Official benchmark claims stay in automem.",
+      "pr": null,
+      "related": [
+        "EXP-POSTMERGE-20261022",
+        "EXP-BEAM-JUDGED"
+      ],
+      "result": "Spec only; no run. Paper code checked 2026-10-30: partially released (hexuan21/MemoryTax @ 179e6a7, naive-RAG reproduction folder is README-only), so the raw-history arm is defined locally.",
+      "started": "2026-10-30",
+      "status": "parked",
+      "title": "Memory Tax: raw-history RAG control for AutoMem",
+      "updated": "2026-10-30",
+      "worktree": null,
+      "worktree_status": null
+    },
     {
       "artifact_count": 5,
       "artifact_samples": [
@@ -3282,37 +3347,37 @@
     },
     {
       "branch": "docs/postmerge-baseline-index",
-      "cleanup_candidate": false,
+      "cleanup_candidate": true,
       "dirty_entries": 1,
-      "head": "7931986",
+      "head": "e6cee41",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals",
       "pr": {
         "headRefName": "docs/postmerge-baseline-index",
-        "mergedAt": null,
+        "mergedAt": "2026-10-26T01:25:49Z",
         "number": 73,
-        "state": "OPEN",
+        "state": "MERGED",
         "title": "docs(eval): refresh dashboard for completed post-merge baseline",
-        "updatedAt": "2026-10-23T02:30:02Z",
+        "updatedAt": "2026-10-26T01:30:24Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/73"
       },
-      "status": "open-pr"
+      "status": "merged"
     },
     {
       "branch": "test/paid-baseline-budget",
-      "cleanup_candidate": false,
+      "cleanup_candidate": true,
       "dirty_entries": 0,
       "head": "9872563",
       "path": "/Users/jgarturo/.codex/worktrees/postmerge-budget-review/automem-evals",
       "pr": {
         "headRefName": "test/paid-baseline-budget",
-        "mergedAt": null,
+        "mergedAt": "2026-10-26T01:25:39Z",
         "number": 71,
-        "state": "OPEN",
+        "state": "MERGED",
         "title": "test(benchmarks): cap shared paid API spend before requests",
-        "updatedAt": "2026-10-22T22:20:56Z",
+        "updatedAt": "2026-10-26T01:30:28Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/71"
       },
-      "status": "open-pr"
+      "status": "merged"
     },
     {
       "branch": "feat/amb-adapter",
@@ -3358,6 +3423,23 @@
       "status": "merged"
     },
     {
+      "branch": "test/inline-obsolete-baseline",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "4b94988",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/inline-obsolete-baseline",
+      "pr": {
+        "headRefName": "test/inline-obsolete-baseline",
+        "mergedAt": null,
+        "number": 78,
+        "state": "OPEN",
+        "title": "test(eval): verify inline obsolete suppression against baseline",
+        "updatedAt": "2026-10-26T02:03:22Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/78"
+      },
+      "status": "open-pr"
+    },
+    {
       "branch": "feat/mem2actbench-pilot",
       "cleanup_candidate": false,
       "dirty_entries": 0,
@@ -3397,6 +3479,15 @@
       "dirty_entries": 0,
       "head": "4927125",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-automem-adapter",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "test/precision-context-ablation",
+      "cleanup_candidate": false,
+      "dirty_entries": 18,
+      "head": "f6e68b0",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
       "pr": null,
       "status": "in-flight"
     },
@@ -3453,6 +3544,23 @@
       "status": "in-flight"
     },
     {
+      "branch": "agent/kernel-worker/34f6a055",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "ebb16db",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-34f6a055",
+      "pr": {
+        "headRefName": "agent/kernel-worker/34f6a055",
+        "mergedAt": null,
+        "number": 75,
+        "state": "OPEN",
+        "title": "docs(eval): add sourced external baseline reference matrix",
+        "updatedAt": "2026-10-24T13:34:28Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/75"
+      },
+      "status": "open-pr"
+    },
+    {
       "branch": "agent/kernel-worker/36a58aae",
       "cleanup_candidate": false,
       "dirty_entries": 0,
@@ -3502,6 +3610,15 @@
         "url": "https://github.com/verygoodplugins/automem-evals/pull/42"
       },
       "status": "merged"
+    },
+    {
+      "branch": "agent/kernel-worker/53c29f42",
+      "cleanup_candidate": false,
+      "dirty_entries": 2,
+      "head": "f0abc8a",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-53c29f42",
+      "pr": null,
+      "status": "in-flight"
     },
     {
       "branch": "agent/kernel-worker/5d7d2e96",
@@ -3578,6 +3695,32 @@
       "dirty_entries": 0,
       "head": "832a3fb",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7271d230",
+      "pr": null,
+      "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/7b268a6f",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "5828784",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7b268a6f",
+      "pr": {
+        "headRefName": "agent/kernel-worker/7b268a6f",
+        "mergedAt": null,
+        "number": 77,
+        "state": "OPEN",
+        "title": "docs(eval): add MemSyco-Bench track and public-artifact preflight",
+        "updatedAt": "2026-10-25T12:14:20Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/77"
+      },
+      "status": "open-pr"
+    },
+    {
+      "branch": "agent/kernel-worker/8329d251",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "b8f4656",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-8329d251",
       "pr": null,
       "status": "in-flight"
     },
