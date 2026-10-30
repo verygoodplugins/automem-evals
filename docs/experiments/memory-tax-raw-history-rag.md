@@ -142,8 +142,12 @@ fires plus one primary tag from the first matching rule:
    - **`invalidation_hiding`**: re-issue the identical `/recall` with `state_mode=history` and
      `state_debug=true`. Fire if the gold session now enters top-10; record the suppression reason
      (`archived`, `not_yet_valid`, `expired`, or replaced via `INVALIDATED_BY`/`EVOLVED_INTO`).
-   - **`graph_noise`**: only where `expand_relations` or `expand_entities` was on. Drop
-     expansion-only results from the saved response. Fire if the gold session re-enters top-10.
+   - **`graph_noise`**: only where `expand_relations` or `expand_entities` was on. Re-issue the
+     identical `/recall` with both flags off. Fire if the gold session now appears in its
+     top-`recall_limit` results. Do not infer this by deleting expansion-only results from the saved
+     response: deletion cannot restore a session that is not in it. At the primary pin expansion is
+     appended after the `limit` seeds, and a seed is lost only through the recency re-weighting and
+     adaptive score floor that run over the merged list.
    - **`retrieval_other`**: otherwise (tag gate, time window, ranking, `recall_limit`). Sub-tag
      `time_window` if removing `start`/`end` recovers it.
 3. If all gold sessions are in the (b) context:
