@@ -1,5 +1,28 @@
 [
   {
+    "id": "EXP-MEMORY-TAX",
+    "title": "Memory Tax: raw-history RAG control for AutoMem",
+    "status": "parked",
+    "hypothesis": "AutoMem's write-time processing, lifecycle suppression (t_invalid, INVALIDATED_BY, EVOLVED_INTO) and graph expansion cost answer accuracy versus plain retrieval over the same raw history, and fusing raw-history retrieval with AutoMem recovers part of that cost (He et al., arXiv:2610.34073).",
+    "result": "Spec only; no run. Paper code checked 2026-10-30: partially released (hexuan21/MemoryTax @ 179e6a7, naive-RAG reproduction folder is README-only), so the raw-history arm is defined locally.",
+    "decision": "Awaiting owner approval of a Stage 1 canary cap; no paid run authorized. Reuses the #48 controlled-baseline contract. Slices: raw/fused backend, pairing analyzer, cause probes, BEAM switch.",
+    "started": "2026-10-30",
+    "updated": "2026-10-30",
+    "artifacts": [
+      "docs/experiments/memory-tax-raw-history-rag.md",
+      "runners/memory_tax/**",
+      "data/results/memory-tax/**"
+    ],
+    "branch": "agent/kernel-worker/53c29f42",
+    "worktree": null,
+    "pr": null,
+    "related": [
+      "EXP-POSTMERGE-20261022",
+      "EXP-BEAM-JUDGED"
+    ],
+    "notes": "Paper figures are the paper's own and must be labelled as paper baselines. Official benchmark claims stay in automem."
+  },
+  {
     "id": "EXP-POSTMERGE-20261022",
     "title": "Combined post-merge baseline and lifecycle follow-up",
     "status": "completed",

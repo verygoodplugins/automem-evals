@@ -2,7 +2,7 @@
 
 Historical AMB snapshot: LoCoMo, PersonaMem, BEAM-100K values retained from the index generated 2026-06-22T20:26:29+00:00 because the raw archives are unavailable. These are historical values, not fresh AMB results. Source: origin/main@35fa73d, docs/experiments/index.json; full source commit/hash recorded per retained row in index.json.
 
-Generated: `2026-10-23T02:32:13+00:00`
+Generated: `2026-10-30T01:24:33+00:00`
 
 Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.
 Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
@@ -10,6 +10,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 ## Thread Overview
 
 - `EXP-BEAM-SHIM` **BEAM mem0-shim harness** - `superseded`; The upstream BEAM runner can be pointed at AutoMem through a mem0-compatible shim. Decision: Superseded by EXP-BEAM-RETRIEVAL and EXP-BEAM-JUDGED; keep artifacts for historical comparison. Artifacts: 17. Updated: `2026-04-24`.
+- `EXP-MEMORY-TAX` **Memory Tax: raw-history RAG control for AutoMem** - `parked`; AutoMem's write-time processing, lifecycle suppression (t_invalid, INVALIDATED_BY, EVOLVED_INTO) and graph expansion cost answer accuracy versus plain retrieval over the same raw history, and fusing raw-history retrieval with AutoMem recovers part of that cost (He et al., arXiv:2610.34073). Decision: Awaiting owner approval of a Stage 1 canary cap; no paid run authorized. Reuses the #48 controlled-baseline contract. Slices: raw/fused backend, pairing analyzer, cause probes, BEAM switch. Artifacts: 0. Updated: `2026-10-30`.
 - `EXP-AMB` **Agent Memory Benchmark adapter and submission** - `parked`; AutoMem can be evaluated against external AMB datasets by adapting benchmark memory and recall calls into the server's native API. Decision: Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result. Artifacts: 1. Updated: `2026-10-22`.
 - `EXP-BEAM-JUDGED` **Native judged BEAM harness** - `parked`; AutoMem should be measured with BEAM's judged answer task, not only proxy retrieval metrics, to make leaderboard-comparable claims. Decision: Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result. Artifacts: 29. Updated: `2026-10-22`.
 - `EXP-ORPHAN-FAMA-MEMORA-RELCHAIN` **Undocumented FAMA, Memora, and relation-chain result clusters** - `parked`; These result clusters likely represent real experiments, but the hypothesis and decision are not recorded in session notes. Decision: Keep parked until someone reviews the raw outputs and either backfills records or deletes the artifacts. Artifacts: 6. Updated: `2026-06-22`.
@@ -30,6 +31,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 
 ```mermaid
 flowchart LR
+  EXP_MEMORY_TAX["EXP-MEMORY-TAX: Memory Tax: raw-history RAG control for AutoMem"]
   EXP_POSTMERGE_20261022["EXP-POSTMERGE-20261022: Combined post-merge baseline and lifecycle follow-up"]
   EXP_AMB["EXP-AMB: Agent Memory Benchmark adapter and submission"]
   EXP_MATRIX["EXP-MATRIX: Parallel matrix harness for AutoMem config sweeps"]
@@ -46,6 +48,8 @@ flowchart LR
   EXP_WRIT["EXP-WRIT: WRIT adapter diagnostics"]
   EXP_MATURATION["EXP-MATURATION: Memory maturation evaluation concept"]
   EXP_ORPHAN_FAMA_MEMORA_RELCHAIN["EXP-ORPHAN-FAMA-MEMORA-RELCHAIN: Undocumented FAMA, Memora, and relation-chain result clusters"]
+  EXP_MEMORY_TAX --> EXP_POSTMERGE_20261022
+  EXP_MEMORY_TAX --> EXP_BEAM_JUDGED
   EXP_POSTMERGE_20261022 --> EXP_CURRENT_STATE
   EXP_POSTMERGE_20261022 --> EXP_NEG_CONTROL
   EXP_POSTMERGE_20261022 --> EXP_AMB
@@ -80,27 +84,33 @@ flowchart LR
 ## Worktree & Branch Reconciliation
 
 - `main` at `/Users/jgarturo/Projects/OpenAI/automem-evals` - `primary`; no PR; dirty entries: `1`; keep/review.
-- `docs/postmerge-baseline-index` at `/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals` - `open-pr`; PR #73 `OPEN`; dirty entries: `1`; keep/review.
-- `test/paid-baseline-budget` at `/Users/jgarturo/.codex/worktrees/postmerge-budget-review/automem-evals` - `open-pr`; PR #71 `OPEN`; dirty entries: `0`; keep/review.
+- `docs/postmerge-baseline-index` at `/Users/jgarturo/.codex/worktrees/postmerge-baseline/automem-evals` - `merged`; PR #73 `MERGED`; dirty entries: `1`; cleanup candidate.
+- `test/paid-baseline-budget` at `/Users/jgarturo/.codex/worktrees/postmerge-budget-review/automem-evals` - `merged`; PR #71 `MERGED`; dirty entries: `0`; cleanup candidate.
 - `feat/amb-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/amb-adapter` - `in-flight`; no PR; dirty entries: `7`; keep/review.
 - `feat/aml-cycle2-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/aml-cycle2-adapter` - `open-pr`; PR #29 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/experiment-registry` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/experiment-registry` - `merged`; PR #20 `MERGED`; dirty entries: `0`; cleanup candidate.
+- `test/inline-obsolete-baseline` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/inline-obsolete-baseline` - `open-pr`; PR #78 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/mem2actbench-pilot` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/mem2actbench-pilot` - `open-pr`; PR #34 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/memorycd-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-adapter` - `open-pr`; PR #35 `OPEN`; dirty entries: `0`; keep/review.
 - `feat/memorycd-automem-adapter` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/memorycd-automem-adapter` - `in-flight`; no PR; dirty entries: `0`; keep/review.
+- `test/precision-context-ablation` at `/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation` - `in-flight`; no PR; dirty entries: `18`; keep/review.
 - `agent/kernel-worker/082439ff` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-082439ff` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/2fa9b7a0` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-2fa9b7a0` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/328d6b09` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-328d6b09` - `open-pr`; PR #70 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/33c1eade` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-33c1eade` - `in-flight`; PR #40 `CLOSED`; dirty entries: `0`; keep/review.
+- `agent/kernel-worker/34f6a055` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-34f6a055` - `open-pr`; PR #75 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/36a58aae` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-36a58aae` - `open-pr`; PR #56 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/48e22593` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-48e22593` - `open-pr`; PR #68 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/4edda3e0` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-4edda3e0` - `merged`; PR #42 `MERGED`; dirty entries: `0`; cleanup candidate.
+- `agent/kernel-worker/53c29f42` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-53c29f42` - `in-flight`; no PR; dirty entries: `2`; keep/review.
 - `agent/kernel-worker/5d7d2e96` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-5d7d2e96` - `open-pr`; PR #55 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/5d85ec21` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-5d85ec21` - `in-flight`; PR #41 `CLOSED`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/5e36f253` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-5e36f253` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/66975d0c` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-66975d0c` - `open-pr`; PR #59 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/6937fb10` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-6937fb10` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/7271d230` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7271d230` - `in-flight`; no PR; dirty entries: `0`; keep/review.
+- `agent/kernel-worker/7b268a6f` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-7b268a6f` - `open-pr`; PR #77 `OPEN`; dirty entries: `0`; keep/review.
+- `agent/kernel-worker/8329d251` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-8329d251` - `in-flight`; no PR; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/92ebad9f` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-92ebad9f` - `open-pr`; PR #66 `OPEN`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/9398bea5` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-9398bea5` - `in-flight`; PR #36 `CLOSED`; dirty entries: `0`; keep/review.
 - `agent/kernel-worker/9c74a3e8` at `/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-9c74a3e8` - `open-pr`; PR #69 `OPEN`; dirty entries: `0`; keep/review.
@@ -180,3 +190,4 @@ Full interactive view: `docs/experiments/scoreboard.html` (open in a browser).
 - `docs/session_20260423_overnight_insights.md` - `session-note`; Session 2026-04-23 — Overnight insights: V1 vs V2 on BEAM 100K
 - `docs/session_20260423_overnight_strategy.md` - `session-note`; Session 2026-04-23 — Overnight strategy (apples-to-apples)
 - `docs/eval/atma-ltp.md` - `eval-doc`; A-TMA / LTP — state-aware ghost-memory evaluation
+- `docs/eval/paid-budget.md` - `eval-doc`; Capped benchmark API calls
