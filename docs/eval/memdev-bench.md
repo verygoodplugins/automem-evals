@@ -1,8 +1,8 @@
 # MemDev-Bench — memory applicability and process preservation for code agents
 
 Status: **spec only, artifact-blocked. No adapter, no paid run, no AutoMem
-score.** Written 2026-10-30. Exploratory and internal; official benchmark claims
-stay in `automem` ([REPO_BOUNDARY](../REPO_BOUNDARY.md)).
+score.** Written 2026-10-30; artifact checks re-run 2026-11-01. Exploratory and
+internal; official benchmark claims stay in `automem` ([REPO_BOUNDARY](../REPO_BOUNDARY.md)).
 
 Candidate fingerprint: `opportunity:automem-graph-rag-research-scout`.
 
@@ -25,8 +25,12 @@ Related, but not the same measurement:
 | #50 StateMemBench | Current vs superseded state (artifact-blocked) | Answer state selection; here staleness is only one hypothesised regression cause. |
 | [A-TMA/LTP](atma-ltp.md) | State-view ghost memory | Same lifecycle primitives, different task type. |
 
-Dedup on 2026-10-30: a search of this repository's issues and PRs for `MemDev`
-returned 0 results. This is one new file. It does not edit `registry.json` or
+Dedup: on 2026-10-30 a search of this repository's issues and PRs for `MemDev`
+returned 0 results. A re-run on 2026-11-01 over all states found nothing that
+names MemDev-Bench, arXiv 2610.27524, MemCalib or arXiv 2609.24259 except draft
+PR #80, an auto-preserved branch titled with the raw task prompt (so a title
+search misses it) that holds this spec file. No tracking issue exists yet. This
+is one new file. It does not edit `registry.json` or
 the generated dashboard files: #77 and #79 both append to `registry.json` and
 regenerate `STATUS.md`, `index.json` and `scoreboard.html`, so a third registry
 PR would conflict. Add a parked `EXP-MEMDEV-BENCH` record once those land or G0
@@ -34,16 +38,17 @@ clears.
 
 ## 2. Release status — blocked on official artifacts
 
-**Decision as of 2026-10-30: do not build a substitute benchmark, adapter or
-AutoMem score.**
+**Decision as of 2026-11-01 (unchanged since 2026-10-30): do not build a
+substitute benchmark, adapter or AutoMem score.**
 
-| Checked source | Finding on 2026-10-30 |
+| Checked source | Finding on 2026-10-30 (re-check in the last row) |
 | --- | --- |
 | [arXiv record](https://arxiv.org/abs/2610.27524) | v1 only (a v2 URL returns 404). cs.AI, 12 authors, no comments field. Links no code, dataset, Hugging Face or project page. Its license link covers the paper, not benchmark artifacts. |
 | [arXiv HTML v1](https://arxiv.org/html/2610.27524v1) and [PDF](https://arxiv.org/pdf/2610.27524v1) (text extracted locally) | No MemDev-Bench repository, data or Hugging Face URL. The Reproducibility Statement points to the method sections and appendices, not to a release. The Ethics Statement says the data comes from public GitHub repositories and that licenses are respected, without naming a benchmark license. The only GitHub links are bibliography entries for third-party tools and memory systems. |
 | GitHub repository search (`MemDev-Bench`, `memdev-bench`, `MemDevBench`) | Two hits, both unrelated memristive-device benchmarks (`JK1234567899999/memdevice-bench`, `TannerRobison/MemDevice_Benchmark`). Neither is an author release; do not pin them. |
 | Hugging Face dataset search (`memdev`) | Empty result. |
 | Web search for the exact title plus `github` | No author repository found. |
+| Re-check on 2026-11-01 | arXiv still lists v1 only, no comments field and no external links. Hugging Face dataset search `memdev` is still empty. GitHub repository search `MemDev-Bench in:name,description,readme` returns 12 repositories, none a MemDev-Bench release (two are the memristor repos above; `KaiWU5/Awesome-AI4AI` is a paper catalog). |
 
 ### Pin ledger
 
@@ -104,6 +109,32 @@ Candidate `verygoodplugins/automem` issues (do not open from here, and do not
 claim any exists): recall results that carry applicability metadata for clients,
 and a state-labelled evidence packet (see [A-TMA](atma-ltp.md)).
 
+### 4.1 Store construction (write-side mapping)
+
+Each historical task becomes memories in a per-base-task store (section 5). A2
+keeps whatever the stock hooks write. A3 adds a deterministic post-pass over the
+same store (no model calls) that writes the edges and invalidations below. The
+harness runs history solves one at a time, so it knows which task each memory
+came from. Relevance annotations choose *which* history is loaded; they never
+become tags, content or edges, because an edge derived from a label would leak
+the answer and score the annotation instead of AutoMem. Every edge comes from
+observable history: patch hunks, merge times, task order.
+
+| History fact | A3 post-pass write |
+| --- | --- |
+| A task's session-summary memory and its hook-captured event memories | Summary `DERIVED_FROM` events, so process detail stays one hop from the summary. |
+| Two history tasks edit overlapping non-test hunks | `RELATES_TO` between their memories, strength from the hunk-overlap ratio. |
+| A later task's pre-image lines were introduced by an earlier task | `DERIVED_FROM`, later → earlier. |
+| A later task rewrites or reverts an earlier task's hunk | `supersedes_memory_id=<earlier>` with `supersede_relation=INVALIDATED_BY` (old → new, as in [A-TMA](atma-ltp.md)), which sets the earlier memory's `t_invalid` to the later merge time. Recall uses `current_only=true`. |
+
+Server-side `expand_relations` is a no-op under tag gating (section 7), so edges
+act only through client-side expansion (`runners/client_side_expand.py`:
+`RELATES_TO` and `DERIVED_FROM` are in its default allowed set, `INVALIDATED_BY`
+is not; defaults are strength ≥ 0.6 and at most 3 per seed). The hypothesis is
+that a flat recall list lacks applicability context (what later changed or built
+on a memory) and edges carry it. Edges can also pull in more history, so report
+injected tokens next to Harm.
+
 ## 5. Arms
 
 All arms share the agent, pinned model ID, prompt, information isolation, turn
@@ -116,20 +147,39 @@ directional only. NoMem in our own runs is the baseline, never a paper figure.
 | **A0 NoMem** | None. Closed-book, as in paper §3 and Appendix E.2. |
 | **A1 RawTraj** | Complete raw historical trajectories in chronological order, no compression or selection. Trajectories come from the same agent solving the historical tasks *without memory*, as in the paper (Appendix E.1). |
 | **A2 AutoMem** | AutoMem as shipped. Memories are built by mcp-automem-style Claude Code hooks while the agent solves the history, at a pinned mcp-automem SHA (this repo's `variants/baseline` pins `4be6724`; choose and record the pin at G0). A task-conditioned recall hook injects results at session start, confirmed against the pinned hook at G0. Stop-hook session summaries are the noise source documented in the [hook-replay notes](../session_2026-04-28_hook_replay.md); record which variant ran. |
-| **A3 AutoMem + applicability** | A2 plus two interventions: (a) write-time invalidation: if a later history task edits the same file region as an earlier one (non-test patch hunk overlap, computed only from history that predates the base task), store it with `supersedes_memory_id` and recall with `current_only=true`; (b) a read-time applicability gate: each recalled memory carries source task, date, touched files and superseded flag, a deterministic check drops or flags memories whose files or symbols no longer exist in the base-task checkout, and the hook asks the agent to state, before its first edit, whether each used memory's assumptions hold. |
+| **A3 AutoMem + applicability** | A2 plus three interventions on the same store: (a) write-time invalidation: if a later history task edits the same file region as an earlier one (non-test patch hunk overlap, computed only from history that predates the base task), store it with `supersedes_memory_id` and recall with `current_only=true`; (b) authored `RELATES_TO`/`DERIVED_FROM` edges (section 4.1) read through one-hop client-side expansion; (c) a read-time applicability gate: each recalled memory carries source task, date, touched files and superseded flag, a deterministic check drops or flags memories whose files or symbols no longer exist in the base-task checkout, and the hook asks the agent to state, before its first edit, whether each used memory's assumptions hold. |
 
-A3 bundles two interventions on purpose, to answer "does any of this help" at
-smoke cost. If Stage 1 shows signal, split it into A3a (invalidation only) and
-A3b (applicability only) before any larger claim.
+A3 bundles three interventions on purpose, to answer "does any of this help" at
+smoke cost. If Stage 1 shows signal, split it into A3a (invalidation only), A3b
+(edges only) and A3c (applicability only) before any larger claim.
 
 Each base task gets its own memory store, frozen and read-only while the base
-task is solved (paper Appendix E.2). History scenarios follow the paper:
-**Relevant** (Strong + Weak related, 3–10 tasks) and **Noisy** (Relevant plus
-Unrelated, 7–21), capped at 35 tasks. Repo history is out of scope for the smoke.
+task is solved (paper Appendix E.2). The release's relevance annotations choose
+the loaded tasks and nothing else:
+
+| History arm | Loaded tasks | What it separates |
+| --- | --- | --- |
+| None | nothing (A0) | the baseline |
+| Relevant | Strong + Weak related, 3–10 tasks (paper) | help or harm when the right history is present |
+| Noisy | Relevant plus Unrelated, 7–21 tasks, capped at 35 (paper) | cost of distractors: paired Harm(Noisy) − Harm(Relevant) |
+| Unrelated-only | annotated Unrelated tasks only (**ours**, not in the paper) | pure unreassessed reuse: any Rescue is chance or leakage, any Harm is reuse without an applicability check |
+
+Repo history is out of scope for the smoke. Stage 1 runs Relevant only, Noisy
+starts at Stage 2, and Unrelated-only needs settings Stage 2 does not size, so it
+is a later add-on.
 
 ## 6. Metrics
 
 Use the official verifier and scorer from the release; never a local substitute.
+Headline metrics are reported per arm and history arm against A0 from the same
+runs, never against paper figures:
+
+| Headline | Definition |
+| --- | --- |
+| Pass-rate delta vs no-memory | Paired change in Resolved from A0 per base task; equals Rescue − Harm. |
+| Regression rate on solvable tasks | Harm restricted to **solvable** base tasks: those A0 resolves in every selection run, where the selection runs are independent of the A0 runs used for the comparison (the paper's Preservation Tasks). The share the arm fails. |
+| Step count | Mean Steps per solve (below); H1 compares A1 with A2. |
+| Applicability reassessment | **Reassessment rate:** share of runs with at least one recalled memory where, before its first edit, the agent assesses whether that memory fits the current checkout (names a file, symbol or version it checked, or states a mismatch). **Rejection precision:** among recalled memories that are Unrelated-labelled or have `t_invalid` set, the share the final edit does not rely on. Reported next to Resolved, since asserting applicability is not the same as being right. A0 has no value. |
 
 | Group | Metric | Definition |
 | --- | --- | --- |
@@ -150,7 +200,8 @@ Rescue, Harm and step differences. Pre-registered comparisons: **H1** A1 uses
 fewer steps than A2; **H2** A3 has lower Harm than A2 on Preservation Tasks under
 Noisy history without lower Rescue on Improvement Tasks; **H3** within A3,
 invalidation removes superseded recalls on the subset of tasks that have a
-superseding pair. Select Improvement/Preservation subsets from runs that are
+superseding pair; **H4** A3 has a higher Reassessment rate than A2, concentrated
+on Unrelated or superseded memories. Select Improvement/Preservation subsets from runs that are
 independent of the NoMem reference runs, as the paper does (Appendix E.1), to
 avoid regression-to-the-mean artifacts. Small N is directional only.
 
@@ -196,6 +247,30 @@ assumed; Stage 1 must report measured billed tokens and cache hits so Stage 2 ca
 be re-estimated from data. A full suite is out of scope: 344 Verified base tasks
 and 2,987 historical tasks (or the full 555 / 4,869) are never run under this spec.
 
+### Pilot command (planned interface; nothing below exists yet)
+
+`runners/memdev_bench/` is not written before G0 (section 10). This is the shape
+Stage 1 must have so that spend is bounded by construction:
+
+```bash
+python3.12 -m runners.memdev_bench.pilot \
+  --release-lock data/memdev-bench/release.lock.json \
+  --repo <one repository from the release> --base-tasks 3 --runs 1 \
+  --arms A0,A1,A2,A3 --history relevant --max-history-solves 12 \
+  --automem-url http://127.0.0.1:8001 --ledger /absolute/memdev-pilot.sqlite3 \
+  --max-input-tokens 250000000 --max-output-tokens 2000000 --abort-at 0.8
+```
+
+Required behaviour: a dry run by default (prints per-arm token ceilings, exits 0,
+zero spend) and a separate `--execute` flag as the only path to a model call.
+It refuses to start unless the release lock carries every pin from section 2, the
+ledger is fresh and a reviewed agent-loop spend guard (G1) is configured. It
+rejects non-local AutoMem URLs. One repository, at most 3 base tasks and 12
+history solves: flags may lower these ceilings, never raise them. It aborts at
+80% of either token ceiling, marks partial output `incomplete`, and prints no
+AutoMem score and no paper figure. The repository is chosen at G0: one with at
+least 3 base tasks whose history has 3–4 related tasks.
+
 Gates (all must be explicit, in order):
 
 - **G0 artifacts.** Official data, loader, verifier/scorer, immutable revision,
@@ -221,7 +296,7 @@ Gates (all must be explicit, in order):
 - **Exposure confound.** The paper's systems differ in how memory reaches the agent
   (tool-driven retrieval, session-start injection, lifecycle hooks). We fix one
   mode, session-start injection, so the result speaks to that mode only.
-- **A3 bundles two interventions** until split (section 5).
+- **A3 bundles three interventions** until split (section 5).
 - **Stock hooks are partial process capture.** A2 measures AutoMem as shipped, not
   an ideal process-preserving store; a per-trajectory distillation build is a later
   variant, not part of this spec.
@@ -237,7 +312,52 @@ Gates (all must be explicit, in order):
 3. Rescue/Harm pairing analyzer with task-level bootstrap on fixtures.
 4. Recall-only hook variant, supersession mapping and applicability gate.
 5. Stage 1 smoke, only after G1 and G2.
-6. Stage 2 pilot, only after G3; split A3 into A3a/A3b first.
+6. Stage 2 pilot, only after G3; split A3 into A3a/A3b/A3c first.
+
+## 11. Secondary lead — MemCalib (arXiv:2609.24259)
+
+[MemCalib](https://arxiv.org/abs/2609.24259) (cs.LG, v1 2026-09-21, v3
+2026-10-08) asks a narrower question: given memory in context, does the model
+give each atomic proposition the right influence, from ignore (A) through bounded
+(B) to controlling (C)? It reports that frontier models over-use and under-use
+memory. Unlike MemDev-Bench its artifacts are public. It is a **secondary lead,
+not a substitute**: single-turn answers scored by an LLM judge, no repository
+state and no execution, so it says nothing about regressions on solvable coding
+tasks. No MemCalib number may be reported as a MemDev-Bench result, and neither
+may be reported as an AutoMem result before our own run.
+
+| Artifact | Revision | License | State |
+| --- | --- | --- | --- |
+| Paper | arXiv:2609.24259v3 | arXiv non-exclusive distribution license | pinned |
+| Code: [`Quark-Medical/MemCalib`](https://github.com/Quark-Medical/memcalib), the paper's "Code and data" footnote | `main` HEAD `8eb018c18e9da84ba24fc2278a3ed5f906e80e47` (2026-09-23, root commit "Release MemCalib code") | Apache-2.0 | pinned. A verl-based RL recipe; `recipe/memcalib_credit/` holds trainer, data, judge and metrics modules, and I found no standalone inference entry point there. |
+| Data: [`ZiLaotou/MemCalib`](https://huggingface.co/datasets/ZiLaotou/MemCalib) | `70050dd3fe824ad66c156a5bf67f87944ef38cd7` (2026-09-23) | CC BY-SA 4.0, per-source licenses in `ATTRIBUTION.md` | pinned; file checksums not recorded, nothing was downloaded |
+| Judge | `recipe/memcalib_credit/judge.py` at the code pin ("Bailian ordered-usage Judge") | code license above | calls Alibaba Bailian with a DashScope key (README); outside the repository's [capped proxy](paid-budget.md) |
+
+From the dataset card and the Hugging Face API on 2026-11-01: 15,000 examples
+(`train.jsonl` 13,500, `test.jsonl` 1,500) over health, general and coding
+sources; fields `id`, `domain`, `question`, `memory_blocks`, `memories` (atoms
+with `u_star`, `memory_action`, `parent_memory_id` and a usage rubric) and
+`source_dataset`. In the first test row the question is a coding question and the
+memory blocks mix unrelated personal details with one atom whose `u_star` is C.
+
+Possible AutoMem fit (proposal; nothing is built):
+
+1. **Recall-only diagnostic, no answer model.** Ingest each example's blocks into
+   a per-example scope, recall with the question, and report the share of recalled
+   blocks holding a C-level atom versus only A-level atoms. This tests whether
+   AutoMem injects distractors, not how a model uses them. Embedding calls go
+   through the capped proxy.
+2. **Answer-and-judge leg** comparing provided blocks, AutoMem-recalled blocks and
+   no memory. Blocked: the release judge is a Bailian call the proxy does not
+   cover, and another judge needs its own validation under the
+   [judge policy](../BENCHMARK_JUDGE_POLICY.md).
+
+The over-use/under-use framing resembles MemDev-Bench's "agents follow memory
+instead of reassessing it" (P5). That is a plausible link, not one either paper
+demonstrates. Before any run: download outside the repository tree (CC BY-SA 4.0
+share-alike reaches derived data, so never commit the data or memory dumps built
+from it), record SHA-256 of both files, and open a separate tracking issue; none
+exists.
 
 ## Sources
 
@@ -250,3 +370,5 @@ Gates (all must be explicit, in order):
 - [A-TMA / LTP tracker](atma-ltp.md)
 - [Hook-replay notes](../session_2026-04-28_hook_replay.md)
 - [Benchmark judge policy](../BENCHMARK_JUDGE_POLICY.md)
+- [MemCalib arXiv record (v3)](https://arxiv.org/abs/2609.24259), [HTML v3](https://arxiv.org/html/2609.24259v3)
+- [MemCalib code](https://github.com/Quark-Medical/memcalib), [dataset card](https://huggingface.co/datasets/ZiLaotou/MemCalib)
