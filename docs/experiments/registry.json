@@ -1,13 +1,36 @@
 [
   {
+    "id": "EXP-INLINE-OBSOLETE-20261026",
+    "title": "Suppress obsolete payloads in inline recall relations",
+    "status": "completed",
+    "hypothesis": "Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access.",
+    "result": "Matched fresh cold replay: full-envelope graph probes 5/10 -> 10/10; top-k 10/10 both; ForgetEval 234/385 both, zero errors, all 385 inputs and standard-case verdicts unchanged. All five supersede fixture leaks fixed; purge fixtures unchanged.",
+    "decision": "Focused inline leak fix verified in automem#273; clean hosted Codex review and all six required CI checks pass. Merge the fix, then run one controlled precision experiment and matched graph on/off. Keep #270 and broader #31 work parked.",
+    "started": "2026-10-26",
+    "updated": "2026-10-26",
+    "artifacts": [
+      "docs/session_20261026_inline_obsolete.md",
+      "data/results/inline-obsolete-20261026/*",
+      "data/sweep_runs/inline-obsolete-20261026/**"
+    ],
+    "branch": "test/inline-obsolete-baseline",
+    "worktree": "../automem-evals.worktrees/inline-obsolete-baseline",
+    "pr": null,
+    "related": [
+      "EXP-POSTMERGE-20261022",
+      "EXP-CURRENT-STATE"
+    ],
+    "notes": "Product PR https://github.com/verygoodplugins/automem/pull/273; addresses only the inline obsolete-content leak in #31. Original baseline and API accounting remain unchanged; this verification uses local embeddings and no paid calls. Separate real-store contract probe passed: active inline content preserved, expired content ID-only in current mode, history content retained. All owned test stores removed."
+  },
+  {
     "id": "EXP-POSTMERGE-20261022",
     "title": "Combined post-merge baseline and lifecycle follow-up",
     "status": "completed",
     "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
     "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
-    "decision": "Baseline complete: LongMemEval 85.4% (six-task average 83.60%); LoCoMo 85.10%. Next #31: suppress obsolete inline-relation content, then one controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
+    "decision": "Baseline complete. Inline relation leak follow-up verified separately in EXP-INLINE-OBSOLETE-20261026 / automem#273; merge it before the controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
     "started": "2026-10-22",
-    "updated": "2026-10-23",
+    "updated": "2026-10-26",
     "artifacts": [
       "docs/session_20261022_postmerge_baseline.md",
       "data/results/postmerge-20261022/*",
