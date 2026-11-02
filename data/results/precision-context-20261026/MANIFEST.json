@@ -15,6 +15,8 @@
   "receipt_sha256": "03b8f9f04bf7cc9e6f4da0689be880a15cf706bd320e08a1a2c4d387f0095470",
   "results_sha256": "1608692923bc914cb595989f910caf375dc1dd9fda9e645020fa7667e0974b4c",
   "retrospective_review": {
+    "calibration_mapping_sha256": "d2e1172ecac967480a11f88f79b6ae71a1422587ec1b433ab9fe83793b6441ab",
+    "calibration_packet_sha256": "eea84c81de4e5b0aed75b85e6b06ed4683e480bef8cb288c9a7c74dfe2546973",
     "calibration_packet_status": "prepared_not_graded",
     "date": "2026-11-02",
     "decision_report": "RECONCILIATION.md",

@@ -1824,7 +1824,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-02T13:07:54+00:00",
+  "generated_at": "2026-11-02T13:12:07+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2046,6 +2046,15 @@
     }
   ],
   "prs": [
+    {
+      "headRefName": "test/precision-context-ablation",
+      "mergedAt": null,
+      "number": 82,
+      "state": "OPEN",
+      "title": "test(precision): reconcile context ablation and scoring concerns",
+      "updatedAt": "2026-11-02T13:11:29Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/82"
+    },
     {
       "headRefName": "agent/kernel-worker/6f5d2e77",
       "mergedAt": null,
@@ -2873,16 +2882,16 @@
         "docs/session_20261026_precision_context.md"
       ],
       "branch": "test/precision-context-ablation",
-      "decision": "Next: blinded evidence-anchored calibration of all60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
+      "decision": "Next: blinded evidence-anchored calibration of all 60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
       "hypothesis": "Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support.",
       "id": "EXP-PRECISION-CONTEXT-20261026",
-      "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted$10.727503350/$20 including retained prior liability; remaining$9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged.",
-      "pr": null,
+      "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted $10.727503350/$20 including retained prior liability; remaining $9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged.",
+      "pr": 82,
       "related": [
         "EXP-POSTMERGE-20261022",
         "EXP-INLINE-OBSOLETE-20261026"
       ],
-      "result": "All34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences15/30 full vs18/30 pruned (4wins/1loss); miss-controls0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
+      "result": "All 34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences 15/30 full vs 18/30 pruned (4 wins/1 loss); miss controls 0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
       "started": "2026-10-26",
       "status": "completed",
       "title": "Paired support-label context pruning diagnostic",
@@ -2892,7 +2901,7 @@
         "branch": "test/precision-context-ablation",
         "cleanup_candidate": false,
         "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
-        "state": "in-flight"
+        "state": "open-pr"
       }
     },
     {
@@ -3615,11 +3624,19 @@
     {
       "branch": "test/precision-context-ablation",
       "cleanup_candidate": false,
-      "dirty_entries": 22,
-      "head": "f6e68b0",
+      "dirty_entries": 18,
+      "head": "53d6edf",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
-      "pr": null,
-      "status": "in-flight"
+      "pr": {
+        "headRefName": "test/precision-context-ablation",
+        "mergedAt": null,
+        "number": 82,
+        "state": "OPEN",
+        "title": "test(precision): reconcile context ablation and scoring concerns",
+        "updatedAt": "2026-11-02T13:11:29Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/82"
+      },
+      "status": "open-pr"
     },
     {
       "branch": "agent/kernel-worker/01f6c283",

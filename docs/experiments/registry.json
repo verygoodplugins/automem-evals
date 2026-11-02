@@ -4,8 +4,8 @@
     "title": "Paired support-label context pruning diagnostic",
     "status": "completed",
     "hypothesis": "Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support.",
-    "result": "All34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences15/30 full vs18/30 pruned (4wins/1loss); miss-controls0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
-    "decision": "Next: blinded evidence-anchored calibration of all60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
+    "result": "All 34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences 15/30 full vs 18/30 pruned (4 wins/1 loss); miss controls 0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
+    "decision": "Next: blinded evidence-anchored calibration of all 60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
     "started": "2026-10-26",
     "updated": "2026-11-02",
     "artifacts": [
@@ -15,12 +15,12 @@
     ],
     "branch": "test/precision-context-ablation",
     "worktree": "../automem-evals.worktrees/precision-context-ablation",
-    "pr": null,
+    "pr": 82,
     "related": [
       "EXP-POSTMERGE-20261022",
       "EXP-INLINE-OBSOLETE-20261026"
     ],
-    "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted$10.727503350/$20 including retained prior liability; remaining$9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged."
+    "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted $10.727503350/$20 including retained prior liability; remaining $9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged."
   },
   {
     "id": "EXP-INLINE-OBSOLETE-20261026",
