@@ -1,6 +1,6 @@
 # Controlled context precision experiment — 2026-10-26
 
-Status: **running; no completed experiment score yet**. This is the one active evaluation batch after the inline obsolete-content fix. [AutoMem #273](https://github.com/verygoodplugins/automem/pull/273) is merged at `fe0d5c374f1da65d30aaa9311e24647284d22793`. [Evidence PR #78](https://github.com/verygoodplugins/automem-evals/pull/78) remains pending hosted review and must only merge once ready.
+Status: **retrospectively reviewed on 2026-11-02; original automated receipts remain incomplete**. See [reconciliation and selected next step](../data/results/precision-context-20261026/RECONCILIATION.md). This is the one active evaluation batch after the inline obsolete-content fix. [AutoMem #273](https://github.com/verygoodplugins/automem/pull/273) is merged at `fe0d5c374f1da65d30aaa9311e24647284d22793`. [Evidence PR #78](https://github.com/verygoodplugins/automem-evals/pull/78) merged on 2026-11-02 at `cead9f49792a03a97366d83487419554b3566867`, after a refreshed clean review.
 
 ## Frozen question and condition
 
@@ -28,6 +28,18 @@ The native controller owns API/benchmark processes and disposable FalkorDB/Qdran
 
 ## Next action
 
-Finish this one batch and reconcile discordant preference answers and the historical miss controls. Keep any proposed product filter, the matched graph-on/graph-off comparison, AutoMem #270, broader #31 work, AMB/BEAM refresh and architecture changes parked until the result is reviewed.
+The offline reconciliation is complete. Calibrate all 60 saved preference answers with masked arm identities before choosing a retrieval change. Keep any proposed product filter, the matched graph-on/graph-off comparison, AutoMem #270, broader #31 work, AMB/BEAM refresh and architecture changes parked until the result is reviewed.
 
 <!-- COMPLETION-STATUS -->
+
+<!-- precision-completion-facts -->
+
+## Recorded completion facts
+
+Status: incomplete.
+
+No aggregate results published. Resume blocker: controller:backend_log_errors.
+
+Support labels are not exhaustive relevance judgments. This is a single stochastic pass of a diagnostic oracle condition, not a deployable filter, measured relevance precision, or headline LongMemEval score. Fresh paired control is primary; historical grades remain unchanged.
+
+Raw paired evidence and accounting are referenced by `MANIFEST.json`.

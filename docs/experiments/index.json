@@ -1777,6 +1777,18 @@
     {
       "created_at": null,
       "kind": "artifact",
+      "path": "data/results/precision-context-20261026/RECONCILIATION.md",
+      "title": "Precision diagnostic: retrospective review, 2026-11-02"
+    },
+    {
+      "created_at": null,
+      "kind": "artifact",
+      "path": "data/results/precision-context-20261026/SUMMARY.md",
+      "title": "Precision context diagnostic"
+    },
+    {
+      "created_at": null,
+      "kind": "artifact",
       "path": "data/results/precision-context-20261026/budget_README.md",
       "title": "Controlled precision budget"
     },
@@ -1812,7 +1824,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-10-26T02:27:13+00:00",
+  "generated_at": "2026-11-02T13:07:54+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2035,12 +2047,39 @@
   ],
   "prs": [
     {
-      "headRefName": "test/inline-obsolete-baseline",
+      "headRefName": "agent/kernel-worker/6f5d2e77",
       "mergedAt": null,
-      "number": 78,
+      "number": 81,
       "state": "OPEN",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. Candidate fingerprint opportunity:automem-g",
+      "updatedAt": "2026-11-01T09:26:29Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/81"
+    },
+    {
+      "headRefName": "agent/kernel-worker/01f6c283",
+      "mergedAt": null,
+      "number": 80,
+      "state": "OPEN",
+      "title": "[preserved] Repo: verygoodplugins/automem-evals. Add a docs-only experiment spec (and a trac",
+      "updatedAt": "2026-10-30T13:20:39Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/80"
+    },
+    {
+      "headRefName": "agent/kernel-worker/53c29f42",
+      "mergedAt": null,
+      "number": 79,
+      "state": "OPEN",
+      "title": "docs(eval): spec Memory Tax raw-history RAG control",
+      "updatedAt": "2026-10-30T02:00:40Z",
+      "url": "https://github.com/verygoodplugins/automem-evals/pull/79"
+    },
+    {
+      "headRefName": "test/inline-obsolete-baseline",
+      "mergedAt": "2026-11-02T13:02:26Z",
+      "number": 78,
+      "state": "MERGED",
       "title": "test(eval): verify inline obsolete suppression against baseline",
-      "updatedAt": "2026-10-26T02:03:22Z",
+      "updatedAt": "2026-11-02T13:02:33Z",
       "url": "https://github.com/verygoodplugins/automem-evals/pull/78"
     },
     {
@@ -2814,19 +2853,19 @@
   ],
   "status_counts": {
     "adopted": 10,
-    "completed": 2,
-    "in-progress": 1,
+    "completed": 3,
     "parked": 4,
     "superseded": 1
   },
   "threads": [
     {
-      "artifact_count": 4,
+      "artifact_count": 6,
       "artifact_samples": [
         "data/results/precision-context-20261026/MANIFEST.json",
         "data/results/precision-context-20261026/README.md",
-        "data/results/precision-context-20261026/budget_README.md",
-        "docs/session_20261026_precision_context.md"
+        "data/results/precision-context-20261026/RECONCILIATION.md",
+        "data/results/precision-context-20261026/SUMMARY.md",
+        "data/results/precision-context-20261026/budget_README.md"
       ],
       "artifacts": [
         "data/results/precision-context-20261026/*",
@@ -2834,20 +2873,20 @@
         "docs/session_20261026_precision_context.md"
       ],
       "branch": "test/precision-context-ablation",
-      "decision": "Run only this paired context condition; keep retrieval, prompt templates, models and scoring fixed. This oracle diagnostic cannot establish true relevance precision or a deployable filter. Graph comparison and broader work stay parked.",
+      "decision": "Next: blinded evidence-anchored calibration of all60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
       "hypothesis": "Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support.",
       "id": "EXP-PRECISION-CONTEXT-20261026",
-      "notes": "AutoMem#273 merged as fe0d5c374f1da65d30aaa9311e24647284d22793. Evals#78 remains pending hosted review; merge only after ready. Stage cap $3 within original $20, prior accounted $9.809397650; no liability refunds. Fresh paired control is primary; historical grades immutable.",
+      "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted$10.727503350/$20 including retained prior liability; remaining$9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged.",
       "pr": null,
       "related": [
         "EXP-POSTMERGE-20261022",
         "EXP-INLINE-OBSOLETE-20261026"
       ],
-      "result": "Preregistered 34 unique questions: all 30 preferences plus five historical support misses with one overlap. Fresh single retrieval; full top-10 versus an order-preserving support-label subset. Provider preflight and offline context/budget checks passed; paired execution is running.",
+      "result": "All34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences15/30 full vs18/30 pruned (4wins/1loss); miss-controls0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
       "started": "2026-10-26",
-      "status": "in-progress",
+      "status": "completed",
       "title": "Paired support-label context pruning diagnostic",
-      "updated": "2026-10-26",
+      "updated": "2026-11-02",
       "worktree": "../automem-evals.worktrees/precision-context-ablation",
       "worktree_status": {
         "branch": "test/precision-context-ablation",
@@ -2870,7 +2909,7 @@
         "data/sweep_runs/inline-obsolete-20261026/**"
       ],
       "branch": "test/inline-obsolete-baseline",
-      "decision": "Focused fix merged in automem#273 at fe0d5c3. EXP-PRECISION-CONTEXT-20261026 is now the one active evaluation batch. Evals#78 evidence review remains external/pending; #270 and broader #31 work stay parked.",
+      "decision": "Focused fix and evidence merged in automem#273 / evals#78. Precision diagnostic reconciled in EXP-PRECISION-CONTEXT-20261026; calibrate scoring before a retrieval change. Keep #270 and broader #31 work parked.",
       "hypothesis": "Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access.",
       "id": "EXP-INLINE-OBSOLETE-20261026",
       "notes": "Product PR https://github.com/verygoodplugins/automem/pull/273; addresses only the inline obsolete-content leak in #31. Original baseline and API accounting remain unchanged; this verification uses local embeddings and no paid calls. Separate real-store contract probe passed: active inline content preserved, expired content ID-only in current mode, history content retained. All owned test stores removed.",
@@ -2887,9 +2926,9 @@
       "worktree": "../automem-evals.worktrees/inline-obsolete-baseline",
       "worktree_status": {
         "branch": "test/inline-obsolete-baseline",
-        "cleanup_candidate": false,
+        "cleanup_candidate": true,
         "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/inline-obsolete-baseline",
-        "state": "open-pr"
+        "state": "merged"
       }
     },
     {
@@ -2907,7 +2946,7 @@
         "data/sweep_runs/postmerge-20261022/**"
       ],
       "branch": "test/postmerge-baseline",
-      "decision": "Baseline complete; inline relation leak fix merged in automem#273. Current batch: EXP-PRECISION-CONTEXT-20261026. Review its result before the matched graph comparison; keep #270, AMB/BEAM refresh, new adapters and architecture work parked.",
+      "decision": "Baseline complete; inline fix/evidence merged. Precision diagnostic retrospectively reviewed; next calibrate preference scoring. Keep graph comparison, #270, AMB/BEAM refresh, new adapters and architecture parked.",
       "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
       "id": "EXP-POSTMERGE-20261022",
       "notes": "Final batch 2026-10-23T02:15:56.210223+00:00: $9.809397650 accounted, $0.073130570 retained ambiguous/reserved, $10.190602350 remaining of original $20; no reset/refund. LoCoMo storage interruption: 497 rows retained unchanged, 260 conversation 42 rows quarantined/rerun; both finalized accepted-window audits passed. Official benchmark metadata stays in automem; exploratory decision here.",
@@ -3515,20 +3554,20 @@
     },
     {
       "branch": "test/inline-obsolete-baseline",
-      "cleanup_candidate": false,
+      "cleanup_candidate": true,
       "dirty_entries": 0,
       "head": "4b94988",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/inline-obsolete-baseline",
       "pr": {
         "headRefName": "test/inline-obsolete-baseline",
-        "mergedAt": null,
+        "mergedAt": "2026-11-02T13:02:26Z",
         "number": 78,
-        "state": "OPEN",
+        "state": "MERGED",
         "title": "test(eval): verify inline obsolete suppression against baseline",
-        "updatedAt": "2026-10-26T02:03:22Z",
+        "updatedAt": "2026-11-02T13:02:33Z",
         "url": "https://github.com/verygoodplugins/automem-evals/pull/78"
       },
-      "status": "open-pr"
+      "status": "merged"
     },
     {
       "branch": "feat/mem2actbench-pilot",
@@ -3576,11 +3615,28 @@
     {
       "branch": "test/precision-context-ablation",
       "cleanup_candidate": false,
-      "dirty_entries": 6,
-      "head": "4b94988",
+      "dirty_entries": 22,
+      "head": "f6e68b0",
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
       "pr": null,
       "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/01f6c283",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "c003a3d",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-01f6c283",
+      "pr": {
+        "headRefName": "agent/kernel-worker/01f6c283",
+        "mergedAt": null,
+        "number": 80,
+        "state": "OPEN",
+        "title": "[preserved] Repo: verygoodplugins/automem-evals. Add a docs-only experiment spec (and a trac",
+        "updatedAt": "2026-10-30T13:20:39Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/80"
+      },
+      "status": "open-pr"
     },
     {
       "branch": "agent/kernel-worker/082439ff",
@@ -3703,6 +3759,23 @@
       "status": "merged"
     },
     {
+      "branch": "agent/kernel-worker/53c29f42",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "9a269ad",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-53c29f42",
+      "pr": {
+        "headRefName": "agent/kernel-worker/53c29f42",
+        "mergedAt": null,
+        "number": 79,
+        "state": "OPEN",
+        "title": "docs(eval): spec Memory Tax raw-history RAG control",
+        "updatedAt": "2026-10-30T02:00:40Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/79"
+      },
+      "status": "open-pr"
+    },
+    {
       "branch": "agent/kernel-worker/5d7d2e96",
       "cleanup_candidate": false,
       "dirty_entries": 0,
@@ -3770,6 +3843,23 @@
       "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-6937fb10",
       "pr": null,
       "status": "in-flight"
+    },
+    {
+      "branch": "agent/kernel-worker/6f5d2e77",
+      "cleanup_candidate": false,
+      "dirty_entries": 0,
+      "head": "384057f",
+      "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-kernel-worker-6f5d2e77",
+      "pr": {
+        "headRefName": "agent/kernel-worker/6f5d2e77",
+        "mergedAt": null,
+        "number": 81,
+        "state": "OPEN",
+        "title": "[preserved] Repo: verygoodplugins/automem-evals. Candidate fingerprint opportunity:automem-g",
+        "updatedAt": "2026-11-01T09:26:29Z",
+        "url": "https://github.com/verygoodplugins/automem-evals/pull/81"
+      },
+      "status": "open-pr"
     },
     {
       "branch": "agent/kernel-worker/7271d230",

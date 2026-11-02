@@ -1,13 +1,30 @@
 {
   "baseline_prior_accounted_usd": "9.809397650",
+  "budget_finalization_sha256": "b4c4acfa272d8f96de75c281dfc06012562b89136b6bf1a55ffdba1953b98029",
+  "completed_at_utc": "2026-10-26T02:43:45.367295+00:00",
   "completion_gate": "receipt.status=complete AND run/status.status=complete AND 34 complete paired cases; incomplete runs have no headline score",
   "execution_helpers": "One-off helpers retained in ignored raw evidence; copies at original launch paths remain while active. No official harness/server source edits.",
   "harness_revision": "3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876",
   "original_total_api_cap_usd": "20.00",
   "per_case_results": "run/<question_id>.json",
   "preregistration_sha256": "d945394ec62469d8e92c851ccd6a9ce11b133ddd8b59bc9a46e7333d3dc452d8",
+  "raw_inventory_finalized": true,
+  "raw_inventory_sha256": "2cfb1717ba0175d29d098a040e097e5162746a7d47db08f497612990b22b1ca9",
   "raw_root": "data/sweep_runs/precision-context-20261026",
   "receipt": "receipt.json",
+  "receipt_sha256": "03b8f9f04bf7cc9e6f4da0689be880a15cf706bd320e08a1a2c4d387f0095470",
+  "results_sha256": "1608692923bc914cb595989f910caf375dc1dd9fda9e645020fa7667e0974b4c",
+  "retrospective_review": {
+    "calibration_packet_status": "prepared_not_graded",
+    "date": "2026-11-02",
+    "decision_report": "RECONCILIATION.md",
+    "diagnostic_facts": "AUDITED_RESULTS.json",
+    "integrity_script": "data/sweep_runs/precision-context-20261026/reconcile.py",
+    "integrity_script_sha256": "60fcf90e222b7662374f14eaf8ace8252f9beeb40dde269da5f29f8a5ba6ceb6",
+    "original_receipts_preserved": true,
+    "provider_calls": 0,
+    "status": "retrospectively_validated_diagnostic"
+  },
   "runtime_source_sha256": {
     "budget_README.md": "cb164299a65fe2e49929df322c8d37502c6e8bd667dec9cd5da1818d069d5d8a",
     "budget_control.py": "76ef07201df271347e068c37f37de16c61f9e2765038f48c4005ec2d427833a4",
@@ -20,5 +37,6 @@
   },
   "server_revision": "fe0d5c374f1da65d30aaa9311e24647284d22793",
   "stage_api_cap_usd": "3.00",
-  "status": "running"
+  "status": "incomplete",
+  "summary_sha256": "298547de30c145e7f789a581c94aec4a82017f9cc017d3e573d29b451fb69e0a"
 }

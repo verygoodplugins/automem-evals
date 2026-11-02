@@ -2,12 +2,12 @@
   {
     "id": "EXP-PRECISION-CONTEXT-20261026",
     "title": "Paired support-label context pruning diagnostic",
-    "status": "in-progress",
+    "status": "completed",
     "hypothesis": "Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support.",
-    "result": "Preregistered 34 unique questions: all 30 preferences plus five historical support misses with one overlap. Fresh single retrieval; full top-10 versus an order-preserving support-label subset. Provider preflight and offline context/budget checks passed; paired execution is running.",
-    "decision": "Run only this paired context condition; keep retrieval, prompt templates, models and scoring fixed. This oracle diagnostic cannot establish true relevance precision or a deployable filter. Graph comparison and broader work stay parked.",
+    "result": "All34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences15/30 full vs18/30 pruned (4wins/1loss); miss-controls0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
+    "decision": "Next: blinded evidence-anchored calibration of all60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
     "started": "2026-10-26",
-    "updated": "2026-10-26",
+    "updated": "2026-11-02",
     "artifacts": [
       "data/results/precision-context-20261026/*",
       "data/sweep_runs/precision-context-20261026/**",
@@ -20,7 +20,7 @@
       "EXP-POSTMERGE-20261022",
       "EXP-INLINE-OBSOLETE-20261026"
     ],
-    "notes": "AutoMem#273 merged as fe0d5c374f1da65d30aaa9311e24647284d22793. Evals#78 remains pending hosted review; merge only after ready. Stage cap $3 within original $20, prior accounted $9.809397650; no liability refunds. Fresh paired control is primary; historical grades immutable."
+    "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted$10.727503350/$20 including retained prior liability; remaining$9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged."
   },
   {
     "id": "EXP-INLINE-OBSOLETE-20261026",
@@ -28,7 +28,7 @@
     "status": "completed",
     "hypothesis": "Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access.",
     "result": "Matched fresh cold replay: full-envelope graph probes 5/10 -> 10/10; top-k 10/10 both; ForgetEval 234/385 both, zero errors, all 385 inputs and standard-case verdicts unchanged. All five supersede fixture leaks fixed; purge fixtures unchanged.",
-    "decision": "Focused fix merged in automem#273 at fe0d5c3. EXP-PRECISION-CONTEXT-20261026 is now the one active evaluation batch. Evals#78 evidence review remains external/pending; #270 and broader #31 work stay parked.",
+    "decision": "Focused fix and evidence merged in automem#273 / evals#78. Precision diagnostic reconciled in EXP-PRECISION-CONTEXT-20261026; calibrate scoring before a retrieval change. Keep #270 and broader #31 work parked.",
     "started": "2026-10-26",
     "updated": "2026-10-26",
     "artifacts": [
@@ -51,7 +51,7 @@
     "status": "completed",
     "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
     "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
-    "decision": "Baseline complete; inline relation leak fix merged in automem#273. Current batch: EXP-PRECISION-CONTEXT-20261026. Review its result before the matched graph comparison; keep #270, AMB/BEAM refresh, new adapters and architecture work parked.",
+    "decision": "Baseline complete; inline fix/evidence merged. Precision diagnostic retrospectively reviewed; next calibrate preference scoring. Keep graph comparison, #270, AMB/BEAM refresh, new adapters and architecture parked.",
     "started": "2026-10-22",
     "updated": "2026-10-26",
     "artifacts": [
@@ -111,9 +111,7 @@
     "branch": "feat/matrix-parallel-harness",
     "worktree": "../automem-evals.worktrees/matrix-harness",
     "pr": 19,
-    "related": [
-      "EXP-RULESET-ISO"
-    ],
+    "related": ["EXP-RULESET-ISO"],
     "notes": "Worktree reconciliation should report this branch as merged/cleanup-only if it appears again."
   },
   {
@@ -162,10 +160,7 @@
     "branch": "feat/beam-retrieval-harness",
     "worktree": null,
     "pr": 12,
-    "related": [
-      "EXP-BEAM-SHIM",
-      "EXP-BEAM-JUDGED"
-    ],
+    "related": ["EXP-BEAM-SHIM", "EXP-BEAM-JUDGED"],
     "notes": "Retrieval proxy metrics should not be described as official BEAM scores."
   },
   {
@@ -192,9 +187,7 @@
     "branch": null,
     "worktree": null,
     "pr": null,
-    "related": [
-      "EXP-BEAM-RETRIEVAL"
-    ],
+    "related": ["EXP-BEAM-RETRIEVAL"],
     "notes": "Use for historical failure analysis only."
   },
   {
@@ -217,10 +210,7 @@
     "branch": null,
     "worktree": null,
     "pr": null,
-    "related": [
-      "EXP-PROD-CLEANUP",
-      "EXP-MATRIX"
-    ],
+    "related": ["EXP-PROD-CLEANUP", "EXP-MATRIX"],
     "notes": "compare_rulesets.py is still markdown-only; adding a JSON sidecar remains a later enhancement."
   },
   {
@@ -241,10 +231,7 @@
     "branch": "feat/stage1-corpus-cleanup",
     "worktree": null,
     "pr": 3,
-    "related": [
-      "EXP-RULESET-ISO",
-      "EXP-METADATA"
-    ],
+    "related": ["EXP-RULESET-ISO", "EXP-METADATA"],
     "notes": "Preserve vs cleanup groups are useful vocabulary for later dashboards."
   },
   {
@@ -267,9 +254,7 @@
     "branch": "feat/hook-eval-layer1",
     "worktree": null,
     "pr": 2,
-    "related": [
-      "EXP-PROD-CLEANUP"
-    ],
+    "related": ["EXP-PROD-CLEANUP"],
     "notes": "This is operational regression tooling rather than benchmark scoring."
   },
   {
@@ -290,9 +275,7 @@
     "branch": "test/pr170-current-state-eval-log",
     "worktree": null,
     "pr": 7,
-    "related": [
-      "EXP-NEG-CONTROL"
-    ],
+    "related": ["EXP-NEG-CONTROL"],
     "notes": "Useful status fields include current_only, expectation, and probes passed."
   },
   {
@@ -315,9 +298,7 @@
     "branch": "test/entity-repair-eval-harness",
     "worktree": null,
     "pr": 8,
-    "related": [
-      "EXP-METADATA"
-    ],
+    "related": ["EXP-METADATA"],
     "notes": "Key variants include sync-only, reject-only, canonicalize-safe, and post-migration."
   },
   {
@@ -342,10 +323,7 @@
     "branch": "feat/metadata-signal-diagnosis",
     "worktree": null,
     "pr": 10,
-    "related": [
-      "EXP-ENTITY-REPAIR",
-      "EXP-NEG-CONTROL"
-    ],
+    "related": ["EXP-ENTITY-REPAIR", "EXP-NEG-CONTROL"],
     "notes": "Endpoint comparison has structured summary.json under sweep_runs, but markdown reports are separate."
   },
   {
@@ -365,10 +343,7 @@
     "branch": "feat/negative-control-probes",
     "worktree": null,
     "pr": 11,
-    "related": [
-      "EXP-METADATA",
-      "EXP-CURRENT-STATE"
-    ],
+    "related": ["EXP-METADATA", "EXP-CURRENT-STATE"],
     "notes": "Treat negative controls as safety checks, not quality wins."
   },
   {
@@ -389,9 +364,7 @@
     "branch": "feat/writ-adapter-reporting",
     "worktree": null,
     "pr": 6,
-    "related": [
-      "EXP-AMB"
-    ],
+    "related": ["EXP-AMB"],
     "notes": "third_party/writ may show submodule-local generated files during runs."
   },
   {
@@ -403,15 +376,11 @@
     "decision": "Parked until a concrete maturation runner is prioritized.",
     "started": "2026-06-17",
     "updated": "2026-06-17",
-    "artifacts": [
-      "docs/eval/maturation.md"
-    ],
+    "artifacts": ["docs/eval/maturation.md"],
     "branch": null,
     "worktree": null,
     "pr": null,
-    "related": [
-      "EXP-RULESET-ISO"
-    ],
+    "related": ["EXP-RULESET-ISO"],
     "notes": "Stub record for future backfill."
   },
   {
@@ -432,9 +401,7 @@
     "branch": null,
     "worktree": null,
     "pr": null,
-    "related": [
-      "EXP-METADATA"
-    ],
+    "related": ["EXP-METADATA"],
     "notes": "This placeholder keeps the clusters visible even though their scientific story still needs backfill."
   }
 ]
