@@ -1,7 +1,7 @@
 {
   "issue": "verygoodplugins/automem-evals#83",
   "automem": {"repo": "verygoodplugins/automem", "commit": "90f41af722fce2e461a7dd26ac3daab81b135e3d", "dependency_image": "automem-flask-api:latest"},
-  "meilisearch": {"image": "getmeili/meilisearch:v1.56.1", "settings": "meili_backend.PINNED_SETTINGS", "matching_strategy": "last"},
+  "meilisearch": {"image": "getmeili/meilisearch:v1.56.1", "settings": "meili_backend.PINNED_SETTINGS", "matching_strategy": "last (pinned a priori); frequency is a post-hoc variant via MEILI_MATCHING_STRATEGY"},
   "embeddings": {"provider": "local-fastembed", "model": "BAAI/bge-small-en-v1.5", "dimensions": 384, "note": "identical and free across arms; not the Voyage-4 production default"},
   "seeds": {"rng": "none: ingest order, query order and conversation selection are deterministic", "locomo": {"file": "locomo10.json", "conversation_index": 0, "top_k": 10}, "beam": {"tier": "100k", "sample_conversations": 1}},
   "arms": {
@@ -9,7 +9,7 @@
     "keyword_swap": {"keyword": "Meilisearch (BM25-style ranking rules, scores 0-1)", "vector": "Qdrant v1.11.3", "graph": "FalkorDB", "hydration": "FalkorDB node + relations"}
   },
   "modes": {
-    "default": "/recall as shipped. The keyword leg only fills slots the vector leg leaves empty (recall.py remaining_slots), so with limit=10 on a 419-memory corpus it is never called.",
+    "default": "/recall as shipped. The keyword leg only fills slots the vector leg leaves empty (recall.py remaining_slots): on the clean LoCoMo conv 0 runs it is called for 12 of 149 recalls and changes no top-10 hit.",
     "keyword_only": "KEYWORD_ONLY=1: _vector_search returns [], so /recall is the keyword leg alone. Used to compare the two keyword implementations. Run for baseline and keyword_swap."
   },
   "maturation": {"cold": "fully wired: ingest, drain embedding + enrichment queues, recall", "matured": "NOT RUN: maturation-v1 is unfrozen and unimplemented (docs/eval/maturation.md); /consolidate has no reference_time"},
