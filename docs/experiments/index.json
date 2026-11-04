@@ -1821,10 +1821,16 @@
       "kind": "session-note",
       "path": "docs/session_20261026_precision_context.md",
       "title": "Controlled context precision experiment \u2014 2026-10-26"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/meme.md",
+      "title": "MEME \u2014 multi-entity and evolving memory: Cascade / Absence / Deletion adapter plan"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-02T13:12:07+00:00",
+  "generated_at": "2026-11-04T17:42:53+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2860,13 +2866,56 @@
       "total_questions": 2
     }
   ],
+  "snapshot_context": {
+    "refresh_scope": [
+      "EXP-MEME"
+    ],
+    "retained_sections": [
+      "other threads and artifacts",
+      "scores",
+      "worktrees",
+      "prs"
+    ],
+    "retained_snapshot_generated_at": "2026-11-02T13:12:07+00:00"
+  },
   "status_counts": {
     "adopted": 10,
     "completed": 3,
+    "in-progress": 1,
     "parked": 4,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/eval/meme.md"
+      ],
+      "artifacts": [
+        "docs/eval/meme.md",
+        "scripts/benchmarks/meme_wiring_smoke.py",
+        "scripts/benchmarks/test_meme_wiring_smoke.py"
+      ],
+      "branch": "agent/kernel-worker/4a5dd6bc",
+      "decision": "Track adapter work in the MEME issue (pending filing); no paid run until the spend guard supports the paper's models or a non-comparable column is chosen, and the owner approves a cap. Publish per-task accuracy with answerer/judge/cost disclosure only after actual AutoMem runs.",
+      "hypothesis": "Typed AutoMem edges plus t_invalid supersession may deliver the change event or a propagated value in a single retrieval, closing Cascade/Absence/Deletion without Opus-class write-time cost.",
+      "id": "EXP-MEME",
+      "notes": "arXiv 2605.12477 (NeurIPS 2026 E&D). Related: #67, PR #68, #50, #31, #62, #14. Candidate: opportunity:automem-graph-rag-research-scout. Paper figures (Cascade 3%, Absence 1% six-system average; Opus 4.7 MD-flat 20-episode subset) are paper-reported baselines, never AutoMem scores. Not run: upstream harness needs an answering LLM and GPT-4o judge for every system.",
+      "pr": null,
+      "related": [
+        "EXP-CURRENT-STATE",
+        "EXP-MATURATION"
+      ],
+      "result": "Release pinned (code a4f10db1, dataset e14c4e68, MIT code, CC BY 4.0 data); 694 post-change questions verified in the pinned JSON. Deterministic offline wiring smoke passed. Upstream run_agent/judge not run; no AutoMem adapter run or score.",
+      "started": "2026-11-04",
+      "status": "in-progress",
+      "title": "MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan",
+      "updated": "2026-11-04",
+      "worktree": ".worktrees/agent-kernel-worker-4a5dd6bc",
+      "worktree_status": {
+        "state": "not-scanned"
+      }
+    },
     {
       "artifact_count": 6,
       "artifact_samples": [
