@@ -120,21 +120,34 @@ class SmokeTests(unittest.TestCase):
         self.assertEqual(json.loads(out.read_text())["status"], "failed")  # fixture is not the pinned file
 
 
-def task_row(task, correct):
-    n = meme.EXPECTED["post_change_by_task"][task]
+SUBSET_N = {"ER": 20, "Agg": 20, "Tr": 20, "Del": 20, "Cas": 30, "Abs": 25}  # 20 episodes
+SUBSET_HOPS = {"Cas": (20, 10), "Abs": (20, 5)}
+
+
+def task_row(task, correct, n=None, hop_n=None):
+    n = n or meme.EXPECTED["post_change_by_task"][task]
     row = {"correct": correct, "n": n, "accuracy": round(correct / n, 6)}
     if task in meme.TRIVIAL_PASS_TASKS:
         row["pass_types"] = {"real_pass": correct, "trivial_pass": 1, "knew_but_failed": 0, "never_knew": n - correct - 1}
+    if task in meme.HOP_TASKS:
+        first, second = hop_n or (meme.EXPECTED["hops"][task]["1"], meme.EXPECTED["hops"][task]["2"])
+        row["hops"] = {"1": {"correct": correct, "n": first}, "2": {"correct": 0, "n": second}}
     return row
 
 
-def scored_result():
-    tasks = {task: task_row(task, 50 if task in ("ER", "Agg", "Tr") else 5) for task in meme.TASKS}
+def scored_result(subset=False):
+    tasks = {task: task_row(task, (10 if subset else 50) if task in ("ER", "Agg", "Tr") else (2 if subset else 5),
+                            SUBSET_N[task] if subset else None, SUBSET_HOPS.get(task) if subset else None)
+             for task in meme.TASKS}
     mean = round(sum(row["accuracy"] for row in tasks.values()) / 6, 6)
-    return {"run_status": "executed", "system": "automem-x", "paper_comparable": True,
-            "dataset": {"episodes": 100, "hf_revision": meme.PIN["hf_revision"]},
+    return {"run_status": "executed", "system": "automem-x", "paper_comparable": not subset,
+            "dataset": {"episodes": 20 if subset else 100, "subset": subset, "hf_revision": meme.PIN["hf_revision"]},
             "answerer": {"model": "gpt-4.1-mini"}, "judge": {"model": "gpt-4o"}, "internal_llm": {"model": None},
+            "embedding_model": "voyage-4", "arm": "M3a edges", "maturation": "cold",
+            "automem": {"commit": "0123abc", "config": {"limit": 20, "current_only": False, "expansion": "client",
+                                                       "enrichment": True}},
             "cost_usd": {"ingest_per_episode": 0.0, "inference_per_episode": 0.02, "judge_total": 1.5},
+            "usage": {"tokens": 1_000_000, "calls": 4_000},
             "tasks": tasks, "overall": {"macro_mean": mean}}
 
 
@@ -164,11 +177,13 @@ class ContractTests(unittest.TestCase):
         result = scored_result()
         result["tasks"]["Cas"]["n"] = 100
         result["tasks"]["Abs"]["pass_types"]["never_knew"] += 1
-        result["overall"]["macro_mean"] = 0.9
         errors = " ".join(meme.contract_errors(result))
         self.assertIn("tasks.Cas.n=100", errors)
         self.assertIn("tasks.Abs.pass_types", errors)
-        self.assertIn("macro_mean", errors)
+        self.assertNotIn("macro_mean", errors)  # no mean from a row whose own accuracy failed validation
+        result = scored_result()
+        result["overall"]["macro_mean"] = 0.9
+        self.assertEqual(meme.contract_errors(result), ["overall.macro_mean must be the unweighted mean of the six task accuracies"])
 
     def test_paper_comparable_is_derived_from_answerer_judge_and_dataset(self):
         result = scored_result()
@@ -182,6 +197,66 @@ class ContractTests(unittest.TestCase):
         result["dataset"]["episodes"] = 20
         result["paper_comparable"] = False
         self.assertTrue(any("subset" in e for e in meme.contract_errors(result)))
+
+    def test_documented_disclosures_hops_and_usage_are_required(self):
+        for mutate, needle in ((lambda r: r.pop("embedding_model"), "embedding_model"),
+                               (lambda r: r.pop("arm"), "arm must"),
+                               (lambda r: r.update(maturation="warm"), "maturation"),
+                               (lambda r: r["automem"].pop("commit"), "automem.commit"),
+                               (lambda r: r["automem"]["config"].pop("limit"), "automem.config.limit"),
+                               (lambda r: r.pop("usage"), "usage.tokens"),
+                               (lambda r: r["usage"].update(calls=-1), "usage.calls"),
+                               (lambda r: r["dataset"].pop("hf_revision"), "dataset.hf_revision"),
+                               (lambda r: r["dataset"].pop("subset"), "dataset.subset"),
+                               (lambda r: r["tasks"]["Cas"].pop("hops"), "tasks.Cas.hops"),
+                               (lambda r: r["tasks"]["Abs"]["hops"]["2"].update(n=29), "tasks.Abs.hops"),
+                               (lambda r: (r["tasks"]["Abs"]["hops"]["1"].update(n=99),
+                                           r["tasks"]["Abs"]["hops"]["2"].update(n=31)), "tasks.Abs.hops n must be")):
+            result = copy.deepcopy(scored_result())
+            mutate(result)
+            self.assertTrue(any(needle in e for e in meme.contract_errors(result)), needle)
+
+    def test_wiring_only_result_needs_no_run_disclosures(self):
+        result = scored_result()
+        for key in ("embedding_model", "arm", "maturation", "automem", "usage"):
+            result.pop(key)
+        result["run_status"] = "wiring_only"
+        for row in result["tasks"].values():
+            row["accuracy"] = None
+        result["overall"]["macro_mean"] = None
+        self.assertEqual(meme.contract_errors(result), [])
+
+    def test_malformed_values_are_reported_not_raised(self):
+        for mutate in (lambda r: r["tasks"]["ER"].update(accuracy=None), lambda r: r["tasks"]["ER"].update(accuracy="0.5"),
+                       lambda r: r["tasks"]["ER"].update(accuracy=True), lambda r: r["tasks"]["ER"].pop("accuracy"),
+                       lambda r: r["tasks"].update(Cas=[]), lambda r: r["tasks"]["Del"].update(pass_types="x"),
+                       lambda r: r["tasks"]["Cas"].update(hops=[1, 2]), lambda r: r.update(overall=None),
+                       lambda r: r.update(automem="0123abc"), lambda r: r["dataset"].update(episodes="100")):
+            result = copy.deepcopy(scored_result())
+            mutate(result)
+            self.assertTrue(meme.contract_errors(result))
+
+    def test_pass_types_must_be_non_negative_integers(self):
+        for kinds in ({"real_pass": 5, "trivial_pass": -1, "knew_but_failed": 0, "never_knew": 160},
+                      {"real_pass": 5, "trivial_pass": 0.5, "knew_but_failed": 0.5, "never_knew": 158},
+                      {"real_pass": 5, "trivial_pass": 1, "never_knew": 158}):
+            result = scored_result()
+            result["tasks"]["Cas"]["pass_types"] = kinds
+            self.assertTrue(any("tasks.Cas.pass_types" in e for e in meme.contract_errors(result)), kinds)
+
+    def test_subset_denominators_follow_the_selected_episodes(self):
+        self.assertEqual(meme.contract_errors(scored_result(subset=True)), [])
+        for task, n, needle in (("ER", 100, "20-episode subset uses 20"), ("Del", 19, "tasks.Del.n=19"),
+                                ("Cas", 41, "uses 20-40"), ("Abs", 19, "tasks.Abs.n=19")):
+            result = scored_result(subset=True)
+            result["tasks"][task] = task_row(task, 2, n, SUBSET_HOPS.get(task) and (n - 5, 5))
+            self.assertTrue(any(needle in e for e in meme.contract_errors(result)), (task, n))
+        result = scored_result(subset=True)
+        result["dataset"]["subset"] = False
+        self.assertTrue(any("dataset.subset" in e for e in meme.contract_errors(result)))
+        result = scored_result()
+        result["dataset"]["subset"] = True
+        self.assertTrue(any("dataset.subset" in e for e in meme.contract_errors(result)))
 
 
 if __name__ == "__main__":

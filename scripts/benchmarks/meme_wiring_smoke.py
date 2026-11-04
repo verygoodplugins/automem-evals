@@ -26,6 +26,12 @@ PIN = {
 TASKS = ("ER", "Agg", "Tr", "Del", "Cas", "Abs")
 TRIVIAL_PASS_TASKS = ("Cas", "Abs", "Del")
 PASS_TYPES = ("real_pass", "trivial_pass", "knew_but_failed", "never_knew")
+HOP_TASKS = ("Cas", "Abs")
+CONFIG_KEYS = ("limit", "current_only", "expansion", "enrichment")
+OBJECT_KEYS = ("dataset", "answerer", "judge", "internal_llm", "cost_usd", "tasks", "overall")
+# Post-change questions per episode (min, max), measured on the pinned file: one each for
+# ER/Agg/Tr/Del, one or two for Cas/Abs. Bounds a subset's denominators.
+PER_EPISODE = {"ER": (1, 1), "Agg": (1, 1), "Tr": (1, 1), "Del": (1, 1), "Cas": (1, 2), "Abs": (1, 2)}
 EXPECTED = {
     "episodes": 100,
     "episodes_by_domain": {"personal_life": 50, "software_project": 50},
@@ -136,19 +142,59 @@ def smoke(path, pin=PIN, expected=EXPECTED):
     return report
 
 
+def is_count(value, minimum=0):  # bool is an int subclass but never a count
+    return isinstance(value, int) and not isinstance(value, bool) and value >= minimum
+
+
+def obj(value):  # malformed nesting must surface as validation errors, never as a traceback
+    return value if isinstance(value, dict) else {}
+
+
+def disclosure_errors(result):
+    """Executed-run disclosures from the reporting contract in docs/eval/meme.md."""
+    errors = []
+    if "embedding_model" not in result:
+        errors.append("embedding_model must be disclosed (null only when none is used)")
+    if not isinstance(result.get("arm"), str) or not result["arm"]:
+        errors.append("arm must be disclosed")
+    if result.get("maturation") not in ("cold", "matured"):
+        errors.append("maturation must be 'cold' or 'matured'")
+    automem = obj(result.get("automem"))
+    if not isinstance(automem.get("commit"), str) or not automem["commit"]:
+        errors.append("automem.commit must be disclosed")
+    errors += [f"automem.config.{key} must be disclosed" for key in CONFIG_KEYS if key not in obj(automem.get("config"))]
+    errors += [f"usage.{key} must be a non-negative integer" for key in ("tokens", "calls")
+               if not is_count(obj(result.get("usage")).get(key))]
+    if not isinstance(result["dataset"].get("hf_revision"), str) or not result["dataset"]["hf_revision"]:
+        errors.append("dataset.hf_revision must be disclosed")
+    return errors
+
+
+def hop_errors(task, row, full, expected):
+    hops, parts = obj(row.get("hops")), [obj(obj(row.get("hops")).get(h)) for h in ("1", "2")]
+    sound = set(hops) == {"1", "2"} and all(is_count(p.get("n")) and is_count(p.get("correct"))
+                                           and p["correct"] <= p["n"] for p in parts)
+    if not sound or sum(p["n"] for p in parts) != row["n"] or sum(p["correct"] for p in parts) != row["correct"]:
+        return [f"tasks.{task}.hops needs '1' and '2' splits of integer correct <= n that sum to the task row"]
+    if full and [p["n"] for p in parts] != [expected["hops"][task]["1"], expected["hops"][task]["2"]]:
+        return [f"tasks.{task}.hops n must be {expected['hops'][task]} on a full run"]
+    return []
+
+
 def contract_errors(result, expected=EXPECTED):
     """Validate a result file against the reporting contract; [] means publishable shape."""
     status = result.get("run_status")
     if status not in ("executed", "wiring_only"):
         return ["run_status must be 'executed' or 'wiring_only'"]
-    errors = [f"missing {key}" for key in ("system", "dataset", "answerer", "judge", "internal_llm",
-                                           "cost_usd", "tasks", "overall") if key not in result]
+    errors = [f"missing {key}" for key in ("system",) + OBJECT_KEYS if key not in result]
+    errors += [f"{key} must be an object" for key in OBJECT_KEYS if key in result and not isinstance(result[key], dict)]
     if errors:
         return errors
     tasks = result["tasks"]
     if status == "wiring_only":
-        scored = [t for t in TASKS if (tasks.get(t) or {}).get("accuracy") is not None]
+        scored = [t for t in TASKS if obj(tasks.get(t)).get("accuracy") is not None]
         return [f"wiring_only result must not carry accuracy: {scored}"] if scored or result["overall"].get("macro_mean") is not None else []
+    errors = disclosure_errors(result)
     for key in ("answerer", "judge"):
         if not isinstance(result[key].get("model"), str) or not result[key]["model"]:
             errors.append(f"{key}.model must be disclosed")
@@ -158,25 +204,38 @@ def contract_errors(result, expected=EXPECTED):
         value = result["cost_usd"].get(key)
         if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
             errors.append(f"cost_usd.{key} must be a non-negative number")
-    full = result["dataset"].get("episodes") == expected["episodes"]
+    episodes, subset = result["dataset"].get("episodes"), result["dataset"].get("subset")
+    if not is_count(episodes, 1) or episodes > expected["episodes"]:
+        errors.append(f"dataset.episodes must be an integer from 1 to {expected['episodes']}")
+        episodes = None
+    full = episodes == expected["episodes"]
+    if not isinstance(subset, bool) or (episodes is not None and subset == full):
+        errors.append(f"dataset.subset must be a boolean that is true exactly when episodes < {expected['episodes']}")
     accuracies = []
     for task in TASKS:
-        row = tasks.get(task) or {}
+        row = obj(tasks.get(task))
         n, correct = row.get("n"), row.get("correct")
-        if not (isinstance(n, int) and isinstance(correct, int) and 0 <= correct <= n and n > 0):
+        if not (is_count(n, 1) and is_count(correct) and correct <= n):
             errors.append(f"tasks.{task} needs integer correct <= n, n > 0")
             continue
-        if full and n != expected["post_change_by_task"][task]:
-            errors.append(f"tasks.{task}.n={n}; full runs use {expected['post_change_by_task'][task]}")
-        if not full and (not result["dataset"].get("subset") or n > expected["post_change_by_task"][task]):
-            errors.append(f"tasks.{task}: a subset run must set dataset.subset and keep n within the full count")
-        if row.get("accuracy") != round(correct / n, 6):
+        full_n, per = expected["post_change_by_task"][task], PER_EPISODE[task]
+        if episodes is not None:
+            low, high = (full_n, full_n) if full else (episodes * per[0], min(episodes * per[1], full_n))
+            if not low <= n <= high:
+                scope = "full runs use" if full else f"a {episodes}-episode subset uses"
+                errors.append(f"tasks.{task}.n={n}; {scope} {low if low == high else f'{low}-{high}'}")
+        accuracy = row.get("accuracy")
+        if isinstance(accuracy, bool) or accuracy != round(correct / n, 6):
             errors.append(f"tasks.{task}.accuracy must equal round(correct/n, 6)")
+        else:
+            accuracies.append(accuracy)
         if task in TRIVIAL_PASS_TASKS:
-            kinds = row.get("pass_types") or {}
-            if sum(kinds.get(k, 0) for k in PASS_TYPES) != n or kinds.get("real_pass") != correct:
-                errors.append(f"tasks.{task}.pass_types must partition n with real_pass == correct")
-        accuracies.append(row.get("accuracy"))
+            kinds = obj(row.get("pass_types"))
+            if not (all(is_count(kinds.get(k)) for k in PASS_TYPES)
+                    and sum(kinds[k] for k in PASS_TYPES) == n and kinds["real_pass"] == correct):
+                errors.append(f"tasks.{task}.pass_types must partition n into non-negative integers with real_pass == correct")
+        if task in HOP_TASKS:
+            errors += hop_errors(task, row, full, expected)
     if len(accuracies) == len(TASKS) and result["overall"].get("macro_mean") != round(sum(accuracies) / len(TASKS), 6):
         errors.append("overall.macro_mean must be the unweighted mean of the six task accuracies")
     comparable = (result["answerer"].get("model") == PAPER_ANSWERER and result["judge"].get("model") == PAPER_JUDGE
