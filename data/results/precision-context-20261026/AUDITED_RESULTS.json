@@ -1,0 +1,79 @@
+{
+  "status": "retrospectively_validated_diagnostic",
+  "audit_date": "2026-11-02",
+  "original_automated_receipt_status": "incomplete",
+  "official_score_eligible": false,
+  "server_revision": "fe0d5c374f1da65d30aaa9311e24647284d22793",
+  "harness_revision": "3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876",
+  "preregistration_sha256": "d945394ec62469d8e92c851ccd6a9ce11b133ddd8b59bc9a46e7333d3dc452d8",
+  "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+  "historical_result_sha256": "858f0e259cc98a988f4f0b3a87712d22e7c4de9bf792c9a1fc1d8b8d78806e12",
+  "ingestion": "fresh per-session, once per question; Voyage-4/1024d; cold; no enrichment/JIT/consolidation",
+  "config": "baseline",
+  "answerer": "gpt-5-mini",
+  "judge": "gpt-5.4-mini-2026-03-17",
+  "unique_questions": 34,
+  "overlap": "d6233ab6",
+  "preference": {
+    "n": 30,
+    "full": {
+      "correct": 15,
+      "abstained": 2,
+      "context_records": 300,
+      "prompt_characters": 4298383
+    },
+    "support_pruned": {
+      "correct": 18,
+      "abstained": 4,
+      "context_records": 29,
+      "prompt_characters": 551350
+    },
+    "wins": [
+      "32260d93",
+      "6b7dfb22",
+      "1a1907b4",
+      "1d4e3b97"
+    ],
+    "losses": [
+      "afdc33df"
+    ],
+    "retrieved_support_questions": 29,
+    "paired_sign_test_two_sided": 0.375
+  },
+  "historical_miss_controls": {
+    "n": 5,
+    "full": {
+      "correct": 0,
+      "abstained": 4,
+      "context_records": 50,
+      "prompt_characters": 634350
+    },
+    "support_pruned": {
+      "correct": 0,
+      "abstained": 5,
+      "context_records": 0,
+      "prompt_characters": 2719
+    },
+    "wins": [],
+    "losses": [],
+    "retrieved_support_questions": 0,
+    "paired_sign_test_two_sided": 1
+  },
+  "accounting_usd": {
+    "experiment": "0.918105700",
+    "cumulative": "10.727503350",
+    "prior_ambiguous_retained": "0.073130570",
+    "remaining_original_cap": "9.272496650",
+    "audit_provider_calls": 0
+  },
+  "accepted_scope": "Saved answer/content diagnostic only. Original controller and proxy-closure receipts stay incomplete. No latency, lifecycle, official benchmark, or deployable-filter claim.",
+  "decision": "Do not ship a retrieval change. Next evaluation is blinded calibration of all 60 saved preference answers against evidence anchors; retain original grades separately.",
+  "evidence_sha256": {
+    "receipt.json": "03b8f9f04bf7cc9e6f4da0689be880a15cf706bd320e08a1a2c4d387f0095470",
+    "budget/finalization.json": "b4c4acfa272d8f96de75c281dfc06012562b89136b6bf1a55ffdba1953b98029",
+    "integrity-audit-20261102.json": "9b059e8841026e03e1b936735a7e306601ba1031cba4d6c0833a6ad5bbf0a882",
+    "log-audit-20261102.json": "69643b9b5f7942372dfc9f4fb370c2c19cd56f4c4609e9265b93f51d3c0e5c13",
+    "budget-audit-20261102.json": "c7f9dad677dcf76f9b2995a6150bb1debe644d7b4e7e00b9766b594e40466941",
+    "run/model-calls.jsonl": "4259d5105783090a99119a4c3445d60102e0204cba833572db3a4ea9b54c6bd5"
+  }
+}

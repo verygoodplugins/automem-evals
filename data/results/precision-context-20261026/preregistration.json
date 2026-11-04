@@ -1,0 +1,343 @@
+{
+  "answerer": "gpt-5-mini",
+  "condition": "support-label-pruned context; diagnostic oracle, not deployable retrieval filter",
+  "config": "baseline",
+  "control_stratum": [
+    "gpt4_f2262a51",
+    "d6233ab6",
+    "gpt4_468eb063",
+    "gpt4_1e4a8aec",
+    "gpt4_8279ba03"
+  ],
+  "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+  "hardener_sha256": "f6c5d47a3792e8dbdf6ac8add93b6158e824144b1f288eb154f07c6421fb132c",
+  "harness_revision": "3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876",
+  "historical_result_sha256": "858f0e259cc98a988f4f0b3a87712d22e7c4de9bf792c9a1fc1d8b8d78806e12",
+  "hypothesis": "Removing off-label retrieved context changes answer correctness without adding missing support.",
+  "id": "precision-context-20261026",
+  "ingestion": "fresh per-session, once per question; Voyage-4/1024d; cold; no enrichment/JIT/consolidation",
+  "interpretation": "Support labels are not exhaustive relevance judgments. Report paired preference effects and historical miss controls separately. One stochastic pass per arm is exploratory; no official headline score.",
+  "invariants": [
+    "same single retrieval for both arms",
+    "same prompt templates and model kwargs",
+    "no missing-support injection",
+    "historical grades immutable",
+    "raw contexts and all model requests/responses retained"
+  ],
+  "judge": "gpt-5.4-mini-2026-03-17",
+  "original_total_cap_usd": "20.00",
+  "primary_stratum": "all 30 single-session-preference questions",
+  "prior_accounted_usd": "9.809397650",
+  "questions": [
+    {
+      "id": "gpt4_f2262a51",
+      "item_sha256": "eb92d4239b41210c4272ef7fa229303ed9e378bdb2abff2263384e1b6b426b2a",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "multi-session"
+    },
+    {
+      "id": "8a2466db",
+      "item_sha256": "7103c34d38ca97af707a945132559c968d9119088dac5300c1eaf6033a61a6af",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "06878be2",
+      "item_sha256": "0b701c9a51ac9740dc36e9a74ed8ccfd8b5d174e348d2662db88d42041d9b090",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "75832dbd",
+      "item_sha256": "0dd2a2d11e018374631350bc134bd8472ed1f9b68364fc6677fda782a1224dd5",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "0edc2aef",
+      "item_sha256": "0d335dd6dc4976149b4337d9435d13bdaf99d7514d37759bfba7e91385438e42",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "35a27287",
+      "item_sha256": "e335a5283d629d56961351b6c8141754bec61d9e225b7eb35f4b395fc2f5bf71",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "32260d93",
+      "item_sha256": "c521c755ec9530a52904ab1074340eae2cccbeaded020c6a1b05050e1d619e9f",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "195a1a1b",
+      "item_sha256": "bbe09ccbfed1fdf30828f9a4e4462839f6176f76738e08fb72ea2e7f0dbfda52",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "afdc33df",
+      "item_sha256": "640553034642a8cf7eaf133d4846b6ce3a1677a708faa882c1c3efd0c1df683b",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "caf03d32",
+      "item_sha256": "4f14949f863d23bca4b0d3aae617f0c63a134ffc2cea549c43151d54e5303a8b",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "54026fce",
+      "item_sha256": "dd7644ed218c3dbdba35af66f73385184044cebcd6f790d7b04d8593d53b502d",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "06f04340",
+      "item_sha256": "4d10df2cd859f24c681da5e8f36f1fd933de42cfc69b3cd9afec6108dc948c32",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "6b7dfb22",
+      "item_sha256": "ba33c3b5a5d55c23b1e8f67cde47867b361fbaac530b2e16044c71681f692636",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "1a1907b4",
+      "item_sha256": "55819b0b247ddb3101bc051839e9e342fd7ee870d383d801b0c46a2e17fdcbcd",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "09d032c9",
+      "item_sha256": "b234f773f1f1b6895ca644d3ccd5e131671770061fe7426f0ec4b9cabe284c2c",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "38146c39",
+      "item_sha256": "da128852e50432d793407c004f2eca177d71901e6ad0643e6367ef20ade596fc",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "d24813b1",
+      "item_sha256": "6fbf3d6513ebf3877d93807fb9a8a9f5f9acc71f7c29f1e005c4518218059779",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "57f827a0",
+      "item_sha256": "51afb00368b6c4512b859df2ba8da9f2a150d95ad2ae504f6066534531b0ec4f",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "95228167",
+      "item_sha256": "6fe29b22c9b028cec924ba7af557b56865b4892558dd82397b8f8a3b491b436c",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "505af2f5",
+      "item_sha256": "00c277f80e27ba9456ec46d3ca494c31fcd716387b4afae69dc69c513d9f424a",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "75f70248",
+      "item_sha256": "a0711c2649962326a72ce6288333c4f1713c5573fba04b7baba4bd433667c29a",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "d6233ab6",
+      "item_sha256": "4513ce9c76dec77bf74cebe2f65aaaa269f0924242836b21f46c400c13a9c168",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "1da05512",
+      "item_sha256": "2972bcf8bd05c2d998e88bd1074353ef396dc4dd614eac41ee0629fd9470ec05",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "fca70973",
+      "item_sha256": "88bde2db8dc801b7619e8817f9f555e0b2265f15539a5dced38002cdb77aa50e",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "b6025781",
+      "item_sha256": "1ed3230f0da2bfa2e0dd65e4cc869cbfe0d5903d03fd46c0f98071112ef7f74d",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "a89d7624",
+      "item_sha256": "7b3e8acd8f5dffb38f84bbda262f186568a9b47513ca3a66b149e4dbacd46039",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "b0479f84",
+      "item_sha256": "f987d918fd45c5625fc105aa65d45e7a8ee2331457f120f5c61d4627638d8082",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "1d4e3b97",
+      "item_sha256": "e3623e1cf0f850abc7f2872c702d2c51424aa608d7573fcbc13a0d7d7eaafdfb",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "07b6f563",
+      "item_sha256": "b2389b40eb50087833d6b7e165497ed15ac23450c899e0d9cc56064482aef2dd",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "1c0ddc50",
+      "item_sha256": "e3e325076707d41b1de4225ac14203acde01dd2dc60c4d100dca9689631be6e8",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "0a34ad58",
+      "item_sha256": "456f4d201162bed8db269a2b442b7ab94fd818f6703d8700346bdefc72282dd5",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "single-session-preference"
+    },
+    {
+      "id": "gpt4_468eb063",
+      "item_sha256": "dcb415a04bf4128487c286d331f9d65b6311f80313d61090ac7848e0ddaddcfc",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "temporal-reasoning"
+    },
+    {
+      "id": "gpt4_1e4a8aec",
+      "item_sha256": "5b5d073697927ceee0f6c36e1ed2cd64e6ba54bbe2753d1c9fa1cb50c6aee63c",
+      "order": [
+        "full",
+        "support_pruned"
+      ],
+      "type": "temporal-reasoning"
+    },
+    {
+      "id": "gpt4_8279ba03",
+      "item_sha256": "90a3924a1a5eac03b917cc3e94f64cce6464f336b63da39740cc17ae58dfdbcd",
+      "order": [
+        "support_pruned",
+        "full"
+      ],
+      "type": "temporal-reasoning"
+    }
+  ],
+  "recall_limit": 10,
+  "runner_sha256": "0ca26dfd562c5cba117600d77f4f91fbe0171a61d8420a10c3871ca9a1370901",
+  "server_revision": "fe0d5c374f1da65d30aaa9311e24647284d22793",
+  "stage_api_cap_usd": "3.00"
+}

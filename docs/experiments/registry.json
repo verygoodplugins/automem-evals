@@ -1,11 +1,34 @@
 [
   {
+    "id": "EXP-PRECISION-CONTEXT-20261026",
+    "title": "Paired support-label context pruning diagnostic",
+    "status": "completed",
+    "hypothesis": "Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support.",
+    "result": "All 34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences 15/30 full vs 18/30 pruned (4 wins/1 loss); miss controls 0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
+    "decision": "Next: blinded evidence-anchored calibration of all 60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
+    "started": "2026-10-26",
+    "updated": "2026-11-02",
+    "artifacts": [
+      "data/results/precision-context-20261026/*",
+      "data/sweep_runs/precision-context-20261026/**",
+      "docs/session_20261026_precision_context.md"
+    ],
+    "branch": "test/precision-context-ablation",
+    "worktree": "../automem-evals.worktrees/precision-context-ablation",
+    "pr": 82,
+    "related": [
+      "EXP-POSTMERGE-20261022",
+      "EXP-INLINE-OBSOLETE-20261026"
+    ],
+    "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted $10.727503350/$20 including retained prior liability; remaining $9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged."
+  },
+  {
     "id": "EXP-INLINE-OBSOLETE-20261026",
     "title": "Suppress obsolete payloads in inline recall relations",
     "status": "completed",
     "hypothesis": "Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access.",
     "result": "Matched fresh cold replay: full-envelope graph probes 5/10 -> 10/10; top-k 10/10 both; ForgetEval 234/385 both, zero errors, all 385 inputs and standard-case verdicts unchanged. All five supersede fixture leaks fixed; purge fixtures unchanged.",
-    "decision": "Focused inline leak fix verified in automem#273; clean hosted Codex review and all six required CI checks pass. Merge the fix, then run one controlled precision experiment and matched graph on/off. Keep #270 and broader #31 work parked.",
+    "decision": "Focused fix and evidence merged in automem#273 / evals#78. Precision diagnostic reconciled in EXP-PRECISION-CONTEXT-20261026; calibrate scoring before a retrieval change. Keep #270 and broader #31 work parked.",
     "started": "2026-10-26",
     "updated": "2026-10-26",
     "artifacts": [
@@ -28,7 +51,7 @@
     "status": "completed",
     "hypothesis": "Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion.",
     "result": "Free paired suites unchanged: ForgetEval 234/385 both; PMB 11/77 and 0/12 both; no assertion regressions. Canaries 21/30 each. LongMemEval-S 427/500 (85.4%; macro 83.60%); LoCoMo 1690/1986 (85.10%).",
-    "decision": "Baseline complete. Inline relation leak follow-up verified separately in EXP-INLINE-OBSOLETE-20261026 / automem#273; merge it before the controlled precision experiment and matched graph on/off. Keep #270 tracked separately; AMB/BEAM refresh, new adapters, maturation and architecture work stay parked.",
+    "decision": "Baseline complete; inline fix/evidence merged. Precision diagnostic retrospectively reviewed; next calibrate preference scoring. Keep graph comparison, #270, AMB/BEAM refresh, new adapters and architecture parked.",
     "started": "2026-10-22",
     "updated": "2026-10-26",
     "artifacts": [
