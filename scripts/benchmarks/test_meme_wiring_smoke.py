@@ -266,6 +266,27 @@ class ContractTests(unittest.TestCase):
         result["dataset"]["subset"] = True
         self.assertTrue(any("dataset.subset" in e for e in meme.contract_errors(result)))
 
+    def test_large_subsets_cannot_drop_hop_2_questions_from_the_denominator(self):
+        def subset_result(episodes, cas_hop2, abs_hop2):
+            result = scored_result(subset=True)
+            result["dataset"]["episodes"] = episodes
+            for task in meme.TASKS:
+                hops = {"Cas": (episodes, cas_hop2), "Abs": (episodes, abs_hop2)}.get(task)
+                result["tasks"][task] = task_row(task, 2, sum(hops) if hops else episodes, hops)
+            result["overall"]["macro_mean"] = round(sum(r["accuracy"] for r in result["tasks"].values()) / 6, 6)
+            return result
+
+        # Leaving out 20 of 100 episodes removes at most 20 hop-2 questions: Cas 64 -> >= 44, Abs 30 -> >= 10.
+        self.assertEqual(meme.contract_errors(subset_result(80, 44, 10)), [])
+        self.assertEqual(meme.contract_errors(subset_result(80, 64, 30)), [])
+        self.assertEqual(meme.contract_errors(subset_result(20, 0, 0)), [])  # 80 omitted episodes: no minimum
+        for episodes, cas_hop2, abs_hop2, needle in ((80, 0, 0, "tasks.Cas.hops n: a 80-episode subset has 80 hop-1 and 44-64"),
+                                                     (80, 43, 10, "tasks.Cas.hops n: a 80-episode subset has 80 hop-1 and 44-64"),
+                                                     (80, 44, 9, "tasks.Abs.hops n: a 80-episode subset has 80 hop-1 and 10-30"),
+                                                     (80, 65, 10, "44-64"), (99, 62, 28, "63-64")):
+            errors = meme.contract_errors(subset_result(episodes, cas_hop2, abs_hop2))
+            self.assertTrue(any(needle in e for e in errors), (episodes, cas_hop2, abs_hop2, errors))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -181,10 +181,13 @@ def hop_errors(task, row, episodes, full, expected):
     (first, second), cap = (p["n"] for p in parts), expected["hops"][task]
     if full and (first, second) != (cap["1"], cap["2"]):
         return [f"tasks.{task}.hops n must be {cap} on a full run"]
-    # Pinned file: every episode has exactly one hop-1 and zero or one hop-2 question.
-    if not full and (first != episodes or second > min(episodes, cap["2"])):
-        return [f"tasks.{task}.hops n: a {episodes}-episode subset has {episodes} hop-1 and at most "
-                f"{min(episodes, cap['2'])} hop-2 questions"]
+    # Pinned file: every episode has exactly one hop-1 and zero or one hop-2 question, so leaving
+    # out `omitted` episodes removes at most `omitted` hop-2 questions from the full count.
+    if not full:
+        least, most = max(0, cap["2"] - (expected["episodes"] - episodes)), min(episodes, cap["2"])
+        if first != episodes or not least <= second <= most:
+            return [f"tasks.{task}.hops n: a {episodes}-episode subset has {episodes} hop-1 and "
+                    f"{least}-{most} hop-2 questions"]
     return []
 
 
