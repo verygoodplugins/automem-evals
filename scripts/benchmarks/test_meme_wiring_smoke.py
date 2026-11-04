@@ -251,6 +251,14 @@ class ContractTests(unittest.TestCase):
             result = scored_result(subset=True)
             result["tasks"][task] = task_row(task, 2, n, SUBSET_HOPS.get(task) and (n - 5, 5))
             self.assertTrue(any(needle in e for e in meme.contract_errors(result)), (task, n))
+        for task, (first, second) in (("Cas", (0, 30)), ("Cas", (19, 11)), ("Abs", (20, 21)), ("Abs", (25, 0))):
+            result = scored_result(subset=True)  # sums still match the task row, only the hop split is impossible
+            row, hop1_correct = result["tasks"][task], min(2, first)
+            row["hops"] = {"1": {"correct": hop1_correct, "n": first}, "2": {"correct": 2 - hop1_correct, "n": second}}
+            row["n"], row["accuracy"] = first + second, round(2 / (first + second), 6)
+            row["pass_types"]["never_knew"] = first + second - 3
+            self.assertTrue(any(f"tasks.{task}.hops n: a 20-episode subset" in e for e in meme.contract_errors(result)),
+                            (task, first, second))
         result = scored_result(subset=True)
         result["dataset"]["subset"] = False
         self.assertTrue(any("dataset.subset" in e for e in meme.contract_errors(result)))

@@ -170,14 +170,21 @@ def disclosure_errors(result):
     return errors
 
 
-def hop_errors(task, row, full, expected):
+def hop_errors(task, row, episodes, full, expected):
     hops, parts = obj(row.get("hops")), [obj(obj(row.get("hops")).get(h)) for h in ("1", "2")]
     sound = set(hops) == {"1", "2"} and all(is_count(p.get("n")) and is_count(p.get("correct"))
                                            and p["correct"] <= p["n"] for p in parts)
     if not sound or sum(p["n"] for p in parts) != row["n"] or sum(p["correct"] for p in parts) != row["correct"]:
         return [f"tasks.{task}.hops needs '1' and '2' splits of integer correct <= n that sum to the task row"]
-    if full and [p["n"] for p in parts] != [expected["hops"][task]["1"], expected["hops"][task]["2"]]:
-        return [f"tasks.{task}.hops n must be {expected['hops'][task]} on a full run"]
+    if episodes is None:
+        return []
+    (first, second), cap = (p["n"] for p in parts), expected["hops"][task]
+    if full and (first, second) != (cap["1"], cap["2"]):
+        return [f"tasks.{task}.hops n must be {cap} on a full run"]
+    # Pinned file: every episode has exactly one hop-1 and zero or one hop-2 question.
+    if not full and (first != episodes or second > min(episodes, cap["2"])):
+        return [f"tasks.{task}.hops n: a {episodes}-episode subset has {episodes} hop-1 and at most "
+                f"{min(episodes, cap['2'])} hop-2 questions"]
     return []
 
 
@@ -235,7 +242,7 @@ def contract_errors(result, expected=EXPECTED):
                     and sum(kinds[k] for k in PASS_TYPES) == n and kinds["real_pass"] == correct):
                 errors.append(f"tasks.{task}.pass_types must partition n into non-negative integers with real_pass == correct")
         if task in HOP_TASKS:
-            errors += hop_errors(task, row, full, expected)
+            errors += hop_errors(task, row, episodes, full, expected)
     if len(accuracies) == len(TASKS) and result["overall"].get("macro_mean") != round(sum(accuracies) / len(TASKS), 6):
         errors.append("overall.macro_mean must be the unweighted mean of the six task accuracies")
     comparable = (result["answerer"].get("model") == PAPER_ANSWERER and result["judge"].get("model") == PAPER_JUDGE
