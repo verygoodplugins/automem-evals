@@ -40,6 +40,7 @@ services:
       MEILI_ARM: ${MEILI_ARM:-baseline}
       MEILI_URL: http://meilisearch:7700
       MEILI_KEYWORD_ONLY: ${MEILI_KEYWORD_ONLY:-}
+      MEILI_MATCHING_STRATEGY: ${MEILI_MATCHING_STRATEGY:-}
       MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-bench-master-key}
       # Identical, free, local embeddings across all arms (no provider keys are forwarded).
       EMBEDDING_PROVIDER: local

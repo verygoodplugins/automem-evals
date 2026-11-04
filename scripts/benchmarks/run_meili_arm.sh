@@ -8,8 +8,8 @@ CONV=${2:-0}
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 : "${AUTOMEM_SRC:?set AUTOMEM_SRC to the automem checkout (pinned commit in configs/meilisearch/arms.json)}"
 export AUTOMEM_SRC MEILI_ARM=$ARM
-SUFFIX=${KEYWORD_ONLY:+-kwonly} # KEYWORD_ONLY=1: vector leg returns nothing, so /recall is the keyword leg alone
-export MEILI_KEYWORD_ONLY=${KEYWORD_ONLY:-}
+SUFFIX=${KEYWORD_ONLY:+-kwonly}${MEILI_MATCHING_STRATEGY:+-$MEILI_MATCHING_STRATEGY} # KEYWORD_ONLY=1: vector leg returns nothing
+export MEILI_KEYWORD_ONLY=${KEYWORD_ONLY:-} MEILI_MATCHING_STRATEGY=${MEILI_MATCHING_STRATEGY:-}
 PROJECT=meilibench-$ARM$SUFFIX
 OUT=${OUT:-$ROOT/data/results/meilisearch-bench}
 DATA=${LOCOMO_DATA:-$AUTOMEM_SRC/tests/benchmarks/locomo/data/locomo10.json}
@@ -28,7 +28,7 @@ for _ in range(60):
 raise SystemExit("AutoMem never became healthy")
 PY
 MEILI_FLAGS=()
-[ "$ARM" != baseline ] && MEILI_FLAGS=(--meili-url http://localhost:17700)
+[ "$ARM" != baseline ] && MEILI_FLAGS=(--meili-url http://localhost:17700 --matching-strategy "$MEILI_MATCHING_STRATEGY")
 python3.12 "$ROOT/scripts/benchmarks/meili_bench.py" locomo --data "$DATA" --conv "$CONV" \
   --endpoint http://localhost:18001 --project "$PROJECT" --top-k 10 \
   --out "$OUT/$ARM$SUFFIX-locomo-conv$CONV.json" "${MEILI_FLAGS[@]}"

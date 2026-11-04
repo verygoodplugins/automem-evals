@@ -12,9 +12,11 @@ dominates end-to-end ``/recall`` when embeddings are local and is identical acro
 
 from __future__ import annotations
 
+import faulthandler
 import json
 import os
 import runpy
+import signal
 import sys
 import threading
 import time
@@ -68,7 +70,8 @@ def install(arm: str) -> None:
     if arm == "keyword_swap":
         index = os.environ.get("MEILI_INDEX", "automem_keyword")
         client.ensure_index(index)
-        h._graph_keyword_search = mb.make_keyword_search(client, index, h._graph_keyword_search)
+        strategy = os.environ.get("MEILI_MATCHING_STRATEGY") or mb.MATCHING_STRATEGY
+        h._graph_keyword_search = mb.make_keyword_search(client, index, h._graph_keyword_search, strategy)
         make = lambda *a, **k: mb.MirrorQdrant(real_cls(*a, **k), client, index)  # noqa: E731
     else:
         make = real_cls
@@ -82,6 +85,7 @@ def install(arm: str) -> None:
 
 
 if __name__ == "__main__":
+    faulthandler.register(signal.SIGUSR1, all_threads=True)  # `docker kill -s USR1`: thread stacks to docker logs
     install(os.environ.get("MEILI_ARM", "baseline"))
     sys.argv = ["app.py"]
     runpy.run_path(os.path.join(os.getcwd(), "app.py"), run_name="__main__")

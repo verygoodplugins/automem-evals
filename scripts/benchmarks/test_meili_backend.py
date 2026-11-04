@@ -1,6 +1,9 @@
 import json
+import sys
+import types
 import unittest
 from types import SimpleNamespace as NS
+from unittest import mock
 
 import meili_backend as mb
 import meili_bench as bench
@@ -47,8 +50,7 @@ class MeiliBackendTests(unittest.TestCase):
         doc = mb.to_document("m1", {"content": "hi", "tags": ["x", "y"], "timestamp": "2026-01-02T03:04:05Z", "metadata": {"k": 1}}, [0.1])
         self.assertEqual(doc["tag_text"], "x y")
         self.assertEqual(doc["ts_epoch"], 1767323045.0)
-        self.assertEqual(doc["_vectors"], {mb.EMBEDDER: [0.1]})
-        self.assertEqual(mb.from_document(doc)["metadata"], {"k": 1})
+        self.assertEqual((doc["_vectors"], json.loads(doc["metadata_json"])), ({mb.EMBEDDER: [0.1]}, {"k": 1}))
 
     def test_build_filter_mirrors_baseline_where_clause(self):
         flt = mb.build_filter(tags=["a:b"], mode="any", match="prefix", excluded_types=["Artifact"], start_time="2026-01-01T00:00:00Z")
@@ -86,6 +88,21 @@ class MeiliBackendTests(unittest.TestCase):
         self.assertEqual(mirror.scroll(), "real-scroll")  # everything else is plain Qdrant
         mirror.delete("c", NS(points=["p1"]))
         self.assertNotIn("p1", fake.docs)
+
+
+    def test_keyword_search_sends_configured_matching_strategy(self):
+        h = NS(_extract_keywords=str.split, _prepare_tag_filters=list, _canonicalize_prefix_filters=list, RECALL_EXCLUDED_TYPES=(),
+               _serialize_node=lambda n: {"id": n}, _format_graph_result=lambda g, n, s, k, seen: {"id": n, "score": s})
+        fake, graph = FakeMeili(), NS(query=lambda q, p: NS(result_set=[["p1"]]))
+        fake.search = lambda uid, body: (setattr(fake, "last_search", body), {"hits": [{"id": "p1", "_rankingScore": 0.5}]})[1]
+        pkg, sub = types.ModuleType("automem"), types.ModuleType("automem.search")
+        pkg.search, sub.runtime_recall_helpers = sub, h
+        with mock.patch.dict(sys.modules, {"automem": pkg, "automem.search": sub, "automem.search.runtime_recall_helpers": h}):
+            for strategy in ("last", "frequency"):
+                out = mb.make_keyword_search(fake, "kw", None, strategy)(graph, "did caroline", 5, set())
+                self.assertEqual(fake.last_search["matchingStrategy"], strategy)
+        self.assertEqual(out, [{"id": "p1", "score": 0.5}])
+        self.assertEqual(mb.MeiliClient.provenance(fake, "kw", "frequency")["matching_strategy"], "frequency")
 
 
 class BenchHelperTests(unittest.TestCase):

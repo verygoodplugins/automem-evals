@@ -178,6 +178,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     lo.add_argument("--out", required=True)
     lo.add_argument("--meili-url", default=None, help="record pinned version + effective index settings")
     lo.add_argument("--meili-key", default="bench-master-key")
+    lo.add_argument("--matching-strategy", default=None, help="recorded in provenance; must match MEILI_MATCHING_STRATEGY")
     bud = sub.add_parser("budget", help="check projected spend against the cap")
     bud.add_argument("--spent", required=True)
     bud.add_argument("--per-run", required=True)
@@ -197,7 +198,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         import meili_backend as mb
 
         meili = mb.MeiliClient(args.meili_url, args.meili_key)
-        result["meili"] = {i["uid"]: meili.provenance(i["uid"]) for i in meili.request("GET", "/indexes")["results"]}
+        strategy = args.matching_strategy or mb.MATCHING_STRATEGY
+        result["meili"] = {i["uid"]: meili.provenance(i["uid"], strategy) for i in meili.request("GET", "/indexes")["results"]}
     leg_timings(api, reset=True)
     result["eval"] = locomo_eval(args.endpoint, args.token, conv, args.top_k)
     result["leg_latency_serial"] = leg_timings(api)

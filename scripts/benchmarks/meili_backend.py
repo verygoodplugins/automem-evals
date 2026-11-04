@@ -1,17 +1,10 @@
 #!/usr/bin/env python3
 """Meilisearch retrieval backend for AutoMem (verygoodplugins/automem-evals#83).
 
-Two swaps behind AutoMem's existing seams, scoring untouched:
-
-* keyword leg: replaces ``runtime_recall_helpers._graph_keyword_search``. Meilisearch
-  ranks; FalkorDB still hydrates the node + relations, so result shape is identical.
-  Writes are mirrored into the Meilisearch index by ``MirrorQdrant`` (Qdrant stays
-  the vector store).
-* vector leg: ``MeiliQdrantShim`` implements the subset of the ``QdrantClient`` API
-  AutoMem calls (search/upsert/retrieve/scroll/delete/set_payload/collection admin).
-  Unsupported methods raise instead of silently falling back, so an arm can never
-  be quietly measuring Qdrant. Scores are re-computed as exact cosine from the
-  returned vectors so they sit on Qdrant's scale and the blended scorer is unchanged.
+Keyword-leg swap behind AutoMem's existing seam, scoring untouched: replaces
+``runtime_recall_helpers._graph_keyword_search``. Meilisearch ranks; FalkorDB still hydrates the
+node + relations, so result shape is identical. Writes are mirrored into the Meilisearch index by
+``MirrorQdrant`` (Qdrant stays the vector store). The vector-leg shim is a later slice.
 
 Stdlib only; ``automem`` is imported lazily so this module is unit-testable on a host.
 """
@@ -101,13 +94,13 @@ class MeiliClient:
     def fetch(self, uid: str, **body: Any) -> dict:
         return self.request("POST", f"/indexes/{uid}/documents/fetch", body)
 
-    def provenance(self, uid: str) -> dict:
+    def provenance(self, uid: str, strategy: str = MATCHING_STRATEGY) -> dict:
         """Version + effective settings, written into every result for reproducibility."""
         return {
             "version": self.request("GET", "/version"),
             "settings": self.request("GET", f"/indexes/{uid}/settings"),
             "stats": self.request("GET", f"/indexes/{uid}/stats"),
-            "matching_strategy": MATCHING_STRATEGY,
+            "matching_strategy": strategy,
         }
 
 
@@ -136,12 +129,6 @@ def to_document(point_id: Any, payload: dict, vector: Optional[list[float]] = No
     if vector is not None:
         doc["_vectors"] = {EMBEDDER: list(vector)}
     return doc
-
-
-def from_document(doc: dict) -> dict:
-    payload = {k: v for k, v in doc.items() if k not in {"id", "tag_text", "ts_epoch", "_vectors", "metadata_json", "_rankingScore"}}
-    payload["metadata"] = json.loads(doc.get("metadata_json") or "{}")
-    return payload
 
 
 def _q(value: Any) -> str:
@@ -256,7 +243,7 @@ class MirrorQdrant:
         return result
 
 
-def make_keyword_search(client: MeiliClient, index: str, original: Any) -> Any:
+def make_keyword_search(client: MeiliClient, index: str, original: Any, strategy: str = MATCHING_STRATEGY) -> Any:
     """Build the drop-in for ``_graph_keyword_search`` (same signature, same result dicts)."""
     import logging
 
@@ -277,7 +264,7 @@ def make_keyword_search(client: MeiliClient, index: str, original: Any) -> Any:
             "q": " ".join(keywords) if keywords else normalized,
             "limit": limit,
             "showRankingScore": True,
-            "matchingStrategy": MATCHING_STRATEGY,
+            "matchingStrategy": strategy,
             "filter": build_filter(tags=tags, mode=tag_mode, match=tag_match,
                                    excluded_types=h.RECALL_EXCLUDED_TYPES, start_time=start_time, end_time=end_time),
         }
