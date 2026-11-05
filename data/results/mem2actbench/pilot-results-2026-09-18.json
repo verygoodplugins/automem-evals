@@ -1,0 +1,39 @@
+{
+  "benchmark": "Mem2ActBench",
+  "split": "Mem2ActBench (full)",
+  "date": "2026-09-18",
+  "tasks": 400,
+  "recall_k": 5,
+  "cleanup": "deleted after each task",
+  "scoring": {
+    "supported_parameters": 398,
+    "expected_parameters": 526,
+    "false_positive_evidence": 99,
+    "defaults_excluded": 254,
+    "unlabelled_parameters_excluded": 6,
+    "association_failures": 0,
+    "parameter_accuracy_percent": 75.67,
+    "precision_percent": 80.08,
+    "recall_percent": 75.67,
+    "f1_percent": 77.81,
+    "strict_task_accuracy_percent": 75.75
+  },
+  "by_complexity": {
+    "L1": {
+      "tasks": 237,
+      "f1_percent": 86.14,
+      "parameter_accuracy_percent": 81.27
+    },
+    "L2": {
+      "tasks": 101,
+      "f1_percent": 80.29,
+      "parameter_accuracy_percent": 72.37
+    },
+    "L3": { "tasks": 17, "f1_percent": 67.8, "parameter_accuracy_percent": 80 },
+    "L4": {
+      "tasks": 45,
+      "f1_percent": 48.72,
+      "parameter_accuracy_percent": 57.58
+    }
+  }
+}
