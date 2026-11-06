@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AutoMem benchmark references, experiments, and the decisions they informed.">
+  <meta name="color-scheme" content="light dark">
+  <title>AutoMem Evaluation Ledger</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f3f5ef;
+      --panel: #fffefa;
+      --ink: #1e2c24;
+      --muted: #495b51;
+      --accent: #1c674b;
+      --line: #cad6ca;
+      --tag: #e0f1e5;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #151e19;
+        --panel: #1e2b23;
+        --ink: #e9f3e9;
+        --muted: #b4c9bb;
+        --accent: #9cdebc;
+        --line: #455a4d;
+        --tag: #29473a;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 1rem/1.6 system-ui, sans-serif; }
+    main { max-width: 54rem; margin: auto; padding: clamp(1rem, 4vw, 3rem); }
+    header { margin: 1rem 0 2rem; }
+    h1, h2 { font-family: Georgia, serif; line-height: 1.1; margin: .35em 0; }
+    h1 { font-size: clamp(2.3rem, 7vw, 4rem); letter-spacing: -.035em; }
+    h2 { font-size: clamp(1.55rem, 4vw, 2.2rem); }
+    p { max-width: 67ch; }
+    a { color: var(--accent); text-underline-offset: .18em; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .eyebrow, .status { font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .eyebrow, .context, footer { color: var(--muted); }
+    nav { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+    article { margin: 1rem 0; padding: clamp(1rem, 4vw, 2rem); border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); scroll-margin-top: 1rem; }
+    article:target { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .status { display: inline-block; padding: .2em .65em; border-radius: 1rem; background: var(--tag); color: var(--accent); }
+    .permalink { font: .85rem system-ui, sans-serif; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-variant-numeric: tabular-nums; }
+    caption { text-align: left; font-weight: 650; margin-bottom: .35rem; }
+    th, td { text-align: left; vertical-align: top; padding: .5rem; border-bottom: 1px solid var(--line); }
+    th { font-weight: 650; }
+    th:first-child, td:first-child { padding-left: 0; }
+    footer { font-size: .9rem; padding: .65rem 0; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">AutoMem · Open evaluation</p>
+    <h1>Evaluation ledger</h1>
+    <p>What we tested, what changed, and which results guided the next decision.</p>
+    <nav aria-label="Experiments">
+      <a href="#post-merge-baseline">Baseline</a>
+      <a href="#inline-obsolete-content">Inline obsolete content</a>
+      <a href="#precision-context-pruning">Context pruning</a>
+    </nav>
+  </header>
+
+  <article id="post-merge-baseline" aria-labelledby="baseline-title">
+    <span class="status">Reference</span>
+    <h2 id="baseline-title">Post-merge benchmark baseline</h2>
+    <a class="permalink" href="#post-merge-baseline">Permalink <span aria-hidden="true">#</span></a>
+    <p>We froze a reference after changes to embedding writes, tag filters, and enrichment. Both suites used fresh cold ingestion on AutoMem <code>3eaa1f5</code> with Voyage 4 at 1024 dimensions.</p>
+    <table>
+      <caption>Canonical AutoMem benchmark results</caption>
+      <thead><tr><th scope="col">Suite</th><th scope="col">Correct / total</th><th scope="col">Accuracy</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">LongMemEval-S</th><td>427 / 500</td><td>85.4%</td></tr>
+        <tr><th scope="row">LoCoMo</th><td>1,690 / 1,986</td><td>85.1%</td></tr>
+      </tbody>
+    </table>
+    <p class="context">Use this reference for comparisons with the same suite, dataset, ingestion mode, and scoring configuration. The canonical record in AutoMem contains the full protocol.</p>
+    <p><a href="https://github.com/verygoodplugins/automem/blob/f47e1896764b02f31cd6bb2fbc8a26cc35a219ce/benchmarks/baselines/postmerge-20261022.json">Pinned AutoMem baseline</a> · <a href="https://github.com/verygoodplugins/automem-evals/pull/72">Evaluation PR #72</a></p>
+  </article>
+
+  <article id="inline-obsolete-content" aria-labelledby="inline-title">
+    <span class="status">Merged</span>
+    <h2 id="inline-title">Inline obsolete content</h2>
+    <a class="permalink" href="#inline-obsolete-content">Permalink <span aria-hidden="true">#</span></a>
+    <p>Obsolete content could appear inside the relations of an active result. The fix suppresses that content in current recall while preserving historical recall.</p>
+    <table>
+      <caption>Matched lifecycle diagnostic</caption>
+      <thead><tr><th scope="col">Check</th><th scope="col">Before</th><th scope="col">After</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Full graph response</th><td>5 / 10</td><td>10 / 10</td></tr>
+        <tr><th scope="row">Top-k graph results</th><td>10 / 10</td><td>10 / 10</td></tr>
+        <tr><th scope="row">ForgetEval</th><td>234 / 385</td><td>234 / 385</td></tr>
+      </tbody>
+    </table>
+    <p class="context">The fix cleared all five failing inline probes. Every standard ForgetEval case kept its original verdict.</p>
+    <p><a href="https://github.com/verygoodplugins/automem-evals/issues/31">Tracking issue #31</a> · <a href="https://github.com/verygoodplugins/automem/pull/273">AutoMem fix #273</a> · <a href="https://github.com/verygoodplugins/automem-evals/pull/78">Evaluation PR #78</a></p>
+  </article>
+
+  <article id="precision-context-pruning" aria-labelledby="pruning-title">
+    <span class="status">Parked</span>
+    <h2 id="pruning-title">Pruning context for preference answers</h2>
+    <a class="permalink" href="#precision-context-pruning">Permalink <span aria-hidden="true">#</span></a>
+    <p>On 30 matched preference questions, we compared the full retrieved top ten with a context containing only the retrieved passages labeled as support. A blinded rubric then graded the same 60 saved answers.</p>
+    <table>
+      <caption>Diagnostic scores, with 30 answers per arm</caption>
+      <thead><tr><th scope="col">Scoring pass</th><th scope="col">Full context</th><th scope="col">Support only</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Original judge</th><td>15 correct</td><td>18 correct</td></tr>
+        <tr><th scope="row">Blinded calibration</th><td>23 pass<br>6 fail<br>1 ambiguous</td><td>22 pass<br>6 fail<br>2 ambiguous</td></tr>
+      </tbody>
+    </table>
+    <p class="context">Pruning won two, lost two, and tied 23 of the 27 pairs with decisive calibration grades. We parked this variant and kept retrieval unchanged. The original advantage did not hold under the second scoring pass, and the diagnostic scorer needs further validation before it can guide another answer comparison.</p>
+    <p><a href="https://github.com/verygoodplugins/automem-evals/pull/82">Context ablation and reconciliation PR #82</a></p>
+  </article>
+
+  <footer><a href="https://github.com/verygoodplugins/automem-evals">AutoMem evaluation harness on GitHub</a></footer>
+</main>
+</body>
+</html>
