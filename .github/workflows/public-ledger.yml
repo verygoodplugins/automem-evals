@@ -1,0 +1,61 @@
+name: Publish public evaluation ledger
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - public-ledger/index.html
+      - .github/workflows/public-ledger.yml
+  push:
+    branches: [main]
+    paths:
+      - public-ledger/index.html
+      - .github/workflows/public-ledger.yml
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: public-ledger/index.html
+          sparse-checkout-cone-mode: false
+
+      - name: Stage the approved export
+        id: export
+        shell: bash
+        run: |
+          test -f public-ledger/index.html && test ! -L public-ledger/index.html || exit 1
+          export_dir="$(mktemp -d "$RUNNER_TEMP/public-ledger.XXXXXX")"
+          install -m 0644 public-ledger/index.html "$export_dir/index.html"
+          echo "path=$export_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the public export
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: ${{ steps.export.outputs.path }}
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: public-evaluation-ledger-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the public ledger
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
