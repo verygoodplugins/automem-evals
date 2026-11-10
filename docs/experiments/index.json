@@ -1827,10 +1827,16 @@
       "kind": "eval-doc",
       "path": "docs/eval/meme.md",
       "title": "MEME \u2014 multi-entity and evolving memory: Cascade / Absence / Deletion adapter plan"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/evomembench.md",
+      "title": "EvoMemBench \u2014 self-evolving agent memory: adapter feasibility and CrossEp-Know smoke plan"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-04T17:42:53+00:00",
+  "generated_at": "2026-11-10T14:37:09+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2868,7 +2874,7 @@
   ],
   "snapshot_context": {
     "refresh_scope": [
-      "EXP-MEME"
+      "EXP-EVOMEMBENCH"
     ],
     "retained_sections": [
       "other threads and artifacts",
@@ -2876,16 +2882,43 @@
       "worktrees",
       "prs"
     ],
-    "retained_snapshot_generated_at": "2026-11-02T13:12:07+00:00"
+    "retained_snapshot_generated_at": "2026-11-04T17:42:53+00:00"
   },
   "status_counts": {
     "adopted": 10,
     "completed": 3,
-    "in-progress": 1,
+    "in-progress": 2,
     "parked": 4,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/eval/evomembench.md"
+      ],
+      "artifacts": [
+        "docs/eval/evomembench.md"
+      ],
+      "branch": "agent/kernel-worker/c49de4c4",
+      "decision": "Track in issue #90 at medium-low priority: runners/evomembench/ adapter plus a 17-episode CrossEp-Know wiring smoke on a local AutoMem endpoint after an owner-approved cap and a spend-guard path. No vendoring of upstream code or data. InEp-Know FactConsolidation adapter is a separate follow-up.",
+      "hypothesis": "A tag-isolated AutoMem recall/store backend can be wired into the EvoMemBench CrossEp-Know driver without editing the unlicensed upstream tree; supersession (t_invalid, INVALIDATED_BY) can only be credited on the separate InEp-Know FactConsolidation suite.",
+      "id": "EXP-EVOMEMBENCH",
+      "notes": "arXiv 2605.18421 v3 (NeurIPS 2026 E&D). Related: #67, #89, #28 scout note. Candidate: opportunity:automem-graph-rag-research-scout. All benchmark figures are paper-reported or recomputed from upstream-committed files, never AutoMem scores.",
+      "pr": null,
+      "related": [
+        "EXP-MEME"
+      ],
+      "result": "Desk review only. Upstream pinned (commit 3efc221f, no license: treat as no grant); CrossEp-Know data hashed and profiled (884 episodes, 120 contexts, system message identical within each context). Committed no-memory baseline recomputes to 211/884 and disagrees with difficulty_tiers.csv in 49 of 120 contexts. Nothing run against AutoMem; no AutoMem score.",
+      "started": "2026-11-10",
+      "status": "in-progress",
+      "title": "EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan",
+      "updated": "2026-11-10",
+      "worktree": ".worktrees/agent-kernel-worker-c49de4c4",
+      "worktree_status": {
+        "state": "not-scanned"
+      }
+    },
     {
       "artifact_count": 1,
       "artifact_samples": [
