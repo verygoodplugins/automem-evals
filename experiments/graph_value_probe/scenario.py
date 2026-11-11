@@ -250,7 +250,10 @@ def main():
                 response, elapsed, size = request(
                     "/recall?" + urllib.parse.urlencode(params)
                 )
-                rows = response.get("results") or []
+                raw_rows = response.get("results") or []
+                # Expansion can return more rows than `limit`. Enforce the
+                # same client-side result cap in both experimental arms.
+                rows = raw_rows[:limit]
                 summary = measure(rows, query, inverse, scopes)
                 summary.update(
                     {
@@ -259,6 +262,8 @@ def main():
                         "expand": expansion,
                         "http_ms": round(elapsed, 3),
                         "response_bytes": size,
+                        "raw_result_count": len(raw_rows),
+                        "trimmed_result_count": len(rows),
                     }
                 )
                 output.append(summary)
