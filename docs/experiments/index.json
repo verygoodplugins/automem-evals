@@ -1842,7 +1842,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-11T01:38:53+00:00",
+  "generated_at": "2026-11-11T01:46:25+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2888,7 +2888,7 @@
       "worktrees",
       "prs"
     ],
-    "retained_snapshot_generated_at": "2026-11-11T01:25:30+00:00"
+    "retained_snapshot_generated_at": "2026-11-11T01:38:53+00:00"
   },
   "status_counts": {
     "adopted": 10,
@@ -2911,7 +2911,7 @@
       "decision": "Use explicit legacy trust only in disposable tests; do not infer agent success or production latency. Investigate calibrated abstention and a matched server chunk arm.",
       "hypothesis": "A separate native original-text index can recover facts lost during summarization without crossing scope or lifecycle boundaries; chunk vectors may improve evidence coverage.",
       "id": "EXP-ORIGINAL-TEXT-20261111",
-      "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Latest candidate 6ea4470 preserves evidence ranks; latency is not a controlled performance estimate.",
+      "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Candidate e45f2ed preserves evidence ranks; latency is not a controlled performance estimate.",
       "pr": 93,
       "related": [
         "EXP-NEG-CONTROL",
