@@ -1,0 +1,71 @@
+{
+  "adapter_revision": "a99366cd21a29c2d7aabaf600884f07c9d8e4f5e",
+  "adapter_source_sha256": "40f264c1235b545bdd8d8e6cab14a612ea4c9fc7d87d8de7bf5ace73a8fae25a",
+  "by_period": {
+    "monthly": {
+      "add": 4779,
+      "delete": 788,
+      "renamed_updates": 135,
+      "update": 583
+    },
+    "quarterly": {
+      "add": 15633,
+      "delete": 2178,
+      "renamed_updates": 753,
+      "update": 2102
+    },
+    "weekly": {
+      "add": 1222,
+      "delete": 193,
+      "renamed_updates": 44,
+      "update": 136
+    }
+  },
+  "dataset_conversation_file_count": 27614,
+  "dataset_conversation_tree_sha256": "7835f7a353a0cbb81f9db2539c554e8fd852ffd0d31191cc9298fad2b93c4736",
+  "dataset_revision": "a6493188efc836d6511ed5e4163fe3ba87da30ff",
+  "kind": "memora-adapter-predecessor-classification",
+  "limitations": [
+    "Protocol double, not AutoMem server, retrieval quality, FAMA scoring or proof of semantic identity.",
+    "Normalized keys may collapse distinct strings; updates after deletes may be valid reintroductions.",
+    "Whole-conversation capture may contain facts beyond the tracked item.",
+    "Public dataset only; no provider calls or raw conversation content in this receipt."
+  ],
+  "method": "Numeric session order, isolated in-process transport per period/persona; classify last operation for the adapter-normalized key and compare recorded session history when supplied.",
+  "recorded_history_last_session_mismatches": 0,
+  "totals": {
+    "delete_result_invalidated": 2996,
+    "delete_result_skipped": 163,
+    "operation_add": 21634,
+    "operation_delete": 3159,
+    "operation_update": 2821,
+    "renamed_destination_active": 1,
+    "renamed_predecessor_missing": 1,
+    "renamed_predecessor_present": 931,
+    "renamed_updates": 932,
+    "sessions": 27614,
+    "update_old_type_NoneType": 1889,
+    "update_old_type_str": 932,
+    "update_result_skipped": 1,
+    "update_result_stored": 2820,
+    "updates_superseded": 2497
+  },
+  "unresolved_by_last_same_key_and_recorded_history": {
+    "delete|delete|invalidated|delete": 46,
+    "delete|delete|invalidated|not_supplied": 81,
+    "delete|delete|skipped|delete": 13,
+    "delete|delete|skipped|not_supplied": 23,
+    "update|delete|invalidated|delete": 95,
+    "update|delete|invalidated|not_supplied": 163,
+    "update|delete|skipped|delete": 17,
+    "update|delete|skipped|not_supplied": 48
+  },
+  "unresolved_without_history_by_operation_conversion_and_pool": {
+    "delete|native|draft": 104,
+    "update|add_to_update|draft": 52,
+    "update|delete_to_update|completed": 20,
+    "update|delete_to_update|draft": 15,
+    "update|native|draft": 122,
+    "update|native|none": 2
+  }
+}
