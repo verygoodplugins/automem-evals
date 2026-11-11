@@ -35,8 +35,9 @@ def main():
     parser.add_argument("--model-cache", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    if args.output.exists():
-        parser.error("output must not exist")
+    raw_output = args.output.with_name(args.output.stem + "-raw.json")
+    if args.output.exists() or raw_output.exists():
+        parser.error("output and raw output must not exist")
     repo = args.product_repo.resolve(strict=True)
     cache = args.model_cache.resolve(strict=True)
     if cmd(["git", "-C", str(repo), "rev-parse", PRODUCT + "^{commit}"]) != PRODUCT:
@@ -117,6 +118,12 @@ def main():
             result = json.loads(
                 cmd(["docker", "exec", container, "python", "/experiment/scenario.py"])
             )
+            # This contains only synthetic fixtures; keep full API envelopes
+            # in the operator's local path, not in the published aggregate.
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            cmd(
+                ["docker", "cp", f"{container}:/tmp/graph-value-raw.json", str(raw_output)]
+            )
         except Exception as exc:
             failure = f"{type(exc).__name__}: {exc}"
         finally:
@@ -155,6 +162,7 @@ def main():
         "api_log_errors": len(errors),
         "failure": failure,
         "result": result,
+        "raw_sha256": sha(raw_output) if raw_output.exists() else None,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x") as out:

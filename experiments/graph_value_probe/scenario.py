@@ -6,6 +6,7 @@ import statistics
 import time
 import urllib.parse
 import urllib.request
+from pathlib import Path
 
 from falkordb import FalkorDB
 from fastembed import TextEmbedding
@@ -181,6 +182,44 @@ def measure(rows, query, inverse, scopes, budget=200):
     }
 
 
+def execute_query(query, embed, limit, respect_tags, expansion, inverse, scopes):
+    params = {
+        "query": query["query"],
+        "tags": query["scope"],
+        "tag_match": "exact",
+        "limit": limit,
+        "expand_relations": str(expansion).lower(),
+        "expand_respect_tags": str(respect_tags).lower(),
+        "relation_limit": 5,
+        "expansion_limit": 5,
+        "adaptive_floor": "false",
+        "auto_decompose": "false",
+        "min_score": 0,
+        "current_only": str(query.get("current", True)).lower(),
+        "recency_bias": "off",
+        "embedding": embed,
+    }
+    response, elapsed, size = request("/recall?" + urllib.parse.urlencode(params))
+    raw_rows = response.get("results") or []
+    # Expansion can return more rows than `limit`. Enforce the same cap for
+    # measuring both experimental arms; retain the untrimmed API response.
+    rows = raw_rows[:limit]
+    summary = measure(rows, query, inverse, scopes)
+    summary.update(
+        {
+            "scenario": query["name"],
+            "limit": limit,
+            "expand": expansion,
+            "respect_tags": respect_tags,
+            "http_ms": round(elapsed, 3),
+            "response_bytes": size,
+            "raw_result_count": len(raw_rows),
+            "trimmed_result_count": len(rows),
+        }
+    )
+    return summary, {"params": params, "response": response}
+
+
 def main():
     docs, queries, edges = fixture()
     ids, scopes = {}, {key: scope for key, scope, _ in docs}
@@ -225,51 +264,29 @@ def main():
     before = snapshot()
     inverse = {value: key for key, value in ids.items()}
     output = []
+    raw = []
     for idx, query in enumerate(queries):
         embed = ",".join(map(str, vector(query["query"])))
         for limit in (5, 10):
-            # Alternate order to reduce fixed warm-cache order bias.
-            order = (False, True) if (idx + limit) % 2 else (True, False)
-            for expansion in order:
-                params = {
-                    "query": query["query"],
-                    "tags": query["scope"],
-                    "tag_match": "exact",
-                    "limit": limit,
-                    "expand_relations": str(expansion).lower(),
-                    "expand_respect_tags": "true",
-                    "relation_limit": 5,
-                    "expansion_limit": 5,
-                    "adaptive_floor": "false",
-                    "auto_decompose": "false",
-                    "min_score": 0,
-                    "current_only": str(query.get("current", True)).lower(),
-                    "recency_bias": "off",
-                    "embedding": embed,
-                }
-                response, elapsed, size = request(
-                    "/recall?" + urllib.parse.urlencode(params)
+            for respect_tags in (True, False):
+                # Alternate order to reduce fixed warm-cache order bias.
+                order = (
+                    (False, True)
+                    if (idx + limit + int(respect_tags)) % 2
+                    else (True, False)
                 )
-                raw_rows = response.get("results") or []
-                # Expansion can return more rows than `limit`. Enforce the
-                # same client-side result cap in both experimental arms.
-                rows = raw_rows[:limit]
-                summary = measure(rows, query, inverse, scopes)
-                summary.update(
-                    {
-                        "scenario": query["name"],
-                        "limit": limit,
-                        "expand": expansion,
-                        "http_ms": round(elapsed, 3),
-                        "response_bytes": size,
-                        "raw_result_count": len(raw_rows),
-                        "trimmed_result_count": len(rows),
-                    }
-                )
-                output.append(summary)
+                for expansion in order:
+                    output_row, raw_row = execute_query(
+                        query, embed, limit, respect_tags, expansion, inverse, scopes
+                    )
+                    output.append(output_row)
+                    raw.append(raw_row)
     after = snapshot()
     if before != after:
         raise RuntimeError("last_accessed changed during paired recall")
+    Path("/tmp/graph-value-raw.json").write_text(
+        json.dumps({"ids": ids, "queries": raw}, indent=2)
+    )
     result = {
         "fixture_sha256": hashlib.sha256(
             json.dumps([docs, queries, edges], sort_keys=True).encode()

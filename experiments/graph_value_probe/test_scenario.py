@@ -58,6 +58,27 @@ class GraphValueTest(unittest.TestCase):
         result = module.measure([row], query, inverse, scopes, budget=8)
         self.assertEqual(result["stale_inline"], 1)
 
+    def test_execute_query_caps_overflow_and_records_controls(self):
+        module = load_scenario()
+        rows = [
+            {"id": str(i), "memory": {"id": str(i), "content": "fact"}}
+            for i in range(6)
+        ]
+        query = {
+            "name": "control", "query": "fact", "scope": "alpha", "expected": ["5"]
+        }
+        with patch.object(module, "request", return_value=({"results": rows}, 1.0, 100)):
+            score, receipt = module.execute_query(
+                query, "0.1,0.2", 5, False, True,
+                {str(i): str(i) for i in range(6)},
+                {str(i): "alpha" for i in range(6)},
+            )
+        self.assertEqual(score["raw_result_count"], 6)
+        self.assertEqual(score["result_count"], 5)
+        self.assertFalse(score["top5_all"])
+        self.assertEqual(receipt["params"]["expand_respect_tags"], "false")
+        self.assertEqual(len(receipt["response"]["results"]), 6)
+
     def test_negative_is_not_scored_as_positive_support(self):
         module = load_scenario()
         row = {"id": "s", "memory": {"id": "s", "content": "unrelated"}}
