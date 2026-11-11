@@ -27,7 +27,7 @@ def summarize(rows):
             for k in (1,5,10):
                 item[f'any_at_{k}']=sum(r['any_rank'] is not None and r['any_rank'] <= k for r in group)
                 item[f'all_at_{k}']=sum(r['all_rank'] is not None and r['all_rank'] <= k for r in group)
-            item['mrr_at_10']=sum(1/r['any_rank'] if r['any_rank'] else 0 for r in group)/len(group)
+            item['mrr_at_10']=sum(1/r['any_rank'] if r['any_rank'] and r['any_rank'] <= 10 else 0 for r in group)/len(group)
         else:
             item['nonempty']=sum(r['count']>0 for r in group)
         summary[f'{kind}@{floor}']=item
