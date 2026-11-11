@@ -18,7 +18,7 @@ The fixture is committed and thus visible to a researcher; the runner's checks d
 
 ## Run when authorized
 
-This preparation **did not run inference**. Confirm a local Ollama server is running at the loopback IP, and that its local model list contains the required model. `--output-dir` must be a new directory outside the git worktree; each run writes local per-case JSONL and a sanitized aggregate summary. Do not commit raw response files. The returned aggregate contains counts and hashes rather than questions, answers, or model responses, but review it before publication.
+The [first frozen run](../../data/results/preference-scorer-probe-20261111/README.md) is complete. The commands below are retained to reproduce that configuration, not to treat its observed held-out cases as fresh evidence. Confirm a local Ollama server is running at the loopback IP, and that its local model list contains the required model. `--output-dir` must be a new directory outside the git worktree; each run writes local per-case JSONL and a sanitized aggregate summary. Do not commit raw response files. The returned aggregate contains counts and hashes rather than questions, answers, or model responses, but review it before publication.
 
 ```sh
 python3 -m unittest discover -s experiments/preference_scorer_probe -p 'test_*.py' -v
