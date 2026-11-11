@@ -19,7 +19,7 @@
       "EXP-NEG-CONTROL",
       "EXP-CURRENT-STATE"
     ],
-    "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Product revisions and experiment limits are pinned in the report."
+    "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Optimized candidate b3beabc preserves evidence ranks; latency is not a controlled performance estimate."
   },
   {
     "id": "EXP-EVOMEMBENCH",
