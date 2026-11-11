@@ -6,7 +6,7 @@ The fixture contains 16 fictional, manually authored cases: eight development an
 
 The runner sends one question, answer, required criteria and optional guidance to the locally installed `qwen3.6:35b-a3b` through an explicit loopback Ollama endpoint. It never sends the expected label, split, category or case identifier. It disables proxy environment settings, rejects non-loopback endpoints and remote-model references, and requires a full installed-model digest. No paid provider call is used.
 
-The scorer returns one status and supporting quote per required criterion. The runner checks JSON structure, criterion coverage, verdict consistency and that each provided quote is a literal answer substring; `met` and `contradicted` require such a quote. **A literal quote is not proof that a criterion was semantically satisfied.** In particular, the runner cannot mechanically prove an `unmet` judgment or that a compound criterion was fully addressed. Error/ambiguous cases remain visible; manual review is necessary before interpreting an improvement.
+The scorer returns one status and supporting quote per required criterion. The runner checks JSON structure, criterion coverage, verdict consistency and that each provided quote is a literal answer substring; `met` and `contradicted` require such a quote. **A literal quote is not proof that a criterion was semantically satisfied.** In particular, the runner cannot mechanically prove an `unmet` judgment or that a compound criterion was fully addressed. Error/ambiguous cases remain visible; manual review is necessary before interpreting an improvement. All HTTP redirects are rejected, including redirects from an otherwise valid loopback endpoint.
 
 ## Freeze before held-out evaluation
 
@@ -18,7 +18,7 @@ The fixture is committed and thus visible to a researcher; the runner's checks d
 
 ## Run when authorized
 
-The [first frozen run](../../data/results/preference-scorer-probe-20261111/README.md) is complete. The commands below are retained to reproduce that configuration, not to treat its observed held-out cases as fresh evidence. Confirm a local Ollama server is running at the loopback IP, and that its local model list contains the required model. `--output-dir` must be a new directory outside the git worktree; each run writes local per-case JSONL and a sanitized aggregate summary. Do not commit raw response files. The returned aggregate contains counts and hashes rather than questions, answers, or model responses, but review it before publication.
+The [first frozen run](../../data/results/preference-scorer-probe-20261111/README.md) is complete. It used the runner at commit `e4ff926`, whose hash is recorded in the result. Redirect hardening was added afterward, so the current runner has a different hash and cannot reuse that run's frozen configuration. The commands below exercise the current runner; the observed held-out cases are not fresh evidence. Confirm a local Ollama server is running at the loopback IP, and that its local model list contains the required model. `--output-dir` must be a new directory outside the git worktree; each run writes local per-case JSONL and a sanitized aggregate summary. Do not commit raw response files. The returned aggregate contains counts and hashes rather than questions, answers, or model responses, but review it before publication.
 
 ```sh
 python3 -m unittest discover -s experiments/preference_scorer_probe -p 'test_*.py' -v

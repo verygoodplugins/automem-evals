@@ -3,8 +3,13 @@
 import json
 import tempfile
 import unittest
+from email.message import Message
+from io import BytesIO
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import URLError
+from urllib.request import BaseHandler, build_opener
+from urllib.response import addinfourl
 
 import run
 
@@ -50,6 +55,49 @@ class ProbeTests(unittest.TestCase):
             run.loopback_url("http://127.0.0.1:11434/"), "http://127.0.0.1:11434"
         )
         self.assertEqual(run.loopback_url("http://[::1]:11434"), "http://[::1]:11434")
+
+    def test_loopback_redirects_never_reach_a_remote_host(self):
+        for path, payload in (("/api/tags", None), ("/api/chat", {"messages": []})):
+            for code in (301, 302, 303, 307, 308):
+                seen = []
+
+                class FakeHTTP(BaseHandler):
+                    handler_order = 400
+
+                    def http_open(self, request):
+                        seen.append(request.full_url)
+                        headers = Message()
+                        if request.host == "127.0.0.1:11434":
+                            headers["Location"] = "http://198.51.100.10/receiver"
+                            response = addinfourl(
+                                BytesIO(b""), headers, request.full_url, code
+                            )
+                            response.msg = "redirect"
+                            return response
+                        response = addinfourl(
+                            BytesIO(b'{"redirected":true}'),
+                            headers,
+                            request.full_url,
+                            200,
+                        )
+                        response.msg = "OK"
+                        return response
+
+                def fake_opener(*handlers):
+                    return build_opener(*handlers, FakeHTTP())
+
+                with self.subTest(path=path, code=code), patch.object(
+                    run, "build_opener", side_effect=fake_opener
+                ):
+                    with self.assertRaisesRegex(URLError, "Redirects are disabled"):
+                        run.transport_json("http://127.0.0.1:11434", path, payload)
+                    self.assertEqual(seen, [f"http://127.0.0.1:11434{path}"])
+
+    def test_transport_rejects_nonloopback_before_opening(self):
+        with patch.object(run, "build_opener") as opener:
+            with self.assertRaises(ValueError):
+                run.transport_json("http://example.com", "/api/tags")
+        opener.assert_not_called()
 
     def test_model_payload_never_exposes_labels_or_split(self):
         payload = run.payload_for(self.row)

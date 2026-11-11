@@ -9,9 +9,11 @@ import random
 import re
 import sys
 import time
+import urllib.request
 from pathlib import Path
+from urllib.error import URLError
 from urllib.parse import urlsplit
-from urllib.request import ProxyHandler, Request, build_opener
+from urllib.request import build_opener
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -93,13 +95,28 @@ def loopback_url(value: str) -> str:
     return value.rstrip("/")
 
 
+class RejectRedirects(urllib.request.HTTPRedirectHandler):
+    """Do not allow a loopback server to redirect requests off the machine."""
+
+    def http_error_302(self, request, response, code, message, headers):
+        response.close()
+        raise URLError("Redirects are disabled")
+
+    http_error_301 = http_error_302
+    http_error_303 = http_error_302
+    http_error_307 = http_error_302
+    http_error_308 = http_error_302
+
+
 def transport_json(
     origin: str, path: str, payload: dict | None = None, timeout: int = 180
 ) -> dict:
-    # Explicitly disable environment proxy configuration: requests never leave loopback.
-    opener = build_opener(ProxyHandler({}))
+    # Validate at the boundary and disable proxies and redirects, even when
+    # called directly instead of through run().
+    origin = loopback_url(origin)
+    opener = build_opener(urllib.request.ProxyHandler({}), RejectRedirects())
     data = None if payload is None else json.dumps(payload).encode()
-    request = Request(
+    request = urllib.request.Request(
         origin + path, data=data, headers={"Content-Type": "application/json"}
     )
     with opener.open(request, timeout=timeout) as response:
