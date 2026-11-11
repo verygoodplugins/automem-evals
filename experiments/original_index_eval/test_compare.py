@@ -31,5 +31,9 @@ class CompareTests(unittest.TestCase):
         chunk = {'fixture_sha256':'same','rows':[entry]}
         self.assertEqual(compare(server, server, chunk)['candidate']['identifier@0']['all_at_5'], 1)
 
+    def test_mrr_at_10_excludes_deeper_hits(self):
+        rows = [row('1','identifier',2,['gold']), row('2','identifier',11,['gold'])]
+        self.assertEqual(summarize(rows)['identifier@0']['mrr_at_10'], 0.25)
+
 
 if __name__=='__main__':unittest.main()
