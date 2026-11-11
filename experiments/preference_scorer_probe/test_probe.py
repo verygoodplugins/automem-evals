@@ -209,21 +209,92 @@ class ProbeTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 run.run("development", "http://127.0.0.1:11434", root / "dev")
 
-    def test_invalid_development_does_not_enable_heldout(self):
+    def test_private_receipt_retains_malformed_and_invalid_model_text(self):
+        bad_texts = [
+            '{"private_marker":"truncated',
+            '{"private_marker":"wrong_schema"}',
+            json.dumps(
+                {
+                    "verdict": "pass",
+                    "judgments": [
+                        {
+                            "criterion_index": 0,
+                            "status": "met",
+                            "quote": "private_marker_not_in_the_answer",
+                        }
+                    ],
+                }
+            ),
+        ]
+        count = 0
+
         def fake_transport(_origin, path, payload=None, **_kwargs):
+            nonlocal count
             if path == "/api/tags":
                 return {
                     "models": [{"name": run.MODEL, "digest": "a" * 64, "size": 100}]
                 }
-            return {"message": {"content": "not json"}}
+            text = bad_texts[count % len(bad_texts)]
+            count += 1
+            return {"message": {"content": text}}
 
         with tempfile.TemporaryDirectory() as directory, patch.object(
             run, "transport_json", fake_transport
         ):
             out = Path(directory) / "dev"
-            result = run.run("development", "http://127.0.0.1:11434", out)
-            self.assertEqual(result["invalid"], 8)
+            summary = run.run("development", "http://127.0.0.1:11434", out)
+            receipts = [
+                json.loads(line)
+                for line in (out / "cases.jsonl").read_text().splitlines()
+            ]
+            responses = [
+                json.loads(line)
+                for line in (out / "responses.jsonl").read_text().splitlines()
+            ]
+            self.assertEqual([row["raw_model_text"] for row in receipts[:3]], bad_texts)
+            self.assertEqual(
+                [row["raw_model_text"] for row in responses[:3]], bad_texts
+            )
+            self.assertEqual(len(responses), 8)
+            self.assertTrue(all(row["validation_errors"] for row in receipts[:3]))
+            self.assertEqual(summary["invalid"], 8)
+            self.assertNotIn("private_marker", json.dumps(summary))
+            self.assertNotIn("private_marker", (out / "summary.json").read_text())
+            self.assertEqual(out.stat().st_mode & 0o777, 0o700)
             self.assertFalse((out / "frozen.json").exists())
+
+    def test_raw_response_is_written_before_parsing(self):
+        bad_text = '{"truncated":'
+        original_loads = json.loads
+        parsed_attempts = 0
+
+        def fake_transport(_origin, path, payload=None, **_kwargs):
+            if path == "/api/tags":
+                return {
+                    "models": [{"name": run.MODEL, "digest": "a" * 64, "size": 100}]
+                }
+            return {"message": {"content": bad_text}}
+
+        with tempfile.TemporaryDirectory() as directory:
+            out = Path(directory) / "dev"
+
+            def observing_loads(value, *args, **kwargs):
+                nonlocal parsed_attempts
+                if value == bad_text:
+                    parsed_attempts += 1
+                    lines = (out / "responses.jsonl").read_text().splitlines()
+                    self.assertEqual(len(lines), parsed_attempts)
+                    self.assertEqual(
+                        original_loads(lines[-1])["raw_model_text"], bad_text
+                    )
+                return original_loads(value, *args, **kwargs)
+
+            with patch.object(run, "transport_json", fake_transport), patch.object(
+                run.json, "loads", side_effect=observing_loads
+            ):
+                summary = run.run("development", "http://127.0.0.1:11434", out)
+            self.assertEqual(parsed_attempts, 8)
+            self.assertEqual(summary["invalid"], 8)
 
     def test_no_output_in_repo_or_remote_model(self):
         with self.assertRaisesRegex(ValueError, "outside"):

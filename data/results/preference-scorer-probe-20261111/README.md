@@ -6,6 +6,6 @@ All cases were manually authored fictional examples, not copied questions or rea
 
 The [sanitized aggregate](AGGREGATE.json) records the local model digest, frozen prompt/schema/fixture/runner hashes, per-category counts, and hashes of locally retained raw receipts. The runner and frozen fixture are documented in the [probe README](../../../experiments/preference_scorer_probe/README.md); raw model responses were retained only in local `/tmp` directories. The local Ollama process used no remote model or paid provider calls.
 
-The aggregate binds the runner as executed at commit `e4ff926`. A later change rejects HTTP redirects; it changes the runner hash and does not alter or replace this run's evidence.
+The aggregate binds the runner as executed at commit `e4ff926`. Later changes reject HTTP redirects and preserve malformed model output in private receipts; they change the runner hash and do not alter or replace this run's evidence.
 
 This is eight held-out synthetic cases with one local model, not human gold, a representative sample, or an official benchmark score. The held-out fixture is visible to a researcher; the freeze protocol is procedural rather than a cryptographic blind. The earlier saved-answer scorer candidate failed two of four held-out cases, and this separate small probe does not erase that failure or validate a benchmark scoring policy. Any revised scorer needs a new disjoint holdout, not a rerun on these now-observed cases.

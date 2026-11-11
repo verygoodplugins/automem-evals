@@ -243,7 +243,8 @@ def run(phase: str, origin: str, output: Path, freeze: Path | None = None) -> di
             )
     elif freeze is not None:
         raise ValueError("--freeze is only used for heldout")
-    output.mkdir(parents=True, exist_ok=False)
+    # Per-case receipts include raw model text and must stay private locally.
+    output.mkdir(mode=0o700, parents=True, exist_ok=False)
     (output / "config.json").write_text(
         json.dumps(config, indent=2, sort_keys=True) + "\n"
     )
@@ -260,6 +261,19 @@ def run(phase: str, origin: str, output: Path, freeze: Path | None = None) -> di
         try:
             response = transport_json(origin, "/api/chat", payload_for(row))
             model_text = response["message"]["content"]
+            if isinstance(model_text, str):
+                # Preserve even malformed or truncated JSON before parsing it.
+                # Close this private receipt before parsing so the raw text is
+                # still available if processing fails or is interrupted.
+                with (output / "responses.jsonl").open("a") as file:
+                    file.write(
+                        json.dumps(
+                            {"id": row["id"], "raw_model_text": model_text},
+                            ensure_ascii=False,
+                        )
+                        + "\n"
+                    )
+                observation["raw_model_text"] = model_text
             result = json.loads(model_text)
             verdict, errors = validate_result(result, row)
             observation.update(
