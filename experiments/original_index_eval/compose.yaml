@@ -1,0 +1,39 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+  qdrant:
+    image: qdrant/qdrant:v1.11.3
+  summarizer:
+    image: automem-flask-api:latest
+    command: ["python", "/experiment/mock_summarizer.py"]
+    volumes:
+      - ./mock_summarizer.py:/experiment/mock_summarizer.py:ro
+  api:
+    image: automem-flask-api:latest
+    command: ["python", "/experiment/server.py"]
+    depends_on: [falkordb, qdrant, summarizer]
+    volumes:
+      - ${AUTOMEM_DIR}:/app:ro
+      - ./server.py:/experiment/server.py:ro
+      - ${EVAL_MODELS_DIR}:/experiment/models:ro
+    environment:
+      PORT: "8001"
+      FALKORDB_HOST: falkordb
+      FALKORDB_PORT: "6379"
+      QDRANT_URL: http://qdrant:6333
+      AUTOMEM_API_TOKEN: buried-fact-test-token
+      ADMIN_API_TOKEN: buried-fact-admin-token
+      OPENAI_API_KEY: synthetic-only
+      OPENAI_BASE_URL: http://summarizer:8080/v1
+      VOYAGE_API_KEY: ""
+      EMBEDDING_PROVIDER: ${EVAL_EMBEDDING_PROVIDER}
+      VECTOR_SIZE: ${EVAL_VECTOR_SIZE}
+      AUTOMEM_MODELS_DIR: /experiment/models
+      HF_HUB_OFFLINE: "1"
+      MEMORY_AUTO_SUMMARIZE: ${EVAL_AUTO_SUMMARIZE}
+      MEMORY_CONTENT_HARD_LIMIT: "2000"
+      JIT_ENRICHMENT_ENABLED: "false"
+      RECALL_ADAPTIVE_FLOOR: "false"
+networks:
+  default:
+    internal: true

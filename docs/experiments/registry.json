@@ -1,5 +1,27 @@
 [
   {
+    "id": "EXP-ORIGINAL-TEXT-20261111",
+    "title": "Original-text index versus chunk retrieval diagnostic",
+    "status": "completed",
+    "hypothesis": "A separate native original-text index can recover facts lost during summarization without crossing scope or lifecycle boundaries; chunk vectors may improve evidence coverage.",
+    "result": "Matched local fixture: identifier R@5 10/16 to 16/16, LoCoMo all-labelled-evidence@5 58/136 to 62/136; chunk prototype 77/136. Negative queries remained nonempty 16/16; no cross-scope or inactive leakage observed.",
+    "decision": "Use explicit legacy trust only in disposable tests; do not infer agent success or production latency. Investigate calibrated abstention and a matched server chunk arm.",
+    "started": "2026-11-11",
+    "updated": "2026-11-11",
+    "artifacts": [
+      "data/results/original-index-20261111/README.md",
+      "data/results/original-index-20261111/aggregate.json"
+    ],
+    "branch": "test/original-text-index-eval",
+    "worktree": "../automem-evals.worktrees/original-text-index-eval",
+    "pr": 93,
+    "related": [
+      "EXP-NEG-CONTROL",
+      "EXP-CURRENT-STATE"
+    ],
+    "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Candidate 45a2f1d preserves evidence ranks. No-judge full LoCoMo b3 comparison is degraded by two replacement-query timeouts; a clean rerun is required."
+  },
+  {
     "id": "EXP-EVOMEMBENCH",
     "title": "EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan",
     "status": "in-progress",
