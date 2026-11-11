@@ -1,5 +1,5 @@
 {
-  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
+  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/original-text-index-eval",
   "artifacts": [
     {
       "created_at": "2026-04-17T23:09:40",
@@ -1833,10 +1833,16 @@
       "kind": "eval-doc",
       "path": "docs/eval/evomembench.md",
       "title": "EvoMemBench \u2014 self-evolving agent memory: adapter feasibility and CrossEp-Know smoke plan"
+    },
+    {
+      "created_at": null,
+      "kind": "artifact",
+      "path": "data/results/original-index-20261111/README.md",
+      "title": "Original-text retrieval: isolated diagnostic comparison"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-10T14:37:09+00:00",
+  "generated_at": "2026-11-11T01:13:57+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2874,7 +2880,7 @@
   ],
   "snapshot_context": {
     "refresh_scope": [
-      "EXP-EVOMEMBENCH"
+      "EXP-ORIGINAL-TEXT-20261111"
     ],
     "retained_sections": [
       "other threads and artifacts",
@@ -2882,16 +2888,45 @@
       "worktrees",
       "prs"
     ],
-    "retained_snapshot_generated_at": "2026-11-04T17:42:53+00:00"
+    "retained_snapshot_generated_at": "2026-11-10T14:37:09+00:00"
   },
   "status_counts": {
     "adopted": 10,
-    "completed": 3,
+    "completed": 4,
     "in-progress": 2,
     "parked": 4,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "data/results/original-index-20261111/README.md"
+      ],
+      "artifacts": [
+        "data/results/original-index-20261111/README.md",
+        "data/results/original-index-20261111/aggregate.json"
+      ],
+      "branch": "test/original-text-index-eval",
+      "decision": "Use explicit legacy trust only in disposable tests; do not infer agent success or production latency. Investigate calibrated abstention and a matched server chunk arm.",
+      "hypothesis": "A separate native original-text index can recover facts lost during summarization without crossing scope or lifecycle boundaries; chunk vectors may improve evidence coverage.",
+      "id": "EXP-ORIGINAL-TEXT-20261111",
+      "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Product revisions and experiment limits are pinned in the report.",
+      "pr": 93,
+      "related": [
+        "EXP-NEG-CONTROL",
+        "EXP-CURRENT-STATE"
+      ],
+      "result": "Matched local fixture: identifier R@5 10/16 to 16/16, LoCoMo all-labelled-evidence@5 58/136 to 62/136; chunk prototype 77/136. Negative queries remained nonempty 16/16; no cross-scope or inactive leakage observed.",
+      "started": "2026-11-11",
+      "status": "completed",
+      "title": "Original-text index versus chunk retrieval diagnostic",
+      "updated": "2026-11-11",
+      "worktree": "../automem-evals.worktrees/original-text-index-eval",
+      "worktree_status": {
+        "state": "not-scanned"
+      }
+    },
     {
       "artifact_count": 1,
       "artifact_samples": [
