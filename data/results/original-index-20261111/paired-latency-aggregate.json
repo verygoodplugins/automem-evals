@@ -1,0 +1,46 @@
+{
+  "status": "exploratory_paired_synthetic_latency_smoke",
+  "baseline_sha": "1a7ba1a6afe69835f62ad7f6013e33301d1ab83e",
+  "candidate_sha": "45a2f1d53c507fb69a4a9d215fe8883754db3539",
+  "baseline_archive_sha256": "b3f2f9d82904e126d4d70a685286c944e5b00474f83838623f7699b40dfb10fb",
+  "candidate_archive_sha256": "d9552681c20e8278d9898d8c6ac8c74f6c011db843e78ff8dffc7cc02bc85943",
+  "fixture_sha256_canonical": "2255c5d7e703cdd9494835e9b80d5f3f029848e24585c935a9873545db63e01d",
+  "fixture_file_sha256": "275e96db1a5210ceda2692300fd488c4000f046151a6af3207fdbe9a5462ffd5",
+  "runner_sha256": "87c8e44c2c4a98318315a7b0c7354d65dadfb8a920aea6c775b26c06d291f1b1",
+  "receipt_sha256": {"report.json": "a748aa0ba393e5c4cb0b98dd699ba2961427f028e9d93965d1624cce334cdc0a", "summary.json": "a09d0aadf7957c14370a492822968c122aa2bf79b2a542a46fea1a9b3e20df85"},
+  "fixture": {"fastembed": "0.4.2", "graph_image": "falkordb/falkordb@sha256:30c530c193ac48cb6ea8c6cae745f793d2c098a0a138f7b3e46c1d90848845ba", "limit": 5, "memories": 545, "model": "BAAI/bge-base-en-v1.5", "order": "shuffled queries and alternating arm order", "pairs": 40, "qdrant_image": "qdrant/qdrant@sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c", "query_embeddings": "precomputed", "repeats": 2, "stored_vector_sha256": "8bbb564da8d29002dde9e43de8aa0dc030074c3b8dcc5db5633d14e320c3d52c", "unique_queries": 20, "warmup": "one full untimed pass per arm"},
+  "arms": {
+    "baseline": {
+      "attempts": 40,
+      "errors": 0,
+      "server_ms": {"p50": 7.055, "p95": 20.22},
+      "slices": {
+        "history": {"attempts": 10, "negative_returned": 0, "target_in_top5": 10},
+        "negative": {"attempts": 10, "negative_returned": 10, "target_in_top5": 0},
+        "positive": {"attempts": 20, "negative_returned": 0, "target_in_top5": 18}
+      },
+      "wall_ms": {"p50": 9.807208502024878, "p95": 23.031082993838936}
+    },
+    "candidate": {
+      "attempts": 40,
+      "errors": 0,
+      "server_ms": {"p50": 10.35, "p95": 33.13},
+      "slices": {
+        "history": {"attempts": 10, "negative_returned": 0, "target_in_top5": 10},
+        "negative": {"attempts": 10, "negative_returned": 10, "target_in_top5": 0},
+        "positive": {"attempts": 20, "negative_returned": 0, "target_in_top5": 20}
+      },
+      "wall_ms": {"p50": 13.172583501727786, "p95": 35.5480829894077}
+    }
+  },
+  "paired_wall_deltas_ms": {
+    "all": {"median": 3.3924175004358403, "p95": 12.272582986042835, "pairs": 40},
+    "history": {"median": 0.10952049342449754, "p95": 3.2706239871913567, "pairs": 10},
+    "negative": {"median": 11.486209004942793, "p95": 14.231248991563916, "pairs": 10},
+    "positive": {"median": 3.3924175004358403, "p95": 5.0994169869227335, "pairs": 20}
+  },
+  "paired_slower": 37,
+  "paired_faster": 3,
+  "candidate_backfill": {"applied": 545, "elapsed_ms": 536.2288330070442, "legacy_original_trust_enabled": true},
+  "limitations": ["Single small synthetic fixture on one host; repeated queries are not independent users or production workloads.", "Query embeddings were precomputed; measurements exclude query embedding generation.", "Paired sequential wall time includes HTTP and local server work; not large-corpus or agent end-to-end latency.", "Backfill and whole-store measurements do not identify index-only storage cost.", "Negative controls all returned results at the tested configuration."]
+}

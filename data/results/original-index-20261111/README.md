@@ -38,6 +38,22 @@ Paired comparison of `e45f2ed` and `45a2f1d` preserved first- and all-evidence r
 
 The chunk arm is an exhaustive client-side prototype with max cosine and summary BM25, not an AutoMem implementation or matched server ranking. It suggests chunk vectors deserve a proper controlled system experiment, not that their apparent gain is deployable. The LoCoMo construction also simulates summarized memories: these are public dialogue snippets with fixture-provided short summaries, not a representative measurement of actual summarizer quality. The small synthetic controls are deliberately diagnostic, not a population sample. No agent answer success, context-token, no-memory, or raw-history controls were measured.
 
+## Offline no-judge LoCoMo diagnostics
+
+A separate local, no-provider diagnostic uses the product harness with the judge and automatic summarization disabled. Its deterministic scorer can add gold-labelled evidence from a scoped tag-only search to nonempty recall, masking retrieval misses. These are not official or leaderboard LoCoMo scores and do not test facts hidden by ingest-time summaries.
+
+The full comparison used baseline `1a7ba1a` and candidate `b3beabc`: 1,206/1,542 versus 1,207/1,542 across 1,986 questions, with 444 skipped, one paired win and zero losses. **The candidate log audit failed:** two FalkorDB replacement queries timed out; the handler returned empty replacement maps and requests continued. The baseline audit passed. This is a degraded, provisional comparison and requires a fresh matched full rerun. The stores had 5,882 matching records and vectors per arm and zero Memory-to-Memory relations, so this fixture cannot test supersession. Record IDs and generated timestamps differed.
+
+A separate 304-question mini compared baseline `1a7ba1a` with `45a2f1d`: both returned 197/235, with 69 skipped and zero paired verdict changes. Both log audits passed; 788 records and vectors matched per arm, with zero Memory relations. This mini overlapped the candidate full run, so elapsed times and request latency are not controlled comparisons.
+
+The reviewed aggregate, per-category counts, corpus and error audits, pinned configuration and hashes of the local raw receipts are in `locomo-no-provider-aggregate.json`. Raw questions, answers and logs are not published. No paid provider calls or production data were used.
+
+## Paired synthetic latency smoke
+
+A separate warmed, alternating-order test compared baseline `1a7ba1a` with `45a2f1d` using 545 synthetic memories and 20 pre-embedded queries repeated twice (40 paired requests per arm). All requests succeeded. Wall-time p50/p95 was 9.81/23.03 ms baseline and 13.17/35.55 ms candidate; median paired difference was +3.39 ms, with the candidate slower on 37/40 pairs. Positive targets appeared in the top five in 18/20 baseline and 20/20 candidate attempts; historical targets appeared in 10/10 in both, and all 10 negative controls returned results in both.
+
+These are local measurements on a small synthetic fixture; query embedding generation is excluded, repeated queries are not independent users, and the result does not establish large-corpus or agent end-to-end latency. Whole-store sizes do not isolate index-only storage cost. `paired-latency-aggregate.json` records the aggregate, control counts, source/fixture hashes and receipt hashes; raw measurements are not published.
+
 ## Artifacts and reproduction
 
 - `aggregate.json`: reviewed aggregate metrics, pinned model and image revisions, backfill counts, and hashes of local run outputs.
