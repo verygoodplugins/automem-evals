@@ -19,7 +19,7 @@
       "EXP-NEG-CONTROL",
       "EXP-CURRENT-STATE"
     ],
-    "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Candidate e45f2ed preserves evidence ranks; latency is not a controlled performance estimate."
+    "notes": "Exploratory public LoCoMo evidence slice and synthetic controls; not an official benchmark score. No paid calls. Candidate 45a2f1d preserves evidence ranks; latency is not a controlled performance estimate."
   },
   {
     "id": "EXP-EVOMEMBENCH",
