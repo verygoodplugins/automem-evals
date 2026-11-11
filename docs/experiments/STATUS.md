@@ -2,7 +2,7 @@
 
 Historical AMB snapshot: LoCoMo, PersonaMem, BEAM-100K values retained from the index generated 2026-06-22T20:26:29+00:00 because the raw archives are unavailable. These are historical values, not fresh AMB results. Source: origin/main@35fa73d, docs/experiments/index.json; full source commit/hash recorded per retained row in index.json.
 
-Generated: `2026-11-11T01:25:30+00:00`
+Generated: `2026-11-11T01:38:53+00:00`
 
 Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.
 Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
