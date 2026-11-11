@@ -28,6 +28,10 @@ The matching no-provider mini scored 197/235 in each arm, with 69 questions skip
 
 The measured candidate is `4431d20`; subsequent product commit `8fb5621` changes only `tests/test_metadata_recall_search.py`. Do not label these measurements as a run of a later head. [Reviewed aggregate evidence](resumed-4431d20-aggregate.json) records the pinned configuration, per-category mini counts, audit results and hashes of local-only receipts. Raw questions and logs are not published. The earlier full `b3beabc` comparison below remains degraded and does not become a clean full run through these checks.
 
+The subsequent full no-provider rerun used baseline `1a7ba1a6afe69835f62ad7f6013e33301d1ab83e` and candidate `8fb56211ba7d7e3d146ae067e575bcafa98eeec0`. Baseline scored 1,206/1,542 and candidate 1,207/1,542, with 444 skipped in each arm, one paired win and no losses. Both isolated corpora had 5,882 matching content/vector records and zero memory-to-memory relationships; generated timestamps differed. Strict API and driver audits for both arms reported zero replacement-lookup failures, query timeouts, exceptions or unexpected HTTP errors. The prior `b3beabc` run remains degraded; this independently reran the full corpus rather than repairing its evidence.
+
+The judge and answer-embedding scoring were disabled, and the native deterministic scorer augments nonempty recall with gold-labelled evidence, which can mask retrieval misses. The corpus had no supersession relationships or ingest-time summarization, so this is neither a lifecycle test nor an official judged LoCoMo or leaderboard score. The sequential baseline/candidate evaluation times of 1,254.6/1,400.6 seconds were measured under varying host conditions and do not establish a latency effect. [Reviewed full-run aggregate](resumed-8fb5621-full-aggregate.json) records per-category counts, audits, pinned configuration, corpus and receipt hashes; raw questions and logs remain local only.
+
 ## Backfill and index maintenance
 
 All 548 records were created by the old server with preserved originals in metadata. On candidate startup, the identifier R@5 was 10/16. Dry run reported 548 unverified originals and applied zero writes. The conservative apply indexed the stored current content for all 548; identifier R@5 remained 10/16. With explicit `--assume-legacy-original-current`, 542 records were upgraded to preserved originals and six already matched their current content. Read-only verification found all 548 labels and index properties present, no conflicts or mismatches; repeating the trusted apply made zero changes. This opt-in is a synthetic experiment, not authorization to trust unknown production history. Old batch originals that were never preserved cannot be recovered by any backfill.
@@ -66,6 +70,7 @@ These are local measurements on a small synthetic fixture; query embedding gener
 
 - `aggregate.json`: reviewed aggregate metrics, pinned model and image revisions, backfill counts, and hashes of local run outputs.
 - `resumed-4431d20-aggregate.json`: strict-audit targeted and judge-off mini follow-up, with local receipt hashes.
+- `resumed-8fb5621-full-aggregate.json`: independent strict-audit full no-judge rerun, with local receipt hashes.
 - The uncommitted local run outputs `baseline.json`, `candidate.json`, `candidate-e3a3e3d.json`, `candidate-b83d349.json`, `candidate-b3beabc.json`, `candidate-6ea4470.json`, `candidate-e45f2ed.json`, `candidate-45a2f1d.json`, `chunk-prototype.json` and the `comparison` files contain per-query rankings and can be regenerated. They are excluded from the published artifacts in line with the repository data policy.
 - Harness and pinned LoCoMo adapter: `experiments/original_index_eval/`.
 
