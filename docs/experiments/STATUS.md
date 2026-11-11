@@ -2,7 +2,7 @@
 
 Historical AMB snapshot: LoCoMo, PersonaMem, BEAM-100K values retained from the index generated 2026-06-22T20:26:29+00:00 because the raw archives are unavailable. These are historical values, not fresh AMB results. Source: origin/main@35fa73d, docs/experiments/index.json; full source commit/hash recorded per retained row in index.json.
 
-Generated: `2026-11-11T02:26:08+00:00`
+Generated: `2026-11-11T18:19:36+00:00`
 
 Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.
 Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
@@ -14,6 +14,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 - `EXP-BEAM-JUDGED` **Native judged BEAM harness** - `parked`; AutoMem should be measured with BEAM's judged answer task, not only proxy retrieval metrics, to make leaderboard-comparable claims. Decision: Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result. Artifacts: 29. Updated: `2026-10-22`.
 - `EXP-ORPHAN-FAMA-MEMORA-RELCHAIN` **Undocumented FAMA, Memora, and relation-chain result clusters** - `parked`; These result clusters likely represent real experiments, but the hypothesis and decision are not recorded in session notes. Decision: Keep parked until someone reviews the raw outputs and either backfills records or deletes the artifacts. Artifacts: 6. Updated: `2026-06-22`.
 - `EXP-MATURATION` **Memory maturation evaluation concept** - `parked`; Recall quality may improve through maturation or consolidation processes beyond immediate ingestion. Decision: Parked until a concrete maturation runner is prioritized. Artifacts: 1. Updated: `2026-06-17`.
+- `EXP-GRAPH-VALUE-20261111` **Controlled graph expansion and scope diagnostic** - `in-progress`; Graph expansion can improve linked-fact retrieval within a fixed context budget without returning foreign, stale, or excessive evidence. Decision: Retest final product PR heads on isolated stacks, including mandatory no-judge mini/full benchmarks and combined scope/limit controls; do not infer agent success or general graph value. Artifacts: 1. Updated: `2026-11-11`.
 - `EXP-EVOMEMBENCH` **EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan** - `in-progress`; A tag-isolated AutoMem recall/store backend can be wired into the EvoMemBench CrossEp-Know driver without editing the unlicensed upstream tree; supersession (t_invalid, INVALIDATED_BY) can only be credited on the separate InEp-Know FactConsolidation suite. Decision: Track in issue #90 at medium-low priority: runners/evomembench/ adapter plus a 17-episode CrossEp-Know wiring smoke on a local AutoMem endpoint after an owner-approved cap and a spend-guard path. No vendoring of upstream code or data. InEp-Know FactConsolidation adapter is a separate follow-up. Artifacts: 1. Updated: `2026-11-10`.
 - `EXP-MEME` **MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan** - `in-progress`; Typed AutoMem edges plus t_invalid supersession may deliver the change event or a propagated value in a single retrieval, closing Cascade/Absence/Deletion without Opus-class write-time cost. Decision: Track adapter work in the MEME issue (pending filing); no paid run until the spend guard supports the paper's models or a non-comparable column is chosen, and the owner approves a cap. Publish per-task accuracy with answerer/judge/cost disclosure only after actual AutoMem runs. Artifacts: 1. Updated: `2026-11-04`.
 - `EXP-ORIGINAL-TEXT-20261111` **Original-text index versus chunk retrieval diagnostic** - `completed`; A separate native original-text index can recover facts lost during summarization without crossing scope or lifecycle boundaries; chunk vectors may improve evidence coverage. Decision: Use explicit legacy trust only in disposable tests; do not infer agent success or production latency. Investigate calibrated abstention and a matched server chunk arm. Artifacts: 1. Updated: `2026-11-11`.
@@ -35,6 +36,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 
 ```mermaid
 flowchart LR
+  EXP_GRAPH_VALUE_20261111["EXP-GRAPH-VALUE-20261111: Controlled graph expansion and scope diagnostic"]
   EXP_ORIGINAL_TEXT_20261111["EXP-ORIGINAL-TEXT-20261111: Original-text index versus chunk retrieval diagnostic"]
   EXP_EVOMEMBENCH["EXP-EVOMEMBENCH: EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan"]
   EXP_MEME["EXP-MEME: MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan"]
@@ -56,6 +58,9 @@ flowchart LR
   EXP_WRIT["EXP-WRIT: WRIT adapter diagnostics"]
   EXP_MATURATION["EXP-MATURATION: Memory maturation evaluation concept"]
   EXP_ORPHAN_FAMA_MEMORA_RELCHAIN["EXP-ORPHAN-FAMA-MEMORA-RELCHAIN: Undocumented FAMA, Memora, and relation-chain result clusters"]
+  EXP_GRAPH_VALUE_20261111 --> EXP_ORIGINAL_TEXT_20261111
+  EXP_GRAPH_VALUE_20261111 --> EXP_NEG_CONTROL
+  EXP_GRAPH_VALUE_20261111 --> EXP_CURRENT_STATE
   EXP_ORIGINAL_TEXT_20261111 --> EXP_NEG_CONTROL
   EXP_ORIGINAL_TEXT_20261111 --> EXP_CURRENT_STATE
   EXP_EVOMEMBENCH --> EXP_MEME
@@ -94,6 +99,7 @@ flowchart LR
 
 ## In Progress / Needs Decision
 
+- `EXP-GRAPH-VALUE-20261111`: Retest final product PR heads on isolated stacks, including mandatory no-judge mini/full benchmarks and combined scope/limit controls; do not infer agent success or general graph value. (branch: `test/graph-value-probe`, worktree: `../automem-evals.worktrees/graph-value-probe`).
 - `EXP-EVOMEMBENCH`: Track in issue #90 at medium-low priority: runners/evomembench/ adapter plus a 17-episode CrossEp-Know wiring smoke on a local AutoMem endpoint after an owner-approved cap and a spend-guard path. No vendoring of upstream code or data. InEp-Know FactConsolidation adapter is a separate follow-up. (branch: `agent/kernel-worker/c49de4c4`, worktree: `.worktrees/agent-kernel-worker-c49de4c4`).
 - `EXP-MEME`: Track adapter work in the MEME issue (pending filing); no paid run until the spend guard supports the paper's models or a non-comparable column is chosen, and the owner approves a cap. Publish per-task accuracy with answerer/judge/cost disclosure only after actual AutoMem runs. (branch: `agent/kernel-worker/4a5dd6bc`, worktree: `.worktrees/agent-kernel-worker-4a5dd6bc`).
 

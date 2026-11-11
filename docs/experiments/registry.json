@@ -1,5 +1,29 @@
 [
   {
+    "id": "EXP-GRAPH-VALUE-20261111",
+    "title": "Controlled graph expansion and scope diagnostic",
+    "status": "in-progress",
+    "hypothesis": "Graph expansion can improve linked-fact retrieval within a fixed context budget without returning foreign, stale, or excessive evidence.",
+    "result": "Synthetic 6-query, 48-variant baseline: expansion yielded no additional capped evidence and exposed inline foreign content and result-limit overflow. Paired intermediate fixes removed both observed issues; negative queries still returned unrelated results.",
+    "decision": "Retest final product PR heads on isolated stacks, including mandatory no-judge mini/full benchmarks and combined scope/limit controls; do not infer agent success or general graph value.",
+    "started": "2026-11-11",
+    "updated": "2026-11-11",
+    "artifacts": [
+      "data/results/graph-value-probe-20261111/README.md",
+      "data/results/graph-value-probe-20261111/aggregate.json",
+      "data/results/graph-value-probe-20261111/paired-fix-aggregate.json"
+    ],
+    "branch": "test/graph-value-probe",
+    "worktree": "../automem-evals.worktrees/graph-value-probe",
+    "pr": 99,
+    "related": [
+      "EXP-ORIGINAL-TEXT-20261111",
+      "EXP-NEG-CONTROL",
+      "EXP-CURRENT-STATE"
+    ],
+    "notes": "Product fixes: https://github.com/verygoodplugins/automem/pull/287 and https://github.com/verygoodplugins/automem/pull/288. Paired live results apply to intermediate combined product 4d1110b, not the final PR heads; Docker stopped before their live replay. No paid provider calls."
+  },
+  {
     "id": "EXP-ORIGINAL-TEXT-20261111",
     "title": "Original-text index versus chunk retrieval diagnostic",
     "status": "completed",
