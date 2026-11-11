@@ -21,6 +21,25 @@ The project-scoped query returned the foreign neighbor's content inline in every
 
 Context is measured by traversing the first k returned results in order and their inline relations, accepting whole content/summary segments until a shared 200 **whitespace-word** budget; it excludes metadata and tags and is not a model tokenizer or a measurement of actual agent context construction. Foreign and stale inline counts use only segments that fit this budget. Response bytes are full untrimmed HTTP JSON bodies and include fields outside that budget; the row-level aggregate includes observational elapsed times, which should not be compared as reliable performance benchmarks from this tiny sequential run. Last-access updates were disabled and a graph snapshot of every memory's `last_accessed` was identical before and after all requests. Enrichment, consolidation and synchronization were disabled.
 
+## Paired product-fix probe
+
+A separate pair of disposable, internal-only stacks repeated the same 48 request shapes against product `46481560b6bf8570a7a43fc1d7e2a5bfdae4e236` and the **intermediate combined** scope-and-limit candidate `4d1110b448ecccea6fc1967d104cb983177a485d`. Both used the same fixture hash, local embedding model, image IDs, settings and 200-word budget; neither called a paid provider. Each API log scan found zero matching error lines, and both access snapshots were unchanged. See [paired-fix-aggregate.json](paired-fix-aggregate.json) for counts and provenance.
+
+| Measure | Before | Intermediate combined candidate |
+|---|---:|---:|
+| Requests with foreign inline content, tag respect on | 4 / 24 | 0 / 24 |
+| Requests with foreign inline content, tag respect off | 4 / 24 | 4 / 24 |
+| Requests exceeding the requested top-level result limit | 4 / 48 | 0 / 48 |
+| Positive request variants with all expected evidence at client-capped top 5 | 32 / 40 | 32 / 40 |
+| Positive request variants with all expected evidence in budgeted context | 40 / 40 | 40 / 40 |
+| Negative request variants returning any result | 8 / 8 | 8 / 8 |
+
+The variants repeat the same five positive and one negative synthetic queries across limits, expansion settings and tag-respect settings; they are not 40 independent examples. The only overflow instances were the linked query with expansion on, where raw counts fell from 6 to 5 at limit 5 and 11 to 10 at limit 10. Tag-respecting scope requests no longer exposed the foreign neighbor's content inline, including when expansion was off. With tag respect explicitly off, the behavior was unchanged. The negative query continued to return two unrelated results at `min_score=0`; neither fix addresses that precision issue. No current stale top-level or budgeted inline content was observed, and the historical expected evidence remained available in every variant. The measurements do not establish an authorization boundary or agent answer quality.
+
+This was a test of the combined *intermediate* revision, not of either final PR head in isolation. A later combined revision, `ed7e457`, and the final standalone scope and stacked limit branches have unit coverage but were not replayed in this live stack after Docker stopped. Their controlled replay and the required broader benchmarks remain outstanding.
+
+The paired receipts identify repository runner revision `e8fc6d08c11f4d2ee6eae4f4e3b25ff43a02369b`, but their `runner_files.run.py` hash is the unchanged repository file, **not** the executed temporary copy. That copy had SHA-256 `ed77faffa14a30fee58c38d8895a28d0041560c7cc42bab5bb903c49aad15074` and differs in two lines: its `HERE` points at the repository's runner directory, and `PRODUCT` reads `GRAPH_PRODUCT_SHA` instead of the fixed baseline. The scenario and server source hashes match the recorded files. The private local paired receipts and their full synthetic responses are `/tmp/graph-value-comparison-{before,after}-20261111.json` and their `-raw.json` siblings; these are separate from the original baseline receipt below. The committed reproduction runner itself pins the baseline and cannot reproduce the candidate without an equivalent product selection change.
+
 ## Reproduction
 
 Run on a machine with Docker, the cached BGE model and the pinned local images listed in the aggregate. The `latest` image tags are mutable: compare `docker image inspect` IDs with those in the receipt before treating another run as comparable. The harness archives only product commit `46481560b6bf8570a7a43fc1d7e2a5bfdae4e236`, checks its own committed source, creates a uniquely named internal-only Compose project with no exposed ports, and removes that project's containers, network and volumes on exit. The local model runs offline; no paid provider is used.
