@@ -60,13 +60,21 @@ def assert_loopback(endpoint: str) -> str:
     return endpoint.rstrip("/")
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """AutoMem never redirects, and following one could carry the API key off loopback."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D401
+        raise ProtocolError(f"refusing HTTP {code} redirect from {req.full_url} to {newurl}")
+
+
 def http_transport(endpoint: str, token: str, timeout: float = 60.0) -> Transport:
     base = assert_loopback(endpoint)
+    opener = urllib.request.build_opener(_NoRedirect)
 
     def get(path: str, params: dict[str, Any]) -> dict[str, Any]:
         query = urllib.parse.urlencode(params, doseq=True)
         req = urllib.request.Request(f"{base}{path}?{query}", headers={"X-Api-Key": token})
-        with urllib.request.urlopen(req, timeout=timeout) as response:  # errors propagate
+        with opener.open(req, timeout=timeout) as response:  # errors propagate
             return json.loads(response.read().decode("utf-8"))
 
     return get

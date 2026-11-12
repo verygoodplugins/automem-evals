@@ -1,7 +1,9 @@
 import hashlib
+import http.server
 import json
 import sys
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -59,6 +61,66 @@ class GuardTests(unittest.TestCase):
 
         with self.assertRaisesRegex(SystemExit, "cannot read git HEAD"):
             mp.verify_checkout(Path("."), run=not_a_repo)
+
+
+class TransportTests(unittest.TestCase):
+    """http_transport against real loopback servers; nothing leaves 127.0.0.1."""
+
+    def serve(self, respond):
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                respond(self)
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        for cleanup in (lambda: thread.join(5), server.server_close, server.shutdown):  # run in reverse
+            self.addCleanup(cleanup)
+        return f"http://127.0.0.1:{server.server_address[1]}"
+
+    def test_returns_json_and_sends_api_key(self):
+        seen = {}
+
+        def ok(handler):
+            seen.update(path=handler.path, key=handler.headers.get("X-Api-Key"))
+            body = b'{"status": "success"}'
+            handler.send_response(200)
+            handler.send_header("Content-Length", str(len(body)))
+            handler.end_headers()
+            handler.wfile.write(body)
+
+        get = mp.http_transport(self.serve(ok), "tok", timeout=5)
+        self.assertEqual(get("/memory/by-tag", {"tags": "t", "limit": 1}), {"status": "success"})
+        self.assertEqual(seen["key"], "tok")
+        self.assertTrue(seen["path"].startswith("/memory/by-tag?"))
+
+    def test_redirects_are_refused_and_never_forward_the_api_key(self):
+        hits = []
+
+        def record(handler):
+            hits.append(handler.headers.get("X-Api-Key"))
+            handler.send_response(200)
+            handler.send_header("Content-Length", "2")
+            handler.end_headers()
+            handler.wfile.write(b"{}")
+
+        bystander = self.serve(record)
+        for location in (f"{bystander}/recall", "http://redirect-target.invalid/recall"):
+            with self.subTest(location=location):
+
+                def redirect(handler, location=location):
+                    handler.send_response(302)
+                    handler.send_header("Location", location)
+                    handler.send_header("Content-Length", "0")
+                    handler.end_headers()
+
+                get = mp.http_transport(self.serve(redirect), "tok", timeout=5)
+                with self.assertRaisesRegex(mp.ProtocolError, "refusing HTTP 302 redirect"):
+                    get("/recall", {"query": "q"})
+        self.assertEqual(hits, [])  # the redirect target was never contacted
 
 
 class BankTests(unittest.TestCase):
