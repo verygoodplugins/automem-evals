@@ -1,6 +1,7 @@
 import hashlib
 import http.server
 import json
+import os
 import sys
 import tempfile
 import threading
@@ -121,6 +122,29 @@ class TransportTests(unittest.TestCase):
                 with self.assertRaisesRegex(mp.ProtocolError, "refusing HTTP 302 redirect"):
                     get("/recall", {"query": "q"})
         self.assertEqual(hits, [])  # the redirect target was never contacted
+
+    def test_environment_proxies_are_ignored(self):
+        proxied = []
+
+        def reply(handler, payload):
+            handler.send_response(200)
+            handler.send_header("Content-Length", str(len(payload)))
+            handler.end_headers()
+            handler.wfile.write(payload)
+
+        def via_proxy(handler):
+            proxied.append(handler.headers.get("X-Api-Key"))
+            reply(handler, b"{}")
+
+        proxy_url = self.serve(via_proxy)
+        target = self.serve(lambda handler: reply(handler, b'{"via": "direct"}'))
+        with patch.dict(os.environ, {"http_proxy": proxy_url, "HTTP_PROXY": proxy_url}):
+            for name in ("no_proxy", "NO_PROXY"):
+                os.environ.pop(name, None)
+            # The opener reads the environment when it is built, so build it inside the patch.
+            get = mp.http_transport(target, "tok", timeout=5)
+            self.assertEqual(get("/recall", {"query": "q"}), {"via": "direct"})
+        self.assertEqual(proxied, [])  # the proxy never saw the request or the key
 
 
 class BankTests(unittest.TestCase):

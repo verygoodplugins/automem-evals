@@ -69,7 +69,8 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def http_transport(endpoint: str, token: str, timeout: float = 60.0) -> Transport:
     base = assert_loopback(endpoint)
-    opener = urllib.request.build_opener(_NoRedirect)
+    # ProxyHandler({}) ignores http(s)_proxy: a proxy would carry the key and query off loopback.
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect)
 
     def get(path: str, params: dict[str, Any]) -> dict[str, Any]:
         query = urllib.parse.urlencode(params, doseq=True)
