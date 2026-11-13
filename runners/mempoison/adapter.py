@@ -62,6 +62,7 @@ QUERY_TYPES = ("adjacent", "distant")
 TOP_K = 5
 SOFT_LIMIT = 500  # automem MEMORY_CONTENT_SOFT_LIMIT default: longer content is auto-summarized
 LOOPBACK_HOSTS = {"localhost", "127.0.0.1", "::1"}
+REJECTED = {400, 403, 409, 413, 422}  # HTTP answers meaning "write refused"; 401, 429 and 5xx are not results
 _SAFE = re.compile(r"^[a-z0-9][a-z0-9_.-]{0,63}$")
 _UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
@@ -281,8 +282,10 @@ def seed(client: AutoMemClient, probes: Iterable[Probe], manifest: Manifest) -> 
             meta = {"origin": probe.asserted_origin, "probe_id": probe.probe_id, "mempoison_run": manifest.run_id}
             try:
                 memory_id = client.write(content, [tag, f"{tag}:{probe.channel}"], meta)
-            except urllib.error.HTTPError as exc:  # the server answered with a rejection: a result.
-                # Connection errors and refused redirects propagate: the endpoint is wrong, not the write.
+            except urllib.error.HTTPError as exc:  # the server refused the write: a result.
+                # Anything else (bad token, outage, dropped connection) propagates: not a resisted poisoning.
+                if exc.code not in REJECTED:
+                    raise
                 manifest.failures.append({"probe_id": probe.probe_id, "copy": copy, "error": f"HTTP {exc.code}"})
             else:
                 manifest.entries.append({"probe_id": probe.probe_id, "copy": copy, "memory_id": memory_id,
@@ -294,7 +297,9 @@ def readback(client: AutoMemClient, probe: Probe, entry: dict[str, Any], tag: st
     """Stage 1: was the write accepted and is it readable inside the run tag."""
     try:
         memory = client.read(entry["memory_id"])
-    except urllib.error.HTTPError:  # 404 and friends: the write is not readable
+    except urllib.error.HTTPError as exc:  # 404: the write is not readable; other errors are not a result
+        if exc.code != 404:
+            raise
         return {"write_ok": False, "origin_preserved": False}
     return {"write_ok": tag in _tags(memory), "origin_preserved": _meta(memory).get("origin") == probe.asserted_origin}
 
@@ -326,7 +331,7 @@ def cleanup(client: AutoMemClient, manifest: Manifest) -> dict[str, list[str]]:
             out["deleted"].append(memory_id)
         except urllib.error.HTTPError as exc:
             out["missing" if exc.code == 404 else "errors"].append(memory_id)
-        except (urllib.error.URLError, ProtocolError):
+        except (OSError, ValueError, ProtocolError):  # timeouts mid-read, resets, non-JSON bodies: next id
             out["errors"].append(memory_id)
     return out
 

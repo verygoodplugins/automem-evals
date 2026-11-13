@@ -30,7 +30,7 @@ class FakeAutoMem:
 
     def __init__(self, background=3):
         self.store, self.calls, self.recall_params = {}, [], []
-        self.reject_writes = self.fail_recall = False
+        self.reject_writes, self.fail_recall = 0, False  # reject_writes: the HTTP status to answer writes with
         self.die_on_write, self.writes = None, 0
         for i in range(background):
             self.put(f"Sourdough starter log {i}: hydration ratio about 75 percent.", ["other:corpus"], {"origin": "user"})
@@ -45,7 +45,7 @@ class FakeAutoMem:
         if (method, path) == ("POST", "/memory"):
             self.writes += 1
             if self.reject_writes:
-                raise http_error(403)
+                raise http_error(self.reject_writes)
             if self.die_on_write == self.writes:
                 raise RuntimeError("process died")
             return {"status": "success", "memory_id": self.put(body["content"], body["tags"], body["metadata"])}
@@ -238,9 +238,13 @@ class ClientTests(unittest.TestCase):
 
     def test_http_rejection_is_a_result_but_connection_errors_abort(self):
         fake, manifest = FakeAutoMem(background=0), mp.Manifest("r1")
-        fake.reject_writes = True
+        fake.reject_writes = 403
         mp.seed(mp.AutoMemClient(fake), mp.build_probes(), manifest)
         self.assertEqual((len(manifest.entries), manifest.failures[0]["error"]), (0, "HTTP 403"))
+        for code in (401, 429, 500, 503):  # a bad token or an outage is not a resisted poisoning
+            fake.reject_writes = code
+            with self.assertRaises(urllib.error.HTTPError):
+                mp.seed(mp.AutoMemClient(fake), mp.build_probes(), mp.Manifest("r1"))
 
         def refused(*a):
             raise urllib.error.URLError("connection refused")
@@ -296,6 +300,20 @@ class LiveFlowTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             mp.run_live(mp.AutoMemClient(fake), mp.build_probes(), mp.Manifest("r1"))
         self.assertEqual(len(fake.store), 2)
+
+    def test_readback_treats_404_as_unreadable_but_an_outage_as_an_abort(self):
+        args = (mp.AutoMemClient(None), mp.build_probes()[0], {"memory_id": str(uuid.uuid4())}, "mempoison:r1")
+        with patch.object(mp.AutoMemClient, "read", side_effect=[http_error(404), http_error(503)]):
+            self.assertFalse(mp.readback(*args)["write_ok"])
+            self.assertRaises(urllib.error.HTTPError, mp.readback, *args)
+
+    def test_cleanup_continues_past_read_timeouts_and_bad_bodies(self):
+        fake, manifest = FakeAutoMem(background=0), mp.Manifest("r1")
+        mp.seed(mp.AutoMemClient(fake), mp.build_probes(), manifest)
+        replies = [TimeoutError("slow"), json.JSONDecodeError("bad body", "", 0)] + [{"tags": ["mempoison:r1"]}] * 4
+        with patch.object(mp.AutoMemClient, "read", side_effect=replies):
+            cleaned = mp.cleanup(mp.AutoMemClient(fake), manifest)
+        self.assertEqual((cleaned["errors"], set(fake.store)), (manifest.ids()[:2], set(manifest.ids()[:2])))
 
     def test_retrieval_is_store_wide_unless_scoped(self):
         fake = FakeAutoMem()
