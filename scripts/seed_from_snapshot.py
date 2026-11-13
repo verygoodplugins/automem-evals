@@ -4,8 +4,14 @@ Fast reseed from a previously captured embedding snapshot.
 
 Unlike generate_corpus.py + seed_corpus.py (which hits OpenAI's embedding API
 for every memory), this reseeds from data/seed_memories/corpus_v1.embedded.jsonl
-with pre-computed vectors. Typical runtime is seconds instead of minutes and
-costs $0 in embedding API credits.
+(or another snapshot via --snapshot) with pre-computed vectors. Typical runtime
+is seconds instead of minutes and costs $0 in embedding API credits.
+
+Timestamps are rebased by default: `timestamp`, `t_valid` and `t_invalid` move
+forward by whole days so the corpus generator's NOW lands on today, keeping the
+corpus inside phase-2 `time_query` windows. See scripts/seed_rebase.py. Pass
+--no-rebase to seed the stored dates, or --rebase-anchor to choose the instant
+that becomes today.
 
 Requirements:
   - Server volumes should be empty (memory_count == 0) before seeding, or you'll
@@ -17,6 +23,10 @@ Usage:
   python3 scripts/seed_from_snapshot.py \
       --endpoint http://localhost:8011 \
       --manifest-output corpus_v1-8011.manifest.json
+  python3 scripts/seed_from_snapshot.py \
+      --endpoint http://localhost:8011 \
+      --snapshot corpus_v2.embedded.jsonl \
+      --manifest-output corpus_v2-8011.manifest.json
 """
 
 import argparse
@@ -27,9 +37,12 @@ import time
 import urllib.error
 import urllib.request
 
+from seed_rebase import add_rebase_args, corpus_key, plan_rebase, shift_entry
+
 HERE = pathlib.Path(__file__).resolve().parent.parent
-SNAPSHOT = HERE / "data" / "seed_memories" / "corpus_v1.embedded.jsonl"
-MANIFEST = HERE / "data" / "seed_memories" / "corpus_v1.manifest.json"
+SEED_DIR = HERE / "data" / "seed_memories"
+SNAPSHOT = SEED_DIR / "corpus_v1.embedded.jsonl"
+MANIFEST = SEED_DIR / "corpus_v1.manifest.json"
 
 
 def request(method: str, url: str, token: str, payload: dict | None = None) -> dict:
@@ -44,13 +57,27 @@ def request(method: str, url: str, token: str, payload: dict | None = None) -> d
         return json.loads(r.read())
 
 
-def resolve_manifest_output(value: str | None) -> pathlib.Path:
-    if not value:
-        return MANIFEST
+def resolve_seed_path(value: str) -> pathlib.Path:
+    """Bare filenames live under data/seed_memories/; paths are used as given."""
     path = pathlib.Path(value)
     if path.is_absolute() or path.parent != pathlib.Path("."):
         return path
-    return HERE / "data" / "seed_memories" / path
+    return SEED_DIR / path
+
+
+def resolve_snapshot(value: str | None) -> pathlib.Path:
+    return resolve_seed_path(value) if value else SNAPSHOT
+
+
+def default_manifest_for(snapshot: pathlib.Path) -> pathlib.Path:
+    """`corpus_v2.embedded.jsonl` -> data/seed_memories/corpus_v2.manifest.json."""
+    return SEED_DIR / f"{corpus_key(snapshot)}.manifest.json"
+
+
+def resolve_manifest_output(
+    value: str | None, default: pathlib.Path = MANIFEST
+) -> pathlib.Path:
+    return resolve_seed_path(value) if value else default
 
 
 def wait_for_enrichment(endpoint: str, token: str, expected_min: int) -> None:
@@ -73,18 +100,31 @@ def main() -> int:
     ap.add_argument("--endpoint", default="http://localhost:8001")
     ap.add_argument("--token", default="test-token")
     ap.add_argument(
+        "--snapshot",
+        default=None,
+        help=(
+            "Embedded snapshot to seed. Bare filenames are read from "
+            "data/seed_memories/. Defaults to corpus_v1.embedded.jsonl."
+        ),
+    )
+    ap.add_argument(
         "--manifest-output",
         default=None,
         help=(
             "Manifest output path. Bare filenames are written under "
-            "data/seed_memories/. Defaults to corpus_v1.manifest.json."
+            "data/seed_memories/. Defaults to <corpus>.manifest.json for the "
+            "snapshot (corpus_v1.manifest.json for the default snapshot)."
         ),
     )
+    add_rebase_args(ap)
     args = ap.parse_args()
-    manifest_path = resolve_manifest_output(args.manifest_output)
+    snapshot = resolve_snapshot(args.snapshot)
+    manifest_path = resolve_manifest_output(
+        args.manifest_output, default_manifest_for(snapshot)
+    )
 
-    if not SNAPSHOT.exists():
-        print(f"snapshot not found: {SNAPSHOT}. run snapshot_corpus.py first.", file=sys.stderr)
+    if not snapshot.exists():
+        print(f"snapshot not found: {snapshot}. run snapshot_corpus.py first.", file=sys.stderr)
         return 2
 
     t0 = time.time()
@@ -92,8 +132,10 @@ def main() -> int:
     if h.get("memory_count", 0) > 0:
         print(f"WARN: server already has {h['memory_count']} memories. Reseed will add more.", file=sys.stderr)
 
-    entries = [json.loads(l) for l in SNAPSHOT.read_text().splitlines() if l.strip()]
-    print(f"reseeding {len(entries)} memories from snapshot (with precomputed embeddings)")
+    entries = [json.loads(l) for l in snapshot.read_text().splitlines() if l.strip()]
+    print(f"reseeding {len(entries)} memories from {snapshot.name} (with precomputed embeddings)")
+    shift_days = plan_rebase(args, snapshot, entries)
+    entries = [shift_entry(e, shift_days) for e in entries]
 
     manifest: dict[str, list[str]] = {}
     scenario_to_mids: dict[str, list[str]] = {}

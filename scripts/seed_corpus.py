@@ -5,6 +5,8 @@ Seed a JSONL corpus into the local AutoMem server.
   - Reads: data/seed_memories/corpus_v1.jsonl
   - Writes: data/seed_memories/corpus_v1.manifest.json (memory_id → scenario hits)
   - Waits for embedding enrichment to drain before returning.
+  - Rebases timestamps by default so the corpus generator's NOW lands on today
+    (see scripts/seed_rebase.py); --no-rebase seeds the stored dates.
 
 Usage:
   python3 scripts/seed_corpus.py [--endpoint http://localhost:8001] [--token test-token]
@@ -21,6 +23,8 @@ import sys
 import time
 import urllib.error
 import urllib.request
+
+from seed_rebase import add_rebase_args, plan_rebase, shift_entry
 
 HERE = pathlib.Path(__file__).resolve().parent.parent
 
@@ -86,6 +90,7 @@ def main() -> int:
             "data/seed_memories/. Defaults to <corpus>.manifest.json."
         ),
     )
+    add_rebase_args(ap)
     args = ap.parse_args()
 
     CORPUS = HERE / "data" / "seed_memories" / args.corpus
@@ -108,6 +113,8 @@ def main() -> int:
 
     memories = [json.loads(line) for line in CORPUS.read_text().splitlines() if line.strip()]
     print(f"seeding {len(memories)} memories")
+    shift_days = plan_rebase(args, CORPUS, memories)
+    memories = [shift_entry(m, shift_days) for m in memories]
 
     manifest: dict[str, list[str]] = {}  # memory_id → scenario_hits
     scenario_to_mids: dict[str, list[str]] = {}  # scenario_id → [memory_id]

@@ -17,6 +17,9 @@ Usage:
   python3 runners/client_side_expand.py \
       --ruleset bare_tag_1m_v2 \
       --scenarios graph_expansion_v1
+  python3 runners/client_side_expand.py \
+      --endpoint http://localhost:8011 \
+      --manifest corpus_v1-8011.manifest.json
 """
 
 import argparse
@@ -27,13 +30,25 @@ import urllib.parse
 import urllib.request
 
 HERE = pathlib.Path(__file__).resolve().parent.parent
-MANIFEST = HERE / "data" / "seed_memories" / "corpus_v1.manifest.json"
+SEED_DIR = HERE / "data" / "seed_memories"
+# Defaults for --manifest / --endpoint / --token.
+MANIFEST = SEED_DIR / "corpus_v1.manifest.json"
 ENDPOINT = "http://localhost:8001"
 TOKEN = "test-token"
 
 
-def http(method: str, url: str, params: dict | None = None) -> dict:
-    headers = {"X-Api-Key": TOKEN}
+def resolve_manifest(value: str | None) -> pathlib.Path:
+    """Bare filenames live under data/seed_memories/; paths are used as given."""
+    if not value:
+        return MANIFEST
+    path = pathlib.Path(value)
+    if path.is_absolute() or path.parent != pathlib.Path("."):
+        return path
+    return SEED_DIR / path
+
+
+def http(method: str, url: str, token: str, params: dict | None = None) -> dict:
+    headers = {"X-Api-Key": token}
     if method == "GET" and params:
         flat = []
         for k, v in params.items():
@@ -49,7 +64,7 @@ def http(method: str, url: str, params: dict | None = None) -> dict:
         return json.loads(r.read())
 
 
-def run_phase2(ruleset: dict, scenario: dict) -> dict:
+def run_phase2(endpoint: str, token: str, ruleset: dict, scenario: dict) -> dict:
     cfg = ruleset["phase_2_task_context"]
     params = {}
     q = scenario["query"]
@@ -65,7 +80,7 @@ def run_phase2(ruleset: dict, scenario: dict) -> dict:
     if cfg.get("time_query"):
         params["time_query"] = cfg["time_query"]
     params["limit"] = cfg["limit"]
-    return http("GET", f"{ENDPOINT}/recall", params)
+    return http("GET", f"{endpoint}/recall", token, params)
 
 
 def client_expand(
@@ -129,15 +144,29 @@ def score(results: list[dict], expected_mids: set[str], k: int = 5) -> dict:
     }
 
 
-def main() -> int:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--endpoint", default=ENDPOINT)
+    ap.add_argument("--token", default=TOKEN)
+    ap.add_argument(
+        "--manifest",
+        default=None,
+        help=(
+            "Manifest written by the seed script for this stack. Bare filenames "
+            "are read from data/seed_memories/. Defaults to corpus_v1.manifest.json."
+        ),
+    )
     ap.add_argument("--ruleset", default="bare_tag_1m_v2")
     ap.add_argument("--scenarios", default="graph_expansion_v1")
-    args = ap.parse_args()
+    return ap.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
 
     ruleset = json.loads((HERE / "rulesets" / f"{args.ruleset}.json").read_text())
     scenarios = json.loads((HERE / "scenarios" / f"{args.scenarios}.json").read_text())
-    manifest = json.loads(MANIFEST.read_text())
+    manifest = json.loads(resolve_manifest(args.manifest).read_text())
 
     print(f"ruleset={args.ruleset}  scenarios={args.scenarios}")
     print(f"{'scenario':<28} {'server_hits':<14} {'+client_exp_hits':<18} {'expanded_added':<16}")
@@ -148,7 +177,7 @@ def main() -> int:
             for mid in manifest["scenario_to_memories"].get(tag, []):
                 expected_mids.add(mid)
 
-        resp = run_phase2(ruleset, scen)
+        resp = run_phase2(args.endpoint, args.token, ruleset, scen)
         server_results = resp.get("results", [])
         server_score = score(server_results, expected_mids)
 

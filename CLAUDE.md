@@ -49,13 +49,24 @@ cd ../automem && docker compose up -d
 
 # Verify: http://localhost:8001/health reports falkordb + qdrant up
 
-# 1a. Fast reseed (v1, uses snapshotted embeddings, no API calls)
+# 1a. Fast reseed (v1, uses snapshotted embeddings, no API calls).
+#     Timestamps are rebased to today by default (see invariant 7).
 python3 scripts/seed_from_snapshot.py
 python3 scripts/seed_associations.py     # adds typed edges for expansion experiments
 
-# 1b. Full v2 reseed (still cheap if snapshot exists)
-python3 scripts/seed_corpus.py --corpus corpus_v2.jsonl    # will skip embedding if server has key
-python3 scripts/snapshot_corpus.py --corpus corpus_v2      # write snapshot for next reseed
+# 1b. v2 reseed. From the embedded snapshot it is $0 (writes corpus_v2.manifest.json):
+python3 scripts/seed_from_snapshot.py --snapshot corpus_v2.embedded.jsonl
+#     Without a snapshot, seed raw (server embeds), then snapshot for next time:
+python3 scripts/seed_corpus.py --corpus corpus_v2.jsonl
+python3 scripts/snapshot_corpus.py --corpus corpus_v2
+
+# 1c. Isolated stack (never reuse the default manifest names for a throwaway stack;
+#     they would point the default :8001 runs at the wrong memory_ids)
+python3 scripts/matrix_stack.py up --label candidate --api-port 8011
+python3 scripts/seed_from_snapshot.py --endpoint http://localhost:8011 \
+    --manifest-output corpus_v1-8011.manifest.json
+python3 scripts/seed_associations.py --endpoint http://localhost:8011 \
+    --manifest corpus_v1-8011.manifest.json
 
 # 2. Run a ruleset comparison (writes data/results/<timestamp>-comparison.md)
 python3 runners/compare_rulesets.py --rulesets baseline_v1 bare_tag_1m_v2
@@ -69,8 +80,12 @@ python3 runners/compare_rulesets.py --rulesets \
     iso_e_drop_tag_gate iso_f_add_expand iso_g_all_new_v2 \
     iso_h_v2_no_gate iso_i_v2_no_gate_expand iso_j_v2_expand
 
-# 4. Client-side graph expansion prototype
+# 4. Client-side graph expansion prototype (--endpoint/--token/--manifest as above)
 python3 runners/client_side_expand.py --ruleset bare_tag_1m_v2 --scenarios graph_expansion_v1
+
+# Tests (stdlib unittest)
+python3 -m unittest discover -s scripts -p 'test_*.py'
+python3 -m unittest discover -s runners -p 'test_*.py'
 ```
 
 **Endpoint + token defaults:** `http://localhost:8001` and `test-token`. Override with `--endpoint` / `--token`. There is no production endpoint; this repo is local-only.
@@ -91,6 +106,7 @@ There is no built-in `--scenario-id` filter. Either:
 4. **Scenario IDs are conventional, not enforced.** `TP-*` = tensor-pipeline, `DA-*` = dashboard-app, `PS-*` = payment-service, `SE-*` = search-engine, `OS-*` = old-service, `VID-*` = video, `DEBUG-*` = phase-3, `SS-*` = session-start scenario (in `scenarios/session_start_*.json`), `PREF-*` = preference scope. Keep the prefix convention when adding memories/scenarios so the manifest stays readable.
 5. **The `video` slug is deliberately collision-prone** in v2. Do not "fix" it by renaming — its purpose is to exercise the slug-collision case.
 6. **Memories live in AutoMem, not in this repo.** Do not treat the JSONL as source of truth for what the server returns — server-side enrichment (summary, entity extraction) mutates fields after ingest. For debugging recall, always inspect `/memory/<id>` or `/recall` response, not the seed file.
+7. **Seed timestamps are rebased to today by default.** The generators bake a fixed `NOW` (v1 2026-04-17, v2 2026-04-18) and phase-2 rulesets filter by `time_query` against the server clock, so unshifted corpora age out of every window (from mid-July 2026 every phase-2 `/recall` returned 0). `seed_from_snapshot.py` and `seed_corpus.py` shift `timestamp` / `t_valid` / `t_invalid` forward by whole days (`scripts/seed_rebase.py`) so the generator `NOW` lands on today without any record becoming future-dated. `--no-rebase` seeds stored dates; `--rebase-anchor` picks the instant that becomes today. Dates written inside `content` are not shifted. If you change a generator's `NOW`, update `KNOWN_ANCHORS` (a test checks they match).
 
 ## Session notes & results
 
