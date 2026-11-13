@@ -250,5 +250,41 @@ class CommittedV1SnapshotTests(unittest.TestCase):
             self.assertIs(after["embedding"], before["embedding"])
 
 
+class SnapshotRoundTripTests(unittest.TestCase):
+    """seed (rebased) -> snapshot_corpus -> reseed must land on the same dates."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load_script("seed_rebase")
+        cls.snap = load_script("snapshot_corpus")
+        path = SCRIPTS.parent / "data" / "seed_memories" / "corpus_v1.embedded.jsonl"
+        cls.path = path
+        cls.entries = [
+            json.loads(line) for line in path.read_text().splitlines() if line.strip()
+        ]
+
+    def seed(self, entries, now):
+        anchor, _ = self.mod.resolve_anchor(self.path, entries)
+        days = self.mod.rebase_days(anchor, now)
+        return days, [self.mod.shift_entry(e, days) for e in entries]
+
+    def test_round_trip_is_exact(self):
+        days, seeded = self.seed(self.entries, PR289_RUN)
+        manifest = {self.mod.MANIFEST_KEY: days}
+        snapshot = self.snap.to_generator_time(seeded, manifest)
+        for original, captured in zip(self.entries, snapshot):
+            for field in self.mod.REBASE_FIELDS:
+                self.assertEqual(captured.get(field), original.get(field))
+        reseed_days, reseeded = self.seed(snapshot, PR289_RUN)
+        self.assertEqual(reseed_days, days)
+        self.assertEqual(
+            [e["timestamp"] for e in reseeded], [e["timestamp"] for e in seeded]
+        )
+
+    def test_manifest_without_rebase_key_is_unchanged(self):
+        snapshot = self.snap.to_generator_time(self.entries, {})
+        self.assertEqual(snapshot[0]["timestamp"], self.entries[0]["timestamp"])
+
+
 if __name__ == "__main__":
     unittest.main()

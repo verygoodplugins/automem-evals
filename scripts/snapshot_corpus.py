@@ -7,6 +7,10 @@ full memory object from /memory/<id>, and pulls the 1024-dim vector from Qdrant
 directly. Writes a combined snapshot so a later reseed does not need to call the
 OpenAI (or any) embedding API again.
 
+If the seed rebased timestamps (manifest `rebase_days`, see seed_rebase.py),
+the snapshot subtracts that shift so it stays in generator time; the next seed
+rebases it to that day's date again.
+
 Usage:
   python3 scripts/snapshot_corpus.py
 """
@@ -18,6 +22,8 @@ import urllib.request
 
 import argparse
 
+from seed_rebase import MANIFEST_KEY, shift_entry
+
 HERE = pathlib.Path(__file__).resolve().parent.parent
 API = "http://localhost:8001"
 QDRANT = "http://localhost:6333"
@@ -28,6 +34,12 @@ def http_get(url: str, headers: dict | None = None) -> dict:
     req = urllib.request.Request(url, headers=headers or {})
     with urllib.request.urlopen(req, timeout=15) as r:
         return json.loads(r.read())
+
+
+def to_generator_time(entries: list[dict], manifest: dict) -> list[dict]:
+    """Undo the seed-time rebase recorded in the manifest (0 when absent)."""
+    days = int(manifest.get(MANIFEST_KEY) or 0)
+    return [shift_entry(e, -days) for e in entries]
 
 
 def main() -> int:
@@ -80,6 +92,10 @@ def main() -> int:
         snapshot.append(entry)
         if (i + 1) % 10 == 0:
             print(f"  [{i+1}/{len(memory_ids)}]")
+
+    if manifest.get(MANIFEST_KEY):
+        print(f"undoing seed rebase: {-int(manifest[MANIFEST_KEY]):+d} days (back to generator time)")
+    snapshot = to_generator_time(snapshot, manifest)
 
     with SNAPSHOT.open("w") as f:
         for e in snapshot:

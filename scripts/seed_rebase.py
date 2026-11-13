@@ -15,6 +15,10 @@ largest whole-day count that keeps the anchor at or before the current time,
 so no record becomes future-dated (a future `t_valid` is suppressed as
 not-yet-valid, and a future `timestamp` falls outside `time_query`).
 
+The applied shift is written to the seed manifest as `rebase_days`.
+`snapshot_corpus.py` subtracts it again, so snapshots stay in generator time
+and a seed -> snapshot -> reseed round trip lands on the same dates.
+
 Dates written inside `content` are not shifted.
 """
 
@@ -33,6 +37,9 @@ KNOWN_ANCHORS: dict[str, datetime] = {
 }
 
 REBASE_FIELDS = ("timestamp", "t_valid", "t_invalid")
+
+# Manifest key holding the whole-day shift applied at seed time.
+MANIFEST_KEY = "rebase_days"
 
 ONE_DAY = timedelta(days=1)
 
@@ -94,8 +101,10 @@ def resolve_anchor(
 
     Order: an explicit override, then the generator NOW for a known corpus,
     then the newest `timestamp` in the data. When the data is newer than the
-    known anchor (a snapshot captured after an earlier rebase), the data wins,
-    so the newest record still never lands in the future.
+    known anchor, the data wins so the newest record still never lands in the
+    future. That only happens for a snapshot captured from a rebased stack
+    without un-shifting it (snapshot_corpus.py un-shifts via the manifest), and
+    it can move dates by up to a day relative to a fresh seed.
     """
     if override:
         return parse_iso(override), "--rebase-anchor"

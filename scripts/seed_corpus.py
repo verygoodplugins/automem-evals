@@ -24,7 +24,7 @@ import time
 import urllib.error
 import urllib.request
 
-from seed_rebase import add_rebase_args, plan_rebase, shift_entry
+from seed_rebase import MANIFEST_KEY, add_rebase_args, plan_rebase, shift_entry
 
 HERE = pathlib.Path(__file__).resolve().parent.parent
 
@@ -151,6 +151,7 @@ def main() -> int:
     MANIFEST.write_text(json.dumps({
         "memory_to_scenarios": manifest,
         "scenario_to_memories": scenario_to_mids,
+        MANIFEST_KEY: shift_days,
     }, indent=2))
     try:
         display = MANIFEST.relative_to(HERE)
