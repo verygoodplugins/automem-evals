@@ -1,0 +1,71 @@
+{
+  "after_intermediate": {
+    "product_sha": "4d1110b448ecccea6fc1967d104cb983177a485d",
+    "raw_sha256": "6a2949537761c04624989a8e934979374da341280d8670b234a1ac10177ec884",
+    "summary": {
+      "current_stale_inline_or_top": 0,
+      "negative_requests_with_results": 8,
+      "positive_budgeted_context_all": 40,
+      "positive_requests": 40,
+      "positive_top10_all": 32,
+      "positive_top5_all": 32,
+      "requests": 48,
+      "respect_tags_off_requests_with_foreign_inline": 4,
+      "respect_tags_requests_with_foreign_inline": 0,
+      "result_limit_overflow_requests": 0
+    }
+  },
+  "before": {
+    "product_sha": "46481560b6bf8570a7a43fc1d7e2a5bfdae4e236",
+    "raw_sha256": "b0fb9df93b7eb9192e038678f3737df2059efe2e8de309d2cf8b80341a29891f",
+    "summary": {
+      "current_stale_inline_or_top": 0,
+      "negative_requests_with_results": 8,
+      "positive_budgeted_context_all": 40,
+      "positive_requests": 40,
+      "positive_top10_all": 32,
+      "positive_top5_all": 32,
+      "requests": 48,
+      "respect_tags_off_requests_with_foreign_inline": 4,
+      "respect_tags_requests_with_foreign_inline": 4,
+      "result_limit_overflow_requests": 4
+    }
+  },
+  "executed_runner_sha256": "ed77faffa14a30fee58c38d8895a28d0041560c7cc42bab5bb903c49aad15074",
+  "note": "The executed temporary runner differs from the recorded repository run.py: its HERE points to the repository runner directory, and PRODUCT is read from GRAPH_PRODUCT_SHA. The recorded runner_files.run.py hash identifies the underlying repository file, not the executed copy.",
+  "paired_changed_requests": {
+    "context_all": 0,
+    "foreign_inline": 4,
+    "foreign_top": 0,
+    "off_label": 0,
+    "raw_result_count": 4,
+    "result_count": 0,
+    "stale_inline": 0,
+    "stale_top": 0,
+    "top10_all": 0,
+    "top5_all": 0
+  },
+  "shared": {
+    "fixture_sha256": "dc555245951949543c1caf91889996df9d74ae11515844c77494acc67a3d0bbc",
+    "image_ids": {
+      "automem-flask-api:latest": "sha256:668fccdfd77afba9be262df8b1ef944da072b72834da098bdd5fc87c7feb722d",
+      "falkordb/falkordb:latest": "sha256:30c530c193ac48cb6ea8c6cae745f793d2c098a0a138f7b3e46c1d90848845ba",
+      "qdrant/qdrant:v1.11.3": "sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c"
+    },
+    "memories": 23,
+    "model": "BAAI/bge-base-en-v1.5",
+    "model_revision": "199291fdd1aa89faf9c20b722dc72ad5e17aa0d0",
+    "model_sha256": "4e556722bc4f65716c544c8a931f1e90fb3f866e5741fd93a96f051d673339c7",
+    "network": "internal",
+    "provider_calls": 0,
+    "relations": 6,
+    "runner_files": {
+      "compose.yaml": "b4bb69dd48a4e5e3209d649b51b6f45763cd269d3d38ae81dcc25fb0a0d638da",
+      "run.py": "235fdae8b1ba8b4e0b3480baed12f75e6a95be99429d443c44a96b0e910fdbab",
+      "scenario.py": "2916883de97fab85e7d0e469e151e6b5b629beaefa570053a72ddcb60e4ac807",
+      "server.py": "eb3e53e8e5f33d78cae92df95f7528efbd03d39150296e94a8fea28b8c92b334"
+    },
+    "runner_sha": "e8fc6d08c11f4d2ee6eae4f4e3b25ff43a02369b",
+    "word_budget": 200
+  }
+}
