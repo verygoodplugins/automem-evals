@@ -57,6 +57,24 @@ The 48 variants repeat six queries across four settings and two limits; they are
 
 The exact executed [replay runner](replay-20261113.py) is archived for inspection; its SHA-256 is `798069625fa0a61211bb3c8bb74cb2bf701e96f959b7fd4bf0339c1b7f4a8036`. It pins both product commits and the evaluation revision `37ca06f70ae3e92b818b70d5fc1ae672db944fb0`, uses an absolute local evaluation checkout path, and expects `scenario.py`, `server.py` and `compose.yaml` beside it. Replaying exactly therefore requires that evaluation checkout at that revision and local path, those sibling files from that revision, both product commits, the model and matching image IDs. Editing the path or choosing a newly reconstructed integration commit changes the executed script hash and must be recorded as a new run. The local receipts are `/private/tmp/graph-value-final-replay-20261113/{baseline,combined}.json` with sibling `-raw.json` files; the aggregate reports their raw hashes. The local comparison script checked matching model, image, fixture and runner hashes, 48 distinct request shapes, clean API logs and unchanged access snapshots; its SHA-256 is `1b1a270186a71c5306cadf6236399097736f55cbc9a595e262f2618591fd0acf`.
 
+The script hashes its sibling `run.py`, so do not execute it under the archived filename or overwrite an existing runner. Copy it as `run.py` into a new directory with the three pinned sibling files, then verify its hash before running. For example, from this checkout:
+
+```sh
+replay_dir=$(mktemp -d "${TMPDIR:-/tmp}/graph-replay.XXXXXXXX")
+cp data/results/graph-value-probe-20261111/replay-20261113.py "$replay_dir/run.py"
+for file in scenario.py server.py compose.yaml; do
+  git show "37ca06f70ae3e92b818b70d5fc1ae672db944fb0:experiments/graph_value_probe/$file" > "$replay_dir/$file"
+done
+shasum -a 256 "$replay_dir/run.py"
+```
+
+The last command must print `798069625fa0a61211bb3c8bb74cb2bf701e96f959b7fd4bf0339c1b7f4a8036`. The pinned absolute checkout must independently exist at revision `37ca06f` before either arm will run; setting up that checkout must not overwrite an existing worktree. After verifying the prerequisites, run each arm in sequence with new output paths:
+
+```sh
+python3 "$replay_dir/run.py" --product-repo /path/to/automem --model-cache /path/to/automem/models --arm baseline --output "$replay_dir/baseline.json"
+python3 "$replay_dir/run.py" --product-repo /path/to/automem --model-cache /path/to/automem/models --arm combined --output "$replay_dir/combined.json"
+```
+
 ## Reproduction
 
 Run on a machine with Docker, the cached BGE model and the pinned local images listed in the aggregate. The `latest` image tags are mutable: compare `docker image inspect` IDs with those in the receipt before treating another run as comparable. The harness archives only product commit `46481560b6bf8570a7a43fc1d7e2a5bfdae4e236`, checks its own committed source, creates a uniquely named internal-only Compose project with no exposed ports, and removes that project's containers, network and volumes on exit. The local model runs offline; no paid provider is used.
