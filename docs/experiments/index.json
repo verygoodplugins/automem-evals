@@ -1,5 +1,5 @@
 {
-  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/original-text-index-eval",
+  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/graph-value-probe",
   "artifacts": [
     {
       "created_at": "2026-04-17T23:09:40",
@@ -1848,7 +1848,7 @@
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-11T18:19:36+00:00",
+  "generated_at": "2026-11-13T00:24:21+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2912,24 +2912,25 @@
       "artifacts": [
         "data/results/graph-value-probe-20261111/README.md",
         "data/results/graph-value-probe-20261111/aggregate.json",
-        "data/results/graph-value-probe-20261111/paired-fix-aggregate.json"
+        "data/results/graph-value-probe-20261111/paired-fix-aggregate.json",
+        "data/results/graph-value-probe-20261111/final-replay-aggregate.json"
       ],
       "branch": "test/graph-value-probe",
-      "decision": "Retest final product PR heads on isolated stacks, including mandatory no-judge mini/full benchmarks and combined scope/limit controls; do not infer agent success or general graph value.",
+      "decision": "Complete isolated no-judge mini/full benchmarks and record comparisons; independently review scope and limit PRs. Do not infer agent success or general graph value from the combined synthetic replay.",
       "hypothesis": "Graph expansion can improve linked-fact retrieval within a fixed context budget without returning foreign, stale, or excessive evidence.",
       "id": "EXP-GRAPH-VALUE-20261111",
-      "notes": "Product fixes: https://github.com/verygoodplugins/automem/pull/287 and https://github.com/verygoodplugins/automem/pull/288. Paired live results apply to intermediate combined product 4d1110b, not the final PR heads; Docker stopped before their live replay. No paid provider calls.",
+      "notes": "Product fixes: https://github.com/verygoodplugins/automem/pull/287 and https://github.com/verygoodplugins/automem/pull/288. Live paired replay used combined integration 3f9a424 with the exact final PR heads, not either head in isolation. No paid provider calls.",
       "pr": 99,
       "related": [
         "EXP-ORIGINAL-TEXT-20261111",
         "EXP-NEG-CONTROL",
         "EXP-CURRENT-STATE"
       ],
-      "result": "Synthetic 6-query, 48-variant baseline: expansion yielded no additional capped evidence and exposed inline foreign content and result-limit overflow. Paired intermediate fixes removed both observed issues; negative queries still returned unrelated results.",
+      "result": "Six synthetic queries across 48 variants: final combined scope and limit heads removed observed tag-respecting inline foreign content (4/24 to 0/24) and limit overflow (4/48 to 0/48); evidence unchanged and all 8 negative variants returned results.",
       "started": "2026-11-11",
       "status": "in-progress",
       "title": "Controlled graph expansion and scope diagnostic",
-      "updated": "2026-11-11",
+      "updated": "2026-11-13",
       "worktree": "../automem-evals.worktrees/graph-value-probe",
       "worktree_status": {
         "state": "not-scanned"

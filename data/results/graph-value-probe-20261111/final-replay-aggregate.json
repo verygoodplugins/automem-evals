@@ -1,0 +1,85 @@
+{
+  "baseline": {
+    "current_stale_inline_or_top": 0,
+    "negative_requests_with_results": 8,
+    "positive_budgeted_context_all": 40,
+    "positive_requests": 40,
+    "positive_top10_all": 32,
+    "positive_top5_all": 32,
+    "requests": 48,
+    "respect_tags_off_requests_with_foreign_inline": 4,
+    "respect_tags_requests_with_foreign_inline": 4,
+    "result_limit_overflow_requests": 4
+  },
+  "baseline_sha": "46481560b6bf8570a7a43fc1d7e2a5bfdae4e236",
+  "caveat": "Synthetic request variants are repeated controls, not independent queries or agent answer scores.",
+  "combined": {
+    "current_stale_inline_or_top": 0,
+    "negative_requests_with_results": 8,
+    "positive_budgeted_context_all": 40,
+    "positive_requests": 40,
+    "positive_top10_all": 32,
+    "positive_top5_all": 32,
+    "requests": 48,
+    "respect_tags_off_requests_with_foreign_inline": 4,
+    "respect_tags_requests_with_foreign_inline": 0,
+    "result_limit_overflow_requests": 0
+  },
+  "combined_sha": "3f9a4241c8932068b31dd658c885262b247a73f1",
+  "executed_runner_sha256": "798069625fa0a61211bb3c8bb74cb2bf701e96f959b7fd4bf0339c1b7f4a8036",
+  "fixture_sha256": "dc555245951949543c1caf91889996df9d74ae11515844c77494acc67a3d0bbc",
+  "paired_changed_requests": {
+    "context_all": 0,
+    "foreign_inline": 4,
+    "foreign_top": 0,
+    "off_label": 0,
+    "raw_result_count": 4,
+    "result_count": 0,
+    "stale_inline": 0,
+    "stale_top": 0,
+    "top10_all": 0,
+    "top5_all": 0
+  },
+  "receipt_audit": {
+    "baseline": {
+      "access_snapshot_unchanged": true,
+      "access_updates_disabled": true,
+      "api_log_errors": 0,
+      "failure": null,
+      "memory_count": 23,
+      "raw_sha256": "4faf97b059cf5e87f1607998dcbd83142b496e59988221460aa2513ab56e9c39",
+      "relation_count": 6,
+      "word_budget": 200
+    },
+    "combined": {
+      "access_snapshot_unchanged": true,
+      "access_updates_disabled": true,
+      "api_log_errors": 0,
+      "failure": null,
+      "memory_count": 23,
+      "raw_sha256": "616cac6266e490c2532d1e023496a3882d8862b85a088835bc734a1703ecfab2",
+      "relation_count": 6,
+      "word_budget": 200
+    }
+  },
+  "shared": {
+    "executed_runner_sha256": "798069625fa0a61211bb3c8bb74cb2bf701e96f959b7fd4bf0339c1b7f4a8036",
+    "image_ids": {
+      "automem-flask-api:latest": "sha256:668fccdfd77afba9be262df8b1ef944da072b72834da098bdd5fc87c7feb722d",
+      "falkordb/falkordb:latest": "sha256:30c530c193ac48cb6ea8c6cae745f793d2c098a0a138f7b3e46c1d90848845ba",
+      "qdrant/qdrant:v1.11.3": "sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c"
+    },
+    "model": "BAAI/bge-base-en-v1.5",
+    "model_revision": "199291fdd1aa89faf9c20b722dc72ad5e17aa0d0",
+    "model_sha256": "4e556722bc4f65716c544c8a931f1e90fb3f866e5741fd93a96f051d673339c7",
+    "network": "internal",
+    "provider_calls": 0,
+    "runner_files": {
+      "compose.yaml": "b4bb69dd48a4e5e3209d649b51b6f45763cd269d3d38ae81dcc25fb0a0d638da",
+      "run.py": "798069625fa0a61211bb3c8bb74cb2bf701e96f959b7fd4bf0339c1b7f4a8036",
+      "scenario.py": "2916883de97fab85e7d0e469e151e6b5b629beaefa570053a72ddcb60e4ac807",
+      "server.py": "eb3e53e8e5f33d78cae92df95f7528efbd03d39150296e94a8fea28b8c92b334"
+    },
+    "runner_sha": "37ca06f70ae3e92b818b70d5fc1ae672db944fb0"
+  }
+}
