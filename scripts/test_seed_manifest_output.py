@@ -3,6 +3,9 @@ import sys
 import unittest
 from pathlib import Path
 
+# seed_from_snapshot / seed_corpus import seed_rebase from this directory.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 
 def load_script(name: str):
     path = Path(__file__).resolve().parent / f"{name}.py"
@@ -35,6 +38,52 @@ class SeedFromSnapshotManifestOutputTests(unittest.TestCase):
         self.assertEqual(
             self.mod.resolve_manifest_output("tmp/out.manifest.json"),
             Path("tmp/out.manifest.json"),
+        )
+
+    def test_default_snapshot_is_v1(self):
+        self.assertEqual(self.mod.resolve_snapshot(None), self.mod.SNAPSHOT)
+        self.assertEqual(
+            self.mod.default_manifest_for(self.mod.SNAPSHOT), self.mod.MANIFEST
+        )
+
+    def test_bare_snapshot_filename_reads_from_seed_memories(self):
+        self.assertEqual(
+            self.mod.resolve_snapshot("corpus_v2.embedded.jsonl"),
+            self.mod.HERE / "data" / "seed_memories" / "corpus_v2.embedded.jsonl",
+        )
+
+    def test_explicit_snapshot_path_is_preserved(self):
+        self.assertEqual(
+            self.mod.resolve_snapshot("/tmp/rebased/corpus_v2.embedded.jsonl"),
+            Path("/tmp/rebased/corpus_v2.embedded.jsonl"),
+        )
+
+    def test_v2_snapshot_defaults_to_v2_manifest_not_v1(self):
+        snapshot = self.mod.resolve_snapshot("corpus_v2.embedded.jsonl")
+        self.assertEqual(
+            self.mod.resolve_manifest_output(None, self.mod.default_manifest_for(snapshot)),
+            self.mod.HERE / "data" / "seed_memories" / "corpus_v2.manifest.json",
+        )
+
+
+class SeedAssociationsManifestTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load_script("seed_associations")
+
+    def test_default_manifest(self):
+        self.assertEqual(self.mod.resolve_manifest(None), self.mod.MANIFEST)
+
+    def test_bare_manifest_filename_reads_from_seed_memories(self):
+        self.assertEqual(
+            self.mod.resolve_manifest("corpus_v1-8011.manifest.json"),
+            self.mod.HERE / "data" / "seed_memories" / "corpus_v1-8011.manifest.json",
+        )
+
+    def test_absolute_path_is_preserved(self):
+        self.assertEqual(
+            self.mod.resolve_manifest("/tmp/x.manifest.json"),
+            Path("/tmp/x.manifest.json"),
         )
 
 
