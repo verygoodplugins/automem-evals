@@ -228,6 +228,11 @@ class ClientTests(unittest.TestCase):
         client.recall("q", None, 5)
         self.assertNotIn("tags", seen[1])
 
+    def test_recall_keeps_the_outer_id_when_the_nested_memory_has_none(self):
+        reply = {"results": [{"id": "outer", "memory": {"content": "c", "metadata": {"origin": "user"}}}]}
+        hits, _ = mp.AutoMemClient(lambda *a: reply).recall("q", None, 5)
+        self.assertEqual((hits[0]["id"], hits[0]["metadata"]), ("outer", {"origin": "user"}))
+
     def test_manifest_is_saved_after_every_write(self):
         fake = FakeAutoMem(background=0)
         fake.die_on_write = 3

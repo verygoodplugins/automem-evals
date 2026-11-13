@@ -264,6 +264,7 @@ class AutoMemClient:
         for item in results[:k]:
             memory = item["memory"] if isinstance(item.get("memory"), dict) else item
             flat.append({**{key: memory.get(key) for key in ("id", "content", "tags", "metadata", "summary")},
+                         "id": memory.get("id") or item.get("id"),  # the id may sit on the outer result only
                          "score": item.get("score", item.get("final_score"))})
         return flat, [e for e in env.get("entities") or [] if isinstance(e, dict)]
 
