@@ -48,6 +48,7 @@ EXPECTED = {"questions": 78, "strata": {"both_labeled": 53, "late_only": 2, "his
                                         "clock_conflict": 3, "abstention": 6}}
 VARIANTS = ("plain", "supersede_oracle")
 CLASSES = ("current", "stale", "other")
+STALE_UNLABELED = "stale_values_unlabeled"  # answer-level verdict detail: no stale annotation, so no class
 RECALL_LIMIT = 10
 RELATION = "INVALIDATED_BY"  # old -> new; EVOLVED_INTO is the evolution alternative
 MATURED_REASON = "maturation-v1 is not wired (narrative-clock /consolidate dependency); docs/eval/maturation.md"
@@ -211,10 +212,18 @@ def _fold(current: bool, stale: bool) -> tuple[str, str | None]:
     return ("other", "both" if current else "neither")
 
 
-def classify_text(answer: str, gold: str, stale_values: Iterable[str]) -> dict[str, Any]:
-    """Answer level. Stale values are not shipped by LongMemEval: they need a sidecar annotation."""
+def classify_text(answer: str, gold: str, stale_values: Iterable[str] | None) -> dict[str, Any]:
+    """Answer level. LongMemEval ships no stale values: they need a sidecar annotation.
+
+    ``None`` means that annotation is unavailable. The verdict then has no class (a three-way class cannot
+    be decided: an answer holding both values would read as ``current``, and ``stale`` could never occur) and
+    ``aggregate`` refuses to turn it into rates. An empty collection is a different claim: "annotated, none".
+    """
     a = normalize(answer)
-    cls, detail = _fold(_mentions(a, gold), any(_mentions(a, s) for s in stale_values))
+    gold_hit = _mentions(a, gold)
+    if stale_values is None:
+        return {"class": None, "detail": STALE_UNLABELED, "gold_mentioned": gold_hit}
+    cls, detail = _fold(gold_hit, any(_mentions(a, s) for s in stale_values))
     return {"class": cls, "detail": detail}
 
 
@@ -227,11 +236,18 @@ def classify_recall(ranked_keys: list[str], stale: set[str], current: set[str]) 
 
 
 def aggregate(tasks: list[Task], verdicts: dict[str, dict[str, Any]] | None) -> dict[str, Any]:
-    """Rates over scorable questions. Any missing verdict makes every rate null (``not_scored``)."""
+    """Rates over scorable questions. A missing or stale-unlabeled verdict makes every rate null (``not_scored``)."""
     scorable = [t for t in tasks if t.scorable]
-    missing = [t.question_id for t in scorable if t.question_id not in (verdicts or {})]
-    reason = "no scorable questions" if not scorable else (
-        f"{len(missing)} of {len(scorable)} scorable questions have no verdict" if missing else None)
+    have = verdicts or {}
+    missing = [t.question_id for t in scorable if t.question_id not in have]
+    unlabeled = [t.question_id for t in scorable if have.get(t.question_id, {}).get("detail") == STALE_UNLABELED]
+    reason = None
+    if not scorable:
+        reason = "no scorable questions"
+    elif missing:
+        reason = f"{len(missing)} of {len(scorable)} scorable questions have no verdict"
+    elif unlabeled:
+        reason = f"{STALE_UNLABELED}: {len(unlabeled)} of {len(scorable)} verdicts cannot tell stale from current"
     if reason:
         return {"status": "not_scored", "reason": reason, "n": len(scorable), "rates": None,
                 "other_breakdown": None, "by_stratum": None}

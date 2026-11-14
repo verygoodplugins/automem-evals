@@ -203,8 +203,16 @@ class ScoringTests(WithDataset):
         self.assertEqual((none["class"], none["detail"]), ("other", "neither"))
         self.assertEqual(sg.classify_text("about 250 miles", "25", [])["class"], "other")  # word boundary
 
-    def test_classify_text_without_stale_values_cannot_report_stale(self):
-        self.assertEqual(sg.classify_text("You live in Boston.", "Denver", [])["class"], "other")
+    def test_classify_text_without_stale_annotation_has_no_class(self):
+        # An empty list used to stand in for "no sidecar": every answer then read stale-free, so a 0.0 stale rate
+        # looked measured and an answer holding both values counted as current.
+        for answer in ("You live in Denver.", "Boston, then Denver", "You live in Boston."):
+            out = sg.classify_text(answer, "Denver", None)
+            self.assertEqual((out["class"], out["detail"]), (None, "stale_values_unlabeled"), answer)
+        self.assertTrue(sg.classify_text("Boston, then Denver", "Denver", None)["gold_mentioned"])
+        self.assertFalse(sg.classify_text("You live in Boston.", "Denver", None)["gold_mentioned"])
+        # An explicit empty annotation is a different claim: "this question has no stale value".
+        self.assertEqual(sg.classify_text("You live in Boston.", "Denver", ())["class"], "other")
 
     def test_classify_recall_reports_ranks(self):
         stale, current = {"a"}, {"b"}
@@ -224,6 +232,20 @@ class ScoringTests(WithDataset):
         self.assertIsNone(out["rates"])
         self.assertIn("1 of 3", out["reason"])
         self.assertEqual(sg.aggregate(self.tasks, None)["status"], "not_scored")
+
+    def test_aggregate_is_not_scored_when_stale_annotations_are_unavailable(self):
+        unlabeled = {t.question_id: sg.classify_text("You live in Denver.", "Denver", None)
+                     for t in self.tasks if t.scorable}
+        out = sg.aggregate(self.tasks, unlabeled)
+        self.assertEqual((out["status"], out["rates"]), ("not_scored", None))
+        self.assertIn("stale_values_unlabeled", out["reason"])
+        self.assertIn("3 of 3", out["reason"])
+        mixed = dict(unlabeled, aaa111={"class": "current", "detail": None})  # one labeled verdict rescues nothing
+        self.assertEqual(sg.aggregate(self.tasks, mixed)["status"], "not_scored")
+        labeled = self.verdicts({"aaa111": "current", "bbb222": "stale", "ccc333": "other"})
+        self.assertEqual(sg.aggregate(self.tasks, labeled)["status"], "scored")
+        report = sg.build_report(self.tasks, "r", verdicts={"plain": unlabeled, "supersede_oracle": unlabeled})
+        self.assertEqual(report["status"], "not_scored")
 
     def test_aggregate_without_scorable_questions_is_not_scored(self):
         out = sg.aggregate([self.task("ddd444_abs")], {})
