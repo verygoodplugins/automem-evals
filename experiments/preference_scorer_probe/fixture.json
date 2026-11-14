@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "provenance": "Manually authored fictional cases; not copied from benchmark data or real user traces.",
+  "cases": [
+    {"id":"dev-01","split":"development","kind":"conjunction-pass","question":"Suggest a drink for the fictional traveler.","criteria":["Suggest tea.","Serve it cold."],"optional":"A citrus garnish is optional.","answer":"Try chilled tea.","expected":"pass"},
+    {"id":"dev-02","split":"development","kind":"missing-clause","question":"Suggest a drink for the fictional traveler.","criteria":["Suggest tea.","Serve it cold."],"optional":"A citrus garnish is optional.","answer":"Try tea served hot.","expected":"fail"},
+    {"id":"dev-03","split":"development","kind":"paraphrase","question":"Recommend a fictional meeting format.","criteria":["Hold the meeting online.","Keep it under thirty minutes."],"optional":"A written agenda is optional.","answer":"Meet by video for twenty minutes.","expected":"pass"},
+    {"id":"dev-04","split":"development","kind":"optional-omission","question":"Propose a fictional desk setup.","criteria":["Use a standing desk."],"optional":"A plant may be included but is not required.","answer":"Use a standing desk.","expected":"pass"},
+    {"id":"dev-05","split":"development","kind":"contradiction","question":"Recommend a fictional reading format.","criteria":["Use printed books.","Avoid audiobooks."],"optional":"A library card is optional.","answer":"Choose an audiobook and skip printed books.","expected":"fail"},
+    {"id":"dev-06","split":"development","kind":"abstention","question":"Suggest fictional garden equipment.","criteria":["Recommend hand tools."],"optional":"A brand name is optional.","answer":"I cannot recommend any equipment without more information.","expected":"fail"},
+    {"id":"dev-07","split":"development","kind":"irrelevant-distraction","question":"Suggest fictional work shoes.","criteria":["Recommend waterproof shoes.","Recommend shoes without laces."],"optional":"Color is optional.","answer":"Choose lightweight black shoes without laces.","expected":"fail"},
+    {"id":"dev-08","split":"development","kind":"optional-inclusion","question":"Suggest a fictional work snack.","criteria":["Recommend an apple."],"optional":"Adding nuts is optional.","answer":"Pack an apple with nuts.","expected":"pass"},
+    {"id":"hold-01","split":"heldout","kind":"conjunction-pass","question":"Suggest a fictional workshop break.","criteria":["Recommend a walk.","Keep the break outdoors."],"optional":"A park is optional.","answer":"Take a short walk outside.","expected":"pass"},
+    {"id":"hold-02","split":"heldout","kind":"missing-clause","question":"Suggest a fictional workshop break.","criteria":["Recommend a walk.","Keep the break outdoors."],"optional":"A park is optional.","answer":"Take a walk inside the building.","expected":"fail"},
+    {"id":"hold-03","split":"heldout","kind":"paraphrase","question":"Recommend a fictional trip schedule.","criteria":["Travel by train.","Leave before noon."],"optional":"A seat reservation is optional.","answer":"Catch the railway service at nine in the morning.","expected":"pass"},
+    {"id":"hold-04","split":"heldout","kind":"optional-omission","question":"Suggest a fictional painting medium.","criteria":["Use watercolors."],"optional":"A blue palette is optional.","answer":"Paint with watercolors.","expected":"pass"},
+    {"id":"hold-05","split":"heldout","kind":"contradiction","question":"Recommend a fictional cooking method.","criteria":["Bake the vegetables.","Do not deep-fry them."],"optional":"Seasoning is optional.","answer":"Deep-fry the vegetables instead of baking them.","expected":"fail"},
+    {"id":"hold-06","split":"heldout","kind":"abstention","question":"Suggest a fictional storage option.","criteria":["Recommend a labeled box."],"optional":"Material is optional.","answer":"I do not have enough information to suggest storage.","expected":"fail"},
+    {"id":"hold-07","split":"heldout","kind":"irrelevant-distraction","question":"Suggest fictional seating.","criteria":["Recommend a chair with armrests.","Recommend an adjustable seat height."],"optional":"A cushion is optional.","answer":"Choose a padded chair with armrests.","expected":"fail"},
+    {"id":"hold-08","split":"heldout","kind":"optional-inclusion","question":"Propose a fictional pet toy.","criteria":["Recommend a soft ball."],"optional":"A bell is optional.","answer":"Try a soft ball that has a bell.","expected":"pass"}
+  ]
+}
