@@ -31,8 +31,17 @@ DATASET_REVISION = "98d7416c24c778c2fee6e6f3006e7a073259d48f"
 DATASET_FILE = "longmemeval_oracle.json"
 DATASET_SHA256 = "821a2034d219ab45846873dd14c14f12cfe7776e73527a483f9dac095d38620c"
 QUESTION_TYPE = "knowledge-update"
-# Measured on the pinned file: strata are decided by the (earlier, later) has_answer turn counts.
-EXPECTED = {"questions": 78, "strata": {"both_labeled": 70, "late_only": 2, "abstention": 6}}
+# Gold is not always the latest value, so session order alone cannot say which evidence is stale. Hand-audited on
+# the pinned file (2026-11-14): all 72 non-abstention questions read, plus the gold text searched in the flagged
+# turns as a cross-check. HISTORICAL: gold is the earlier value ("initially", "previous", "before X"). MIXED: gold
+# needs both values ("now vs previously", "did I switch"). Linking earlier to later for either would invalidate
+# the evidence that answers the question, so they get no links and stay out of the three rates.
+HISTORICAL = frozenset({"07741c44", "50635ada", "e66b632c", "0ddfec37", "dfde3500", "9bbe84a2", "0977f2af",
+                        "89941a94", "10e09553"})
+MIXED = frozenset({"031748ae", "f685340e", "6071bd76", "c4ea545c", "c6853660"})
+UNSCORED_STRATA = frozenset({"abstention", "historical", "mixed"})
+# Measured on the pinned file: strata come from the annotations above, else the (earlier, later) has_answer counts.
+EXPECTED = {"questions": 78, "strata": {"both_labeled": 56, "late_only": 2, "historical": 9, "mixed": 5, "abstention": 6}}
 VARIANTS = ("plain", "supersede_oracle")
 CLASSES = ("current", "stale", "other")
 RECALL_LIMIT = 10
@@ -79,12 +88,16 @@ class Task:
     def stratum(self) -> str:
         if self.question_id.endswith("_abs"):
             return "abstention"
+        if self.question_id in HISTORICAL:
+            return "historical"
+        if self.question_id in MIXED:
+            return "mixed"
         early, late = (sum(t.evidence for t in s.turns) for s in (self.sessions[0], self.sessions[-1]))
         return "both_labeled" if early and late else "late_only" if late else "unlabeled"
 
     @property
     def scorable(self) -> bool:
-        return self.stratum != "abstention"
+        return self.stratum not in UNSCORED_STRATA
 
 
 def parse_time(text: str) -> datetime:  # the weekday name is dropped: %a is locale dependent
@@ -147,7 +160,7 @@ def build_plan(task: Task, run_id: str, variant: str) -> dict[str, Any]:
     Writes carry content, tags, a narrative ``timestamp`` (-> ``t_valid``, +1s per turn for a total
     order) and neutral metadata. The ``has_answer`` label never enters a payload. ``supersede_oracle``
     links earlier to later evidence *using those labels*: an upper bound for the read path, not
-    a measure of AutoMem detecting revisions.
+    a measure of AutoMem detecting revisions. Abstention, historical and mixed questions get no links.
     """
     if variant not in VARIANTS:
         raise ValueError(f"variant must be one of {VARIANTS}: {variant!r}")

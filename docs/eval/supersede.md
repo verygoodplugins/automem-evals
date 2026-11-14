@@ -16,7 +16,14 @@ Upstream's env downloads `.../resolve/main/longmemeval_oracle.json` **unpinned**
 
 ## What the data is (verified at the pin)
 
-The oracle file has 500 questions; **78 are `knowledge-update`**. Each has exactly **two dated, chronological sessions** (earlier and later evidence session, no distractors; 20 to 24 turns, 1,830 in total). `has_answer` flags user turns only. Flagged turns per question (earlier, later): **68 are (1, 1), 2 are (2, 1), 2 are (0, 1), 6 are (0, 0)**; the six `(0, 0)` are the `_abs` abstention items. Two golds are integers. **LongMemEval ships no superseded value**, so upstream's `stale_penalty` is inert here (its README: "gold-only"). Strata used below: `both_labeled` 70, `late_only` 2, `abstention` 6 (excluded from the three rates).
+The oracle file has 500 questions; **78 are `knowledge-update`**. Each has exactly **two dated, chronological sessions** (earlier and later evidence session, no distractors; 20 to 24 turns, 1,830 in total). `has_answer` flags user turns only. Flagged turns per question (earlier, later): **68 are (1, 1), 2 are (2, 1), 2 are (0, 1), 6 are (0, 0)**; the six `(0, 0)` are the `_abs` abstention items. Two golds are integers. **LongMemEval ships no superseded value**, so upstream's `stale_penalty` is inert here (its README: "gold-only"). 
+
+**Session order is not a currency label.** The gold is not always the latest value. Nine questions ask for the earlier one (`initially`, `previous`, `before X`) and five need both (`now vs previously`, `did I switch`). Treating the later session as `current` for them would mark the gold-bearing earlier turn `stale` and, in the oracle arm, invalidate it. A pre-PR review caught this (e.g. `07741c44` "Where do I *initially* keep my old sneakers?" gold "under my bed"; `9bbe84a2` "previous goal", gold "level 100"; `031748ae` needs both). Audit: all 72 non-abstention questions read, plus the gold text searched in the flagged turns (every earlier-only match is in the historical set). Annotated in `adapter.py`; each can be checked against the pin:
+
+- `historical` (9): `07741c44`, `50635ada`, `e66b632c`, `0ddfec37`, `dfde3500`, `9bbe84a2`, `0977f2af`, `89941a94`, `10e09553`
+- `mixed` (5): `031748ae`, `f685340e`, `6071bd76`, `c4ea545c`, `c6853660`
+
+Strata used below: `both_labeled` 56, `late_only` 2, `historical` 9, `mixed` 5, `abstention` 6. Only the first two (58 questions) feed the three rates and the oracle links; the other three are reported with their n and excluded. This is a human-judgment audit by one reviewer, not an upstream label: a stale-value annotation pass (see Gates) should re-check it.
 
 ## Paper-reported results (not AutoMem scores)
 
@@ -33,14 +40,14 @@ Bounded 300-character self-rewritten notes vs full context, n = 78, oracle, LLM 
 | Variant | Write path | Note |
 | --- | --- | --- |
 | `plain` | All turns, no lifecycle fields | Cold substrate |
-| `supersede_oracle` | Later evidence supersedes earlier evidence, **chosen from `has_answer` labels** | Oracle upper bound for the read path (does `current_only` suppress the stale record?); 72 links over 70 questions (the (1,1) and (2,1) groups). Not a measure of AutoMem detecting revisions |
+| `supersede_oracle` | Later evidence supersedes earlier evidence, **chosen from `has_answer` labels** | Oracle upper bound for the read path (does `current_only` suppress the stale record?); 58 links over 56 questions (the `both_labeled` stratum; `historical`, `mixed` and abstention get none). Not a measure of AutoMem detecting revisions |
 | `supersede_detected` | Agent or consolidation decides, no labels | Not scaffolded; owner decision; always a separate column |
 
 Read params (`current_only=true`, limit 10, exact tag, `end`) are identical across variants, so the write path is the only experimental variable. A live smoke should also run `current_only=false` as a diagnostic.
 
 ## Scoring: current / stale / other
 
-Exclusive classes per scorable question: `current` (current value, no stale), `stale` (stale value, not current), `other` (neither, or both; sub-counts `neither` and `both` always reported). Two levels: **retrieval** (`classify_recall`: ranks of the later/earlier evidence turns in the recalled top-k, no model) and **answer** (`classify_text`: reader output vs gold and stale values, word-boundary match). Answer-level `stale` needs stale values LongMemEval does not ship: a hand-annotated sidecar for the 72 non-abstention questions, or `stale = null`. `aggregate` returns every rate as null (`not_scored`) unless every scorable question has a verdict. Report per-stratum n with every rate.
+Exclusive classes per scorable question: `current` (current value, no stale), `stale` (stale value, not current), `other` (neither, or both; sub-counts `neither` and `both` always reported). Two levels: **retrieval** (`classify_recall`: ranks of the later/earlier evidence turns in the recalled top-k, no model) and **answer** (`classify_text`: reader output vs gold and stale values, word-boundary match). Answer-level `stale` needs stale values LongMemEval does not ship: a hand-annotated sidecar for the 58 scored questions, or `stale = null`. `aggregate` returns every rate as null (`not_scored`) unless every scorable question has a verdict. Report per-stratum n with every rate.
 
 ## Cold and matured
 

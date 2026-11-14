@@ -34,9 +34,12 @@ SYNTHETIC = [
     item("bbb222", (0, 0)),
     item("ccc333", (None, 1), answer=120),
     item("ddd444_abs", (None, None)),
+    item("07741c44", (0, 2), answer="under my bed"),  # real id annotated HISTORICAL: gold is the earlier value
+    item("031748ae", (0, 0), answer="4 then 5"),  # real id annotated MIXED: gold needs both values
     item("eee555", (0, 0), qtype="temporal-reasoning"),
 ]
-SYNTH_EXPECTED = {"questions": 4, "strata": {"both_labeled": 2, "late_only": 1, "abstention": 1}}
+SYNTH_EXPECTED = {"questions": 6, "strata": {"both_labeled": 2, "late_only": 1, "historical": 1, "mixed": 1,
+                                             "abstention": 1}}
 
 
 class WithDataset(unittest.TestCase):
@@ -64,9 +67,20 @@ class LoaderTests(WithDataset):
         self.assertEqual(sg.UPSTREAM_LICENSE, "Apache-2.0")
 
     def test_filters_question_type_and_classifies_strata(self):
-        self.assertEqual([t.question_id for t in self.tasks], ["aaa111", "bbb222", "ccc333", "ddd444_abs"])
-        self.assertEqual([t.stratum for t in self.tasks], ["both_labeled", "both_labeled", "late_only", "abstention"])
-        self.assertEqual([t.scorable for t in self.tasks], [True, True, True, False])
+        self.assertEqual([t.question_id for t in self.tasks],
+                         ["aaa111", "bbb222", "ccc333", "ddd444_abs", "07741c44", "031748ae"])
+        self.assertEqual([t.stratum for t in self.tasks],
+                         ["both_labeled", "both_labeled", "late_only", "abstention", "historical", "mixed"])
+        self.assertEqual([t.scorable for t in self.tasks], [True, True, True, False, False, False])
+
+    def test_direction_annotations_are_disjoint_and_leave_abstention_twins_alone(self):
+        self.assertEqual((len(sg.HISTORICAL), len(sg.MIXED)), (9, 5))
+        self.assertFalse(sg.HISTORICAL & sg.MIXED)
+        self.assertFalse(any(q.endswith("_abs") for q in sg.HISTORICAL | sg.MIXED))
+        path = self.write([item("07741c44_abs", (None, None))], name="twin.json")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        (twin,) = sg.load_tasks(path, expected_sha256=digest, expected={"questions": 1, "strata": {"abstention": 1}})
+        self.assertEqual(twin.stratum, "abstention")
 
     def test_gold_is_cast_to_str(self):
         self.assertEqual(self.task("ccc333").gold, "120")
@@ -97,7 +111,8 @@ class LoaderTests(WithDataset):
     def test_pinned_file_matches_expected_shape(self):
         tasks = sg.load_tasks(Path(os.environ["SUPERSEDE_ORACLE_JSON"]))
         self.assertEqual(len(tasks), 78)
-        self.assertEqual(sum(len(sg.build_plan(t, "x", "supersede_oracle")["links"]) for t in tasks), 72)
+        self.assertEqual(sum(t.scorable for t in tasks), 58)
+        self.assertEqual(sum(len(sg.build_plan(t, "x", "supersede_oracle")["links"]) for t in tasks), 58)
 
 
 class PlanTests(WithDataset):
@@ -141,6 +156,14 @@ class PlanTests(WithDataset):
         self.assertEqual(sg.build_plan(self.task("ddd444_abs"), "r", "supersede_oracle")["links"], [])
         self.assertEqual(sg.evidence_keys(self.task("ccc333")), (set(), {"ccc333:s1:t1"}))
         self.assertEqual(sg.evidence_keys(self.task("ddd444_abs")), (set(), set()))
+
+    def test_historical_and_mixed_questions_never_get_links(self):
+        # Their gold is the earlier value (or needs both): invalidating the earlier turn would erase the answer.
+        for qid in ("07741c44", "031748ae"):
+            task = self.task(qid)
+            self.assertEqual(sg.evidence_keys(task), (set(), set()))
+            for variant in sg.VARIANTS:
+                self.assertEqual(sg.build_plan(task, "r", variant)["links"], [], (qid, variant))
 
     def test_read_params_are_identical_across_variants(self):
         for t in self.tasks:
@@ -200,7 +223,8 @@ class ScoringTests(WithDataset):
         self.assertAlmostEqual(sum(out["rates"].values()), 1.0)
         self.assertEqual(out["other_breakdown"], {"neither": 1})
         self.assertEqual(out["by_stratum"]["late_only"]["n"], 1)
-        self.assertNotIn("abstention", out["by_stratum"])
+        for unscored in ("abstention", "historical", "mixed"):
+            self.assertNotIn(unscored, out["by_stratum"])
 
 
 class ReportTests(WithDataset):
