@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from supersede_gap import adapter as sg
 
 
-def item(qid, flags, qtype="knowledge-update", answer="Denver"):
+def item(qid, flags, qtype="knowledge-update", answer="Denver", asked="2023/06/01 (Thu) 00:58"):
     """Two dated sessions; ``flags`` = (earlier, later) index of the has_answer user turn or None."""
     sessions = []
     for n, flag in enumerate(flags):
@@ -24,7 +24,7 @@ def item(qid, flags, qtype="knowledge-update", answer="Denver"):
         ])
     return {
         "question_id": qid, "question_type": qtype, "question": f"Where do I live? ({qid})", "answer": answer,
-        "question_date": "2023/06/01 (Thu) 00:58", "haystack_session_ids": [f"{qid}_1", f"{qid}_2"],
+        "question_date": asked, "haystack_session_ids": [f"{qid}_1", f"{qid}_2"],
         "haystack_dates": ["2023/05/25 (Thu) 20:21", "2023/05/27 (Sat) 10:20"], "haystack_sessions": sessions,
     }
 
@@ -36,10 +36,12 @@ SYNTHETIC = [
     item("ddd444_abs", (None, None)),
     item("07741c44", (0, 2), answer="under my bed"),  # real id annotated HISTORICAL: gold is the earlier value
     item("031748ae", (0, 0), answer="4 then 5"),  # real id annotated MIXED: gold needs both values
+    # Later session starts 10:20 on 05-27, after this question's date: the `end` cutoff would hide its evidence.
+    item("hhh888", (0, 2), asked="2023/05/27 (Sat) 09:00"),
     item("eee555", (0, 0), qtype="temporal-reasoning"),
 ]
-SYNTH_EXPECTED = {"questions": 6, "strata": {"both_labeled": 2, "late_only": 1, "historical": 1, "mixed": 1,
-                                             "abstention": 1}}
+SYNTH_EXPECTED = {"questions": 7, "strata": {"both_labeled": 2, "late_only": 1, "historical": 1, "mixed": 1,
+                                             "clock_conflict": 1, "abstention": 1}}
 
 
 class WithDataset(unittest.TestCase):
@@ -68,10 +70,21 @@ class LoaderTests(WithDataset):
 
     def test_filters_question_type_and_classifies_strata(self):
         self.assertEqual([t.question_id for t in self.tasks],
-                         ["aaa111", "bbb222", "ccc333", "ddd444_abs", "07741c44", "031748ae"])
+                         ["aaa111", "bbb222", "ccc333", "ddd444_abs", "07741c44", "031748ae", "hhh888"])
         self.assertEqual([t.stratum for t in self.tasks],
-                         ["both_labeled", "both_labeled", "late_only", "abstention", "historical", "mixed"])
-        self.assertEqual([t.scorable for t in self.tasks], [True, True, True, False, False, False])
+                         ["both_labeled", "both_labeled", "late_only", "abstention", "historical", "mixed",
+                          "clock_conflict"])
+        self.assertEqual([t.scorable for t in self.tasks], [True, True, True, False, False, False, False])
+
+    def test_evidence_at_or_after_question_date_is_a_clock_conflict(self):
+        # Equal counts too: whether `end` is inclusive is not verified, so only strictly earlier evidence is safe.
+        rows = [item("jjj111", (0, 0), asked="2023/05/27 (Sat) 10:20"),   # later evidence at exactly question_date
+                item("kkk222", (0, 0), asked="2023/05/27 (Sat) 10:21")]   # one minute after it
+        path = self.write(rows, name="clock.json")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        expected = {"questions": 2, "strata": {"clock_conflict": 1, "both_labeled": 1}}
+        tasks = {t.question_id: t for t in sg.load_tasks(path, expected_sha256=digest, expected=expected)}
+        self.assertEqual((tasks["jjj111"].stratum, tasks["kkk222"].stratum), ("clock_conflict", "both_labeled"))
 
     def test_direction_annotations_are_disjoint_and_leave_abstention_twins_alone(self):
         self.assertEqual((len(sg.HISTORICAL), len(sg.MIXED)), (9, 5))
@@ -111,8 +124,11 @@ class LoaderTests(WithDataset):
     def test_pinned_file_matches_expected_shape(self):
         tasks = sg.load_tasks(Path(os.environ["SUPERSEDE_ORACLE_JSON"]))
         self.assertEqual(len(tasks), 78)
-        self.assertEqual(sum(t.scorable for t in tasks), 58)
-        self.assertEqual(sum(len(sg.build_plan(t, "x", "supersede_oracle")["links"]) for t in tasks), 58)
+        self.assertEqual(sum(t.scorable for t in tasks), 55)
+        self.assertEqual(sum(len(sg.build_plan(t, "x", "supersede_oracle")["links"]) for t in tasks), 55)
+        by_id = {t.question_id: t for t in tasks}
+        self.assertEqual({q for q, t in by_id.items() if t.stratum == "clock_conflict"},
+                         {"2133c1b5", "7a87bd0c", "e61a7584"})
 
 
 class PlanTests(WithDataset):
@@ -157,9 +173,9 @@ class PlanTests(WithDataset):
         self.assertEqual(sg.evidence_keys(self.task("ccc333")), (set(), {"ccc333:s1:t1"}))
         self.assertEqual(sg.evidence_keys(self.task("ddd444_abs")), (set(), set()))
 
-    def test_historical_and_mixed_questions_never_get_links(self):
-        # Their gold is the earlier value (or needs both): invalidating the earlier turn would erase the answer.
-        for qid in ("07741c44", "031748ae"):
+    def test_historical_mixed_and_clock_conflict_questions_never_get_links(self):
+        # Gold is the earlier value (or needs both), or sits after question_date: linking would only mislead.
+        for qid in ("07741c44", "031748ae", "hhh888"):
             task = self.task(qid)
             self.assertEqual(sg.evidence_keys(task), (set(), set()))
             for variant in sg.VARIANTS:
@@ -169,7 +185,7 @@ class PlanTests(WithDataset):
         for t in self.tasks:
             probes = [sg.build_plan(t, "r", v)["probe"] for v in sg.VARIANTS]
             self.assertEqual(probes[0], probes[1])
-        probe = probes[0]
+        probe = sg.build_plan(self.task("aaa111"), "r", "plain")["probe"]
         self.assertEqual((probe["tag_match"], probe["current_only"], probe["end"]), ("exact", True, "2023-06-01T00:58:00Z"))
 
     def test_unknown_variant_is_rejected(self):
@@ -223,7 +239,7 @@ class ScoringTests(WithDataset):
         self.assertAlmostEqual(sum(out["rates"].values()), 1.0)
         self.assertEqual(out["other_breakdown"], {"neither": 1})
         self.assertEqual(out["by_stratum"]["late_only"]["n"], 1)
-        for unscored in ("abstention", "historical", "mixed"):
+        for unscored in ("abstention", "historical", "mixed", "clock_conflict"):
             self.assertNotIn(unscored, out["by_stratum"])
 
 

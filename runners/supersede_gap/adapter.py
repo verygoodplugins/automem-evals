@@ -39,9 +39,13 @@ QUESTION_TYPE = "knowledge-update"
 HISTORICAL = frozenset({"07741c44", "50635ada", "e66b632c", "0ddfec37", "dfde3500", "9bbe84a2", "0977f2af",
                         "89941a94", "10e09553"})
 MIXED = frozenset({"031748ae", "f685340e", "6071bd76", "c4ea545c", "c6853660"})
-UNSCORED_STRATA = frozenset({"abstention", "historical", "mixed"})
-# Measured on the pinned file: strata come from the annotations above, else the (earlier, later) has_answer counts.
-EXPECTED = {"questions": 78, "strata": {"both_labeled": 56, "late_only": 2, "historical": 9, "mixed": 5, "abstention": 6}}
+# ``clock_conflict`` is derived, not annotated: an evidence turn at or after ``question_date`` (3 pinned questions
+# start their later session hours after it, same day). The probe's ``end`` cutoff would exclude that evidence, so no
+# write path could answer them. ``end`` keeps its documented meaning; reconciling it is an owner decision.
+UNSCORED_STRATA = frozenset({"abstention", "historical", "mixed", "clock_conflict"})
+# Measured on the pinned file: strata come from the rules above, else the (earlier, later) has_answer counts.
+EXPECTED = {"questions": 78, "strata": {"both_labeled": 53, "late_only": 2, "historical": 9, "mixed": 5,
+                                        "clock_conflict": 3, "abstention": 6}}
 VARIANTS = ("plain", "supersede_oracle")
 CLASSES = ("current", "stale", "other")
 RECALL_LIMIT = 10
@@ -92,6 +96,8 @@ class Task:
             return "historical"
         if self.question_id in MIXED:
             return "mixed"
+        if any(turn_time(s, j) >= self.asked for s in self.sessions for j, t in enumerate(s.turns) if t.evidence):
+            return "clock_conflict"
         early, late = (sum(t.evidence for t in s.turns) for s in (self.sessions[0], self.sessions[-1]))
         return "both_labeled" if early and late else "late_only" if late else "unlabeled"
 
@@ -106,6 +112,10 @@ def parse_time(text: str) -> datetime:  # the weekday name is dropped: %a is loc
 
 def iso(moment: datetime) -> str:  # dataset clocks carry no zone; treated as UTC narrative time
     return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def turn_time(session: Session, index: int) -> datetime:  # +1 s per turn gives a total order
+    return session.started + timedelta(seconds=index)
 
 
 def load_tasks(path: Path, *, expected_sha256: str | None = None, expected: dict | None = None) -> list[Task]:
@@ -160,7 +170,7 @@ def build_plan(task: Task, run_id: str, variant: str) -> dict[str, Any]:
     Writes carry content, tags, a narrative ``timestamp`` (-> ``t_valid``, +1s per turn for a total
     order) and neutral metadata. The ``has_answer`` label never enters a payload. ``supersede_oracle``
     links earlier to later evidence *using those labels*: an upper bound for the read path, not
-    a measure of AutoMem detecting revisions. Abstention, historical and mixed questions get no links.
+    a measure of AutoMem detecting revisions. Abstention, historical, mixed and clock-conflict questions get no links.
     """
     if variant not in VARIANTS:
         raise ValueError(f"variant must be one of {VARIANTS}: {variant!r}")
@@ -169,7 +179,7 @@ def build_plan(task: Task, run_id: str, variant: str) -> dict[str, Any]:
     for i, session in enumerate(task.sessions):
         for j, turn in enumerate(session.turns):
             key = _key(task, i, j)
-            stamps[key] = iso(session.started + timedelta(seconds=j))
+            stamps[key] = iso(turn_time(session, j))
             writes.append({
                 "key": key, "content": f"{turn.role}: {turn.content}", "tags": [tag], "timestamp": stamps[key],
                 "metadata": {"question_id": task.question_id, "session_id": session.session_id,

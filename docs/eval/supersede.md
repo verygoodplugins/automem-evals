@@ -23,7 +23,9 @@ The oracle file has 500 questions; **78 are `knowledge-update`**. Each has exact
 - `historical` (9): `07741c44`, `50635ada`, `e66b632c`, `0ddfec37`, `dfde3500`, `9bbe84a2`, `0977f2af`, `89941a94`, `10e09553`
 - `mixed` (5): `031748ae`, `f685340e`, `6071bd76`, `c4ea545c`, `c6853660`
 
-Strata used below: `both_labeled` 56, `late_only` 2, `historical` 9, `mixed` 5, `abstention` 6. Only the first two (58 questions) feed the three rates and the oracle links; the other three are reported with their n and excluded. This is a human-judgment audit by one reviewer, not an upstream label: a stale-value annotation pass (see Gates) should re-check it.
+**Clock conflicts.** For three more questions (`2133c1b5`, `7a87bd0c`, `e61a7584`) the whole later session starts hours after `question_date` (same day), so the probe's `end = question_date` cutoff would hide their current evidence and no write path could answer them. They form a derived `clock_conflict` stratum (any evidence turn at or after `question_date`; no annotation). `end` keeps its documented meaning. Reconciling it, for example `end` = end of the haystack, is an owner decision for the live adapter.
+
+Strata used below (precedence: abstention, historical, mixed, clock_conflict, then by labels): `both_labeled` 53, `late_only` 2, `historical` 9, `mixed` 5, `clock_conflict` 3, `abstention` 6. Only the first two (55 questions) feed the three rates and the oracle links; the other four are reported with their n and excluded. The historical/mixed split is a human-judgment audit by one reviewer, not an upstream label: a stale-value annotation pass (see Gates) should re-check it.
 
 ## Paper-reported results (not AutoMem scores)
 
@@ -40,14 +42,14 @@ Bounded 300-character self-rewritten notes vs full context, n = 78, oracle, LLM 
 | Variant | Write path | Note |
 | --- | --- | --- |
 | `plain` | All turns, no lifecycle fields | Cold substrate |
-| `supersede_oracle` | Later evidence supersedes earlier evidence, **chosen from `has_answer` labels** | Oracle upper bound for the read path (does `current_only` suppress the stale record?); 58 links over 56 questions (the `both_labeled` stratum; `historical`, `mixed` and abstention get none). Not a measure of AutoMem detecting revisions |
+| `supersede_oracle` | Later evidence supersedes earlier evidence, **chosen from `has_answer` labels** | Oracle upper bound for the read path (does `current_only` suppress the stale record?); 55 links over 53 questions (the `both_labeled` stratum; every other stratum gets none). Not a measure of AutoMem detecting revisions |
 | `supersede_detected` | Agent or consolidation decides, no labels | Not scaffolded; owner decision; always a separate column |
 
 Read params (`current_only=true`, limit 10, exact tag, `end`) are identical across variants, so the write path is the only experimental variable. A live smoke should also run `current_only=false` as a diagnostic.
 
 ## Scoring: current / stale / other
 
-Exclusive classes per scorable question: `current` (current value, no stale), `stale` (stale value, not current), `other` (neither, or both; sub-counts `neither` and `both` always reported). Two levels: **retrieval** (`classify_recall`: ranks of the later/earlier evidence turns in the recalled top-k, no model) and **answer** (`classify_text`: reader output vs gold and stale values, word-boundary match). Answer-level `stale` needs stale values LongMemEval does not ship: a hand-annotated sidecar for the 58 scored questions, or `stale = null`. `aggregate` returns every rate as null (`not_scored`) unless every scorable question has a verdict. Report per-stratum n with every rate.
+Exclusive classes per scorable question: `current` (current value, no stale), `stale` (stale value, not current), `other` (neither, or both; sub-counts `neither` and `both` always reported). Two levels: **retrieval** (`classify_recall`: ranks of the later/earlier evidence turns in the recalled top-k, no model) and **answer** (`classify_text`: reader output vs gold and stale values, word-boundary match). Answer-level `stale` needs stale values LongMemEval does not ship: a hand-annotated sidecar for the 55 scored questions, or `stale = null`. `aggregate` returns every rate as null (`not_scored`) unless every scorable question has a verdict. Report per-stratum n with every rate.
 
 ## Cold and matured
 
