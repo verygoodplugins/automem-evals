@@ -213,13 +213,29 @@ def apply_owner_gate(results, querier, keep=K):
         if owner_from_tags((r.get("memory") or {}).get("tags")) != querier:
             continue
         gated = dict(r)
-        gated["relations"] = [
-            rel if owner_from_tags((rel.get("memory") or {}).get("tags")) == querier
-            else {"type": rel.get("type"), "memory": {"id": _rid(rel)}}
-            for rel in r.get("relations") or []
-        ]
+        gated["relations"] = [_gate_relation(rel, querier)
+                              for rel in r.get("relations") or []]
         out.append(gated)
     return out[:keep]
+
+
+def _gate_relation(rel, querier):
+    inline = rel.get("memory")
+    if not isinstance(inline, dict):
+        # Provenance-only edge on an expanded result (type, strength, from,
+        # seed_*): there is no target payload to scope, so keep the type only.
+        return {"type": rel.get("type")}
+    if owner_from_tags(inline.get("tags")) == querier:
+        return rel
+    return {"type": rel.get("type"), "memory": {"id": inline.get("id")}}
+
+
+def _inline_text(inline):
+    """AutoMem's inline relation node carries ``summary`` for an enriched
+    memory and falls back to a ``content`` snippet only when none exists
+    (``_summarize_relation_node`` at the pin), so either field is disclosed text."""
+    return any(isinstance(inline.get(f), str) and inline[f].strip()
+               for f in ("content", "summary"))
 
 
 def _rid(item):
@@ -265,11 +281,18 @@ def classify_response(query, response, owners, crafted, k=K):
                 row["crafted_in_topk"] += _rid(r) in crafted
                 cross_scores.append(score)
         for rel in r.get("relations") or []:
-            tid = _rid(rel)
+            inline = rel.get("memory")
+            if not isinstance(inline, dict):
+                # Provenance-only edge on an expanded result: no target payload,
+                # so not an inline leak, but its seed id must still be known.
+                if rel.get("from") is not None and rel["from"] not in owners:
+                    row["unknown_owner"] += 1
+                continue
+            tid = inline.get("id")
             if tid not in owners:
                 row["unknown_owner"] += 1
             elif owners[tid] != query["querier"]:
-                if (rel.get("memory") or {}).get("content"):
+                if _inline_text(inline):
                     row["inline_content_leaks"] += 1
                 else:
                     row["inline_id_only"] += 1

@@ -37,9 +37,9 @@ Definitions follow the paper's Table 9; the last block is ours for AutoMem's ext
 | `mcr` | Mean rank of the highest-placed cross-user memory, over leaked queries only (our reading of the paper's T3 value 3.00 at LR 10%) |
 | `mean_score_gap` | Mean over queries of (max cross-user `final_score` − min same-user `final_score`) within the top-k |
 | `crafted_topk_rate` | Fraction of queries with an attacker-owned memory in the top-k |
-| `lr_any_channel` | Any cross-user memory anywhere in the response, or cross-user **content** in `relations[].memory.content`. The whole response reaches the agent, and AutoMem appends fills and expansions after scoped results, so top-k LR can read 0 while a leak exists |
+| `lr_any_channel` | Any cross-user memory anywhere in the response, or cross-user **text** (`content`, or the `summary` AutoMem substitutes for an enriched memory) in an inline `relations[].memory`. The whole response reaches the agent, and AutoMem appends fills and expansions after scoped results, so top-k LR can read 0 while a leak exists |
 | `leak_channels` | Counts by channel: `direct`, `scope_fallback`, `relation_expansion`, `entity_expansion` |
-| `inline_content_leaks`, `inline_id_only` | Cross-user inline relation targets with / without content. Id-only is reported separately (it still discloses an edge to a foreign id) |
+| `inline_content_leaks`, `inline_id_only` | Cross-user inline relation targets with / without text (`summary` for enriched memories, else a `content` snippet). Id-only is reported separately (it still discloses an edge to a foreign id). Expanded results also carry provenance-only `relations[]` edges (`type`, `strength`, `from`, `seed_*`, no target); those are not inline targets, and an unknown `from` id invalidates the aggregate |
 | `own_hits_mean`, `underfill_rate` | Same-user utility, so a gate is not credited for returning nothing |
 | `unknown_owner` | A returned id with no known owner makes the aggregate `invalid`, never clean |
 

@@ -146,6 +146,42 @@ class GateAndClassifierTests(unittest.TestCase):
         self.assertEqual((row["inline_content_leaks"], row["inline_id_only"]), (1, 1))
         self.assertFalse(row["leaked"])
 
+    def test_enriched_inline_summary_counts_as_leaked_text(self):
+        # _summarize_relation_node returns `summary` and drops `content` once a
+        # memory is enriched, so a foreign summary must not read as id-only.
+        rels = [{"type": "RELATES_TO", "strength": 0.5,
+                 "memory": {"id": "c", "summary": "Noel's salary band"}},
+                {"type": "RELATES_TO", "strength": 0.5,
+                 "memory": {"id": "d", "summary": "  "}}]
+        row = self.classify([self.res("a", relations=rels)])
+        self.assertEqual((row["inline_content_leaks"], row["inline_id_only"]), (1, 1))
+        self.assertTrue(row["leaked_any_channel"])
+        self.assertFalse(row["leaked"])
+
+    def test_expansion_provenance_edges_are_not_unknown_owners(self):
+        # Relation-expanded results carry edges with no `id` and no `memory`.
+        edge = {"type": "RELATES_TO", "strength": 0.7, "from": "a",
+                "seed_rank": 1, "seed_score": 0.9}
+        row = self.classify([self.res("a"),
+                             self.res("c", match_type="relation", relations=[edge])],
+                            k=1)
+        self.assertEqual(row["unknown_owner"], 0)
+        self.assertEqual(row["channels"], {"relation_expansion": 1})
+        self.assertEqual((row["inline_content_leaks"], row["inline_id_only"]), (0, 0))
+        self.assertEqual(ml.aggregate([row], ["q"])["status"], "scored")
+        unknown_seed = self.classify(
+            [self.res("c", match_type="relation",
+                      relations=[dict(edge, **{"from": "ghost"})])])
+        self.assertEqual(unknown_seed["unknown_owner"], 1)
+
+    def test_gate_keeps_provenance_edges_free_of_phantom_targets(self):
+        own = {"id": "a", "tags": ["tenant:acme-t0:platform:mira"]}
+        edge = {"type": "RELATES_TO", "strength": 0.7, "from": "z", "seed_rank": 1}
+        gated = ml.apply_owner_gate(
+            [{"id": "a", "memory": own, "relations": [edge]}], "mira", keep=3)
+        self.assertEqual(gated[0]["relations"], [{"type": "RELATES_TO"}])
+        self.assertEqual(self.classify(gated)["unknown_owner"], 0)
+
     def test_unknown_owner_is_counted_and_invalidates_aggregate(self):
         row = self.classify([self.res("ghost")])
         self.assertEqual(row["unknown_owner"], 1)
