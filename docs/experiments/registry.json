@@ -1,5 +1,25 @@
 [
   {
+    "id": "EXP-MEMLEAK-ADMISSIBILITY",
+    "title": "MemLeak cross-user admissibility leakage: offline design and scaffold",
+    "status": "in-progress",
+    "hypothesis": "A pooled AutoMem store scoped only by tags can return another tenant's memories through tag prefix matching, graph and entity expansion, inline relation content or scope_fallback; a per-user partition or a fail-closed post-retrieval ownership gate over an over-fetched candidate set closes every channel.",
+    "result": "Desk review and offline scaffold only. No official code or data exists for arXiv:2610.04195, so the fixture is synthetic; the AutoMem mapping is read from automem docs and source at 933004ab (expansion and inline relations bypass tag scope by default), not observed in a run. Nothing run against AutoMem; no AutoMem score; paper figures are a different construct.",
+    "decision": "Track as an offline scaffold (runners/memleak_admissibility/); a loopback live adapter and a cold plus injected-graph matured run need an owner-approved plan. File the drafted automem issue only if a loopback probe reproduces the leak. Distinct from ForgetEval #31 (a different MemLeak paper) and PrecisionMemBench #64.",
+    "started": "2026-11-16",
+    "updated": "2026-11-16",
+    "artifacts": [
+      "docs/eval/memleak-admissibility.md",
+      "runners/memleak_admissibility/**",
+      "runners/test_memleak_admissibility.py"
+    ],
+    "branch": "agent/hub-developer/7e7c93c9",
+    "worktree": ".worktrees/agent-hub-developer-7e7c93c9",
+    "pr": null,
+    "related": ["EXP-EVOMEMBENCH", "EXP-MATURATION"],
+    "notes": "Candidate: opportunity:automem-graph-rag-research-scout. CLAUDE.md invariant 2 (expansion is a no-op under tag gating) conflicts with the automem API doc at the pin; settle with a loopback probe before relying on either."
+  },
+  {
     "id": "EXP-EVOMEMBENCH",
     "title": "EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan",
     "status": "in-progress",

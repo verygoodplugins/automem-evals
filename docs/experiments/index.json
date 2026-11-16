@@ -1,5 +1,5 @@
 {
-  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
+  "artifact_overlay_root": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-hub-developer-7e7c93c9",
   "artifacts": [
     {
       "created_at": "2026-04-17T23:09:40",
@@ -1833,10 +1833,16 @@
       "kind": "eval-doc",
       "path": "docs/eval/evomembench.md",
       "title": "EvoMemBench \u2014 self-evolving agent memory: adapter feasibility and CrossEp-Know smoke plan"
+    },
+    {
+      "created_at": null,
+      "kind": "eval-doc",
+      "path": "docs/eval/memleak-admissibility.md",
+      "title": "MemLeak: cross-user admissibility leakage \u2014 design and offline scaffold"
     }
   ],
   "data_root": "/Users/jgarturo/Projects/OpenAI/automem-evals",
-  "generated_at": "2026-11-10T14:37:09+00:00",
+  "generated_at": "2026-11-16T12:48:34+00:00",
   "orphan_artifacts": [
     {
       "created_at": "2026-05-01T12:21:06",
@@ -2518,7 +2524,7 @@
       "url": "https://github.com/verygoodplugins/automem-evals/pull/1"
     }
   ],
-  "root": "/Users/jgarturo/Projects/OpenAI/automem-evals.worktrees/precision-context-ablation",
+  "root": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-hub-developer-7e7c93c9",
   "schema": "automem-evals.experiment-index.v1",
   "scores": [
     {
@@ -2874,7 +2880,7 @@
   ],
   "snapshot_context": {
     "refresh_scope": [
-      "EXP-EVOMEMBENCH"
+      "EXP-MEMLEAK-ADMISSIBILITY"
     ],
     "retained_sections": [
       "other threads and artifacts",
@@ -2882,16 +2888,49 @@
       "worktrees",
       "prs"
     ],
-    "retained_snapshot_generated_at": "2026-11-04T17:42:53+00:00"
+    "retained_snapshot_generated_at": "2026-11-10T14:37:09+00:00"
   },
   "status_counts": {
     "adopted": 10,
     "completed": 3,
-    "in-progress": 2,
+    "in-progress": 3,
     "parked": 4,
     "superseded": 1
   },
   "threads": [
+    {
+      "artifact_count": 1,
+      "artifact_samples": [
+        "docs/eval/memleak-admissibility.md"
+      ],
+      "artifacts": [
+        "docs/eval/memleak-admissibility.md",
+        "runners/memleak_admissibility/**",
+        "runners/test_memleak_admissibility.py"
+      ],
+      "branch": "agent/hub-developer/7e7c93c9",
+      "decision": "Track as an offline scaffold (runners/memleak_admissibility/); a loopback live adapter and a cold plus injected-graph matured run need an owner-approved plan. File the drafted automem issue only if a loopback probe reproduces the leak. Distinct from ForgetEval #31 (a different MemLeak paper) and PrecisionMemBench #64.",
+      "hypothesis": "A pooled AutoMem store scoped only by tags can return another tenant's memories through tag prefix matching, graph and entity expansion, inline relation content or scope_fallback; a per-user partition or a fail-closed post-retrieval ownership gate over an over-fetched candidate set closes every channel.",
+      "id": "EXP-MEMLEAK-ADMISSIBILITY",
+      "notes": "Candidate: opportunity:automem-graph-rag-research-scout. CLAUDE.md invariant 2 (expansion is a no-op under tag gating) conflicts with the automem API doc at the pin; settle with a loopback probe before relying on either.",
+      "pr": null,
+      "related": [
+        "EXP-EVOMEMBENCH",
+        "EXP-MATURATION"
+      ],
+      "result": "Desk review and offline scaffold only. No official code or data exists for arXiv:2610.04195, so the fixture is synthetic; the AutoMem mapping is read from automem docs and source at 933004ab (expansion and inline relations bypass tag scope by default), not observed in a run. Nothing run against AutoMem; no AutoMem score; paper figures are a different construct.",
+      "started": "2026-11-16",
+      "status": "in-progress",
+      "title": "MemLeak cross-user admissibility leakage: offline design and scaffold",
+      "updated": "2026-11-16",
+      "worktree": ".worktrees/agent-hub-developer-7e7c93c9",
+      "worktree_status": {
+        "branch": "agent/hub-developer/7e7c93c9",
+        "cleanup_candidate": false,
+        "path": "/Users/jgarturo/Projects/OpenAI/automem-evals/.worktrees/agent-hub-developer-7e7c93c9",
+        "state": "in-flight"
+      }
+    },
     {
       "artifact_count": 1,
       "artifact_samples": [

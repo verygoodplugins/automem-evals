@@ -2,7 +2,7 @@
 
 Historical AMB snapshot: LoCoMo, PersonaMem, BEAM-100K values retained from the index generated 2026-06-22T20:26:29+00:00 because the raw archives are unavailable. These are historical values, not fresh AMB results. Source: origin/main@35fa73d, docs/experiments/index.json; full source commit/hash recorded per retained row in index.json.
 
-Generated: `2026-11-10T14:37:09+00:00`
+Generated: `2026-11-16T12:48:34+00:00`
 
 Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.
 Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
@@ -14,6 +14,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 - `EXP-BEAM-JUDGED` **Native judged BEAM harness** - `parked`; AutoMem should be measured with BEAM's judged answer task, not only proxy retrieval metrics, to make leaderboard-comparable claims. Decision: Defer refresh and scaling work until the post-merge baseline is reconciled and the next retrieval change has a matched result. Artifacts: 29. Updated: `2026-10-22`.
 - `EXP-ORPHAN-FAMA-MEMORA-RELCHAIN` **Undocumented FAMA, Memora, and relation-chain result clusters** - `parked`; These result clusters likely represent real experiments, but the hypothesis and decision are not recorded in session notes. Decision: Keep parked until someone reviews the raw outputs and either backfills records or deletes the artifacts. Artifacts: 6. Updated: `2026-06-22`.
 - `EXP-MATURATION` **Memory maturation evaluation concept** - `parked`; Recall quality may improve through maturation or consolidation processes beyond immediate ingestion. Decision: Parked until a concrete maturation runner is prioritized. Artifacts: 1. Updated: `2026-06-17`.
+- `EXP-MEMLEAK-ADMISSIBILITY` **MemLeak cross-user admissibility leakage: offline design and scaffold** - `in-progress`; A pooled AutoMem store scoped only by tags can return another tenant's memories through tag prefix matching, graph and entity expansion, inline relation content or scope_fallback; a per-user partition or a fail-closed post-retrieval ownership gate over an over-fetched candidate set closes every channel. Decision: Track as an offline scaffold (runners/memleak_admissibility/); a loopback live adapter and a cold plus injected-graph matured run need an owner-approved plan. File the drafted automem issue only if a loopback probe reproduces the leak. Distinct from ForgetEval #31 (a different MemLeak paper) and PrecisionMemBench #64. Artifacts: 1. Updated: `2026-11-16`.
 - `EXP-EVOMEMBENCH` **EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan** - `in-progress`; A tag-isolated AutoMem recall/store backend can be wired into the EvoMemBench CrossEp-Know driver without editing the unlicensed upstream tree; supersession (t_invalid, INVALIDATED_BY) can only be credited on the separate InEp-Know FactConsolidation suite. Decision: Track in issue #90 at medium-low priority: runners/evomembench/ adapter plus a 17-episode CrossEp-Know wiring smoke on a local AutoMem endpoint after an owner-approved cap and a spend-guard path. No vendoring of upstream code or data. InEp-Know FactConsolidation adapter is a separate follow-up. Artifacts: 1. Updated: `2026-11-10`.
 - `EXP-MEME` **MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan** - `in-progress`; Typed AutoMem edges plus t_invalid supersession may deliver the change event or a propagated value in a single retrieval, closing Cascade/Absence/Deletion without Opus-class write-time cost. Decision: Track adapter work in the MEME issue (pending filing); no paid run until the spend guard supports the paper's models or a non-comparable column is chosen, and the owner approves a cap. Publish per-task accuracy with answerer/judge/cost disclosure only after actual AutoMem runs. Artifacts: 1. Updated: `2026-11-04`.
 - `EXP-PRECISION-CONTEXT-20261026` **Paired support-label context pruning diagnostic** - `completed`; Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support. Decision: Next: blinded evidence-anchored calibration of all 60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked. Artifacts: 6. Updated: `2026-11-02`.
@@ -34,6 +35,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 
 ```mermaid
 flowchart LR
+  EXP_MEMLEAK_ADMISSIBILITY["EXP-MEMLEAK-ADMISSIBILITY: MemLeak cross-user admissibility leakage: offline design and scaffold"]
   EXP_EVOMEMBENCH["EXP-EVOMEMBENCH: EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan"]
   EXP_MEME["EXP-MEME: MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan"]
   EXP_PRECISION_CONTEXT_20261026["EXP-PRECISION-CONTEXT-20261026: Paired support-label context pruning diagnostic"]
@@ -54,6 +56,8 @@ flowchart LR
   EXP_WRIT["EXP-WRIT: WRIT adapter diagnostics"]
   EXP_MATURATION["EXP-MATURATION: Memory maturation evaluation concept"]
   EXP_ORPHAN_FAMA_MEMORA_RELCHAIN["EXP-ORPHAN-FAMA-MEMORA-RELCHAIN: Undocumented FAMA, Memora, and relation-chain result clusters"]
+  EXP_MEMLEAK_ADMISSIBILITY --> EXP_EVOMEMBENCH
+  EXP_MEMLEAK_ADMISSIBILITY --> EXP_MATURATION
   EXP_EVOMEMBENCH --> EXP_MEME
   EXP_MEME --> EXP_CURRENT_STATE
   EXP_MEME --> EXP_MATURATION
@@ -90,6 +94,7 @@ flowchart LR
 
 ## In Progress / Needs Decision
 
+- `EXP-MEMLEAK-ADMISSIBILITY`: Track as an offline scaffold (runners/memleak_admissibility/); a loopback live adapter and a cold plus injected-graph matured run need an owner-approved plan. File the drafted automem issue only if a loopback probe reproduces the leak. Distinct from ForgetEval #31 (a different MemLeak paper) and PrecisionMemBench #64. (branch: `agent/hub-developer/7e7c93c9`, worktree: `.worktrees/agent-hub-developer-7e7c93c9`).
 - `EXP-EVOMEMBENCH`: Track in issue #90 at medium-low priority: runners/evomembench/ adapter plus a 17-episode CrossEp-Know wiring smoke on a local AutoMem endpoint after an owner-approved cap and a spend-guard path. No vendoring of upstream code or data. InEp-Know FactConsolidation adapter is a separate follow-up. (branch: `agent/kernel-worker/c49de4c4`, worktree: `.worktrees/agent-kernel-worker-c49de4c4`).
 - `EXP-MEME`: Track adapter work in the MEME issue (pending filing); no paid run until the spend guard supports the paper's models or a non-comparable column is chosen, and the owner approves a cap. Publish per-task accuracy with answerer/judge/cost disclosure only after actual AutoMem runs. (branch: `agent/kernel-worker/4a5dd6bc`, worktree: `.worktrees/agent-kernel-worker-4a5dd6bc`).
 
