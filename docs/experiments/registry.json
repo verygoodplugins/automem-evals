@@ -1,5 +1,28 @@
 [
   {
+    "id": "EXP-MEMOPS",
+    "title": "MemOps lifecycle memory operations: offline design and per-operation probe scaffold",
+    "status": "in-progress",
+    "hypothesis": "AutoMem's typed lifecycle (store, t_invalid plus INVALIDATED_BY, DELETE, DERIVED_FROM) can carry MemOps' remember/forget/update/reflect traces so that per-operation probe cells separate state-maintenance failures from final-answer accuracy; the open question is whether AutoMem's own matured invalidation recovers Update and Forget without an oracle writer.",
+    "result": "Desk review and offline scaffold only. Official code and data are public (MemTensor/MemOps, MIT, pinned at 312af65e) and match the paper's counts (403 evidence conversations, 4,012 probe instances). Nothing run against AutoMem and nothing spent; status not_scored, paper_comparable false; paper figures are baselines, not AutoMem scores.",
+    "decision": "Track in issue #108: loopback transport plus an owner-approved smoke on topic A02 (adjacent first, cold then matured, wiring only). Judge-scored final-answer accuracy needs a spend cap and a routable judge; long-context ingestion (108,557 writes) needs its own cap. No vendoring of upstream data.",
+    "started": "2026-11-18",
+    "updated": "2026-11-18",
+    "artifacts": [
+      "docs/eval/memops.md",
+      "runners/memops/**",
+      "runners/test_memops.py"
+    ],
+    "branch": "agent/hub-developer/73df6aca",
+    "worktree": ".worktrees/agent-hub-developer-73df6aca",
+    "pr": null,
+    "related": [
+      "EXP-MATURATION",
+      "EXP-MEME"
+    ],
+    "notes": "Candidate: opportunity:automem-graph-rag-research-scout. Related, not duplicated: #50, #51, #57, #22, #31, #53, #62, PR #61. DyadMem (arXiv:2610.03020) is artifact-blocked; DolphinBench is already tracked in #45."
+  },
+  {
     "id": "EXP-EVOMEMBENCH",
     "title": "EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan",
     "status": "in-progress",
