@@ -1,0 +1,34 @@
+# Benchmark watchlist
+
+Leads that were tracked as open pull requests or issues and closed in the pre-launch sweep on 2026-11-19. None of them has an AutoMem score. Each row says what would bring it back.
+
+- Closing kept every branch. The "Work kept at" column says where the plan, scaffold or spec lives.
+- Paper IDs, repositories and commit pins are copied from the closed items. They were not re-verified when this list was written.
+- To revive a lead, add a registry entry in `registry.json` that names the product or credibility question it answers, then reopen the item or open a new one. A benchmark adapter with no such entry does not get a PR.
+
+| Lead | Source | What it would test | Comes back when | Work kept at |
+|---|---|---|---|---|
+| Supersede | arXiv:2606.27472, `Vrin-cloud/supersede` (MIT data) | Supersession gap in `current_only` recall on LongMemEval knowledge-update questions | A no-reader retrieval smoke on local embeddings is approved (10 questions, plain vs oracle) and the live adapter is written | Branch `agent/kernel-worker/a10c9c7c`; PR #106; issue #105 holds the pins and acceptance checklist |
+| MEMPROBE / MemAudit | arXiv:2606.24595, `sora1998/MEMAUDIT-bench` (CC BY 4.0) | Recovery of hidden user state from the store, full-store vs top-5 access | A judge budget is approved (1,550 targets per mode) and the replay arm is seeded | Branch `agent/kernel-worker/adf45213`; PR #101; issue #100 |
+| MemDev-Bench | arXiv:2610.27524 | Whether memory helps or hurts code agents on executable repo-history tasks | The authors publish data, loader, scorer and a licence | Branch `agent/kernel-worker/6f5d2e77`; PR #81 (PR #80 is a subset). The spec also notes MemCalib, arXiv:2609.24259 |
+| MemSyco-Bench | arXiv:2607.01071, `XMUDeepLIT/MemSyco-Bench@3c3aa01` | Memory-induced sycophancy: reject, constrain, update, reconcile, leverage | Upstream fixes its manifest checksum and a memory-authority diagnostic is wanted | Branch `agent/kernel-worker/7b268a6f`; PR #77; issue #76 |
+| External baseline matrix | 22 sourced competitor rows; draft new-system proposal for `RonsenbergVI/agent-memory-benchmarks` | Nothing by itself; reference material for comparison claims | A refreshed comparison table or an upstream submission is wanted | Branch `agent/kernel-worker/34f6a055`; PR #75 |
+| StreamMemBench | arXiv:2606.14571 (EMNLP 2026 Findings), `landian60/StreamMemBench@b329655` (MIT) | Streaming evidence, feedback and reuse; a fit for `INVALIDATED_BY` feedback supersession | An AutoMem MemorySystem adapter is built and a cold smoke is run | Branch `agent/kernel-worker/48e22593`; PR #68; issue #67; also raised in the #51 comments |
+| Veracium / Ground Truth First | arXiv:2607.21962, `veracium-ai/Veracium@f7a1a42` (MIT) | Validity intervals, as-of recall, provenance and injection over weeks | The study artifact is released and the harness accepts a local store | Branch `agent/kernel-worker/da882528`; PR #63; issue #62, which also lists DynamicMem (arXiv:2606.22877) and Agent Zero Memory (arXiv:2608.29606, no artifact) |
+| STALE | arXiv:2605.06527, `icedreamc/STALE@ea7d391` (MIT), HF `STALEproj/STALE@617c51d` (CC BY 4.0) | Implicit-conflict invalidation and stale-fact propagation | It is folded into the Supersede track, or an adapter is written and a judge budget approved | Branch `agent/kernel-worker/66975d0c`; PR #59 |
+| Shared-memory governance | GateMem arXiv:2606.18829 (`rzhub/GateMem@603f9f4`, MIT, data available); CPB arXiv:2609.30813 and CoMemBench arXiv:2609.32192 (both blocked) | Multi-principal admission and access leakage | The product needs multi-user or team memory scoping | Branch `agent/kernel-worker/36a58aae`; PR #56 |
+| MERIT | arXiv:2609.05441, `smshweta/merit-bench@293933d9` (MIT) | Action-producing, cost-aware memory use, with an updated-fact tier | Someone runs the free upstream mock mode against a local AutoMem on the existing scaffold | Branch `agent/kernel-worker/5d7d2e96`; PR #55; issue #53 |
+| MemTrace | arXiv:2606.17328 | Evidence use versus retrieval, by memory age and question type | Official code and data are released (none found on 2026-10-02) | Branch `agent/kernel-worker/cf3bbbef`; PR #52; issue #51 |
+| EvoMemBench | arXiv:2605.18421 (NeurIPS 2026 E&D), `DSAIL-Memory/EvoMemBench@3efc221f` (no licence) | Supersession through InEp-Know FactConsolidation | Upstream adds a licence and a budget for a 17-episode smoke is approved | `docs/eval/evomembench.md`; registry `EXP-EVOMEMBENCH`; issue #90 |
+| MemTools | arXiv:2607.21404, `JJJAYYYZhao/MemTools-public@92318687` (no licence) | Design reference only: the provides/requires adapter capability manifest | Upstream adds a licence, packaging and tests | Issue #89 |
+| AgentMemBench | arXiv:2608.00009 | Retrieval-only Recall@5, MRR and nDCG with no LLM spend | An official code and data repository with a licence is verified | Issue #86 |
+| FEB-30 | arXiv:2610.22209 (Amazon Science) | Store state after each write: create, update, reinforce, supersede | The official harness is published (the repository returned 404 on 2026-10-24) | Branch `backup/feb30-store-inspector`; issue #74 |
+| A-TMA / LTP | arXiv:2607.01935v2 | Ghost memory: current, historical and transition views | Official LTP data, scorer and licence are published | `docs/eval/atma-ltp.md`; issue #57. Carries a product idea: state-labelled recall packets |
+| LongMemEval-V2 | arXiv:2605.12493, `xiaowu0162/LongMemEval-V2` (public) | 451 questions over web-agent histories of up to about 115M tokens | A feasibility pass is funded (licence pin, multimodal ingestion, latency accounting) | Issue #54 |
+| StateMemBench | arXiv:2608.19652 (no public data) | Current versus superseded answers with a closed answer pool | The authors publish scenarios and pools with a revision, checksum and licence | Issue #50, including an outside offer to build the adapter |
+| GAM | arXiv:2604.12285 | Hierarchical event-graph memory versus AutoMem on LoCoMo | Code is released, or a LoCoMo-50 run with `expand_relations` is wanted | Issue #33 |
+| MemoryAgentBench | ICLR 2026, `HUST-AI-HYZ/MemoryAgentBench` (MIT) | Memorize, update, retrieve and long-term competencies | A thin store/supersede/recall adapter and a 50-session subset run are wanted | Issue #32 |
+| PlugMem | `TIMAN-group/PlugMem` | Architecture comparison with a knowledge-unit graph memory | A docs pass names its benchmarks and one overlapping run is wanted | Issue #26 |
+| PersonaMem-v2 / DCPM | arXiv:2606.09483 | Implicit cross-session preference inference | The dataset and its licence are located | Issue #25 |
+
+Closed with no watchlist row: issue #65, a dashboard-refresh chore that later regenerations overtook.
