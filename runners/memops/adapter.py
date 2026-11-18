@@ -215,6 +215,11 @@ def ingest_plan(evidence, *, setting, arm, run_tag, record_id, injected=None):
                   _tags(run_tag, record_id, "memops:op:reflect", f"memops:validity:{op['validity']}", tag),
                   memory_type="Insight",
                   confidence=TENTATIVE_CONFIDENCE if op["validity"] == "tentative" else 0.9)
+            # The reflection is tagged with its target, so a later forget or update of
+            # that target must reach it. Tentative ones stay out of ``current``.
+            bound[target].append(ref)
+            if op["validity"] != "tentative":
+                current[target] = ref
             for span in op["evidence_spans"]:
                 src = ensure_turn(span["segment_index"], span["turn_index"], op, (tag,))
                 steps.append({"step": "associate", "from": ref, "to": src, "type": "DERIVED_FROM",
@@ -224,6 +229,9 @@ def ingest_plan(evidence, *, setting, arm, run_tag, record_id, injected=None):
         elif op["type"] == "update" and arm == "oracle_inplace" and target in current:
             steps.append({"step": "patch", "ref": current[target], "body": {
                 "content": segments[seg][turn - 1]["content"], "timestamp": ts, "t_valid": ts}})
+            # The trigger turn now lives in the patched memory: a later citation of it
+            # (a reflection's evidence span) must reuse that ref, not store a duplicate.
+            refs.setdefault((seg, turn), current[target])
         else:
             new = ensure_turn(seg, turn, op, (tag,))
             old = current.get(target)

@@ -122,6 +122,49 @@ class WriteArmTests(unittest.TestCase):
         self.assertEqual(confirmed["body"]["confidence"], 0.9)
         self.assertIn("memops:validity:confirmed", confirmed["body"]["tags"])
 
+    @staticmethod
+    def after_reflection(kind, validity="confirmed"):
+        """Fixture plus a later op on the reflection's own target ('habit')."""
+        record = m.fixture()
+        record["operations"][5]["validity"] = validity
+        trigger = {"segment_index": 2, "turn_index": 3, "quote": ""}
+        record["operations"].append({
+            "operation_id": "op7", "type": kind, "validity": "confirmed", "trigger_span": trigger,
+            "target": {"target_id": "habit", "target_name": "habit"}, "old_value": None,
+            "new_value": None if kind == "forget" else "Settles down", "evidence_spans": [trigger]})
+        return record
+
+    def test_forget_reaches_a_reflection_of_the_same_target(self):
+        record = self.after_reflection("forget")
+        soft = plan("oracle_lifecycle_soft", record=record)
+        self.assertEqual(soft["warnings"], [])
+        self.assertEqual([s["body"] for s in kinds(soft, "patch") if s["ref"] == "op6r"],
+                         [{"t_invalid": m.narrative_ts(2, 3)}])
+        hard = plan("oracle_lifecycle_hard", record=record)
+        self.assertIn("op6r", [s["ref"] for s in kinds(hard, "delete")])
+
+    def test_update_supersedes_a_confirmed_reflection_but_not_a_tentative_one(self):
+        confirmed = plan("oracle_lifecycle_soft", record=self.after_reflection("update"))
+        self.assertIn(("op6r", "c2t3"), {(a["from"], a["to"]) for a in kinds(confirmed, "associate")
+                                         if a["type"] == "INVALIDATED_BY"})
+        self.assertTrue([s for s in kinds(confirmed, "patch") if s["ref"] == "op6r"])
+        tentative = plan("oracle_lifecycle_soft", record=self.after_reflection("update", "tentative"))
+        self.assertFalse([a for a in kinds(tentative, "associate") if a["type"] == "INVALIDATED_BY"
+                          and a["from"] == "op6r"])
+        self.assertIn("op7: update without a predecessor", tentative["warnings"])
+        # still bound to its target, so a forget reaches it even though it was never current
+        forgotten = self.after_reflection("forget", "tentative")
+        self.assertTrue([s for s in kinds(plan("oracle_lifecycle_soft", record=forgotten), "patch")
+                         if s["ref"] == "op6r"])
+
+    def test_inplace_update_is_not_stored_again_when_a_reflection_cites_it(self):
+        p = plan("oracle_inplace")
+        stored = [s["ref"] for s in kinds(p, "store")]
+        self.assertNotIn("c2t1", stored)  # the update trigger lives in the patched c1t1
+        self.assertEqual(len(stored), len(set(stored)))
+        derived = {a["to"] for a in kinds(p, "associate") if a["type"] == "DERIVED_FROM"}
+        self.assertEqual(derived, {"c1t1"})  # the reflection links the patched memory itself
+
     def test_retracted_operation_is_skipped_not_applied(self):
         record = m.fixture()
         record["operations"][4]["validity"] = "retracted"
