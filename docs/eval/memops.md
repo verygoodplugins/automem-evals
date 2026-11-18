@@ -68,7 +68,7 @@ Verified against automem `1a7ba1a6afe69835f62ad7f6013e33301d1ab83e` (`docs/API.m
 | remember / update (tentative) | `store` with `confidence` 0.3 and `memops:validity:tentative`; never becomes current | `POST /memory`; **no** supersession (the `recency_trap` knob) |
 | update | `store` new turn, then supersede the target's current memory | `POST /memory`, `PATCH /memory/<old>` `{t_invalid}`, `POST /associate` `INVALIDATED_BY` old to new (the `supersedes_memory_id` sequence the MCP `store_memory` performs) |
 | forget | soft: `PATCH {t_invalid}` on every memory bound to the target; hard: `DELETE`. The trigger turn is **not stored** (no retrievable tombstone) | `PATCH /memory/<id>` / `DELETE /memory/<id>` |
-| reflect | `store` the reflection `new_value` and link it to its evidence turns | `POST /memory` type `Insight`, `POST /associate` `DERIVED_FROM` (authorable) |
+| reflect | `store` the reflection `new_value` and link it to its evidence turns; a tentative reflection takes the same `confidence` 0.3 and `memops:validity:tentative` as a tentative remember/update (11 at the pin), so it never reads as a confirmed insight | `POST /memory` type `Insight`, `POST /associate` `DERIVED_FROM` (authorable) |
 | TrajectoryOps | the steps above in trigger order, keyed by `chain_id` | same; `state_checkpoints` become per-step probes later |
 | retracted | skipped (2 ops at the pin) | none |
 
@@ -80,7 +80,7 @@ Verified against automem `1a7ba1a6afe69835f62ad7f6013e33301d1ab83e` (`docs/API.m
 
 ## Per-operation probe reporting
 
-A cell is operation type x probe x setting x arm x variant, holding `n`, `support_labeled/hits/rate` and `leak_labeled/leaks/rate`. Support is "every `must_include` string appears in the recalled text" and leak is "any `must_not_include` string appears" (case-insensitive substring, a **lower bound**; paraphrases are not credited). A question with no label is **unknown, never zero**. The `diagnostic_checks` that need judgement (leakage, over_forget, trajectory order, reflection precision/recall) are `judge_required` and stay `not_scored` offline. **Final-answer accuracy is a separate field** (`final_answer_accuracy`, null) that needs an answerer and a judge; probe cells never carry it. `aggregate` refuses to score unless every planned question has a result.
+A cell is operation type x probe x setting x arm x variant, holding `n`, `support_labeled/hits/rate` and `leak_labeled/leaks/rate`. Support is "every `must_include` string appears in the recalled text" and leak is "any `must_not_include` string appears" (case-insensitive substring, a **lower bound**; paraphrases are not credited). A question with no label is **unknown, never zero**. The `diagnostic_checks` that need judgement (leakage, over_forget, trajectory order, reflection precision/recall) are `judge_required` and stay `not_scored` offline. **Final-answer accuracy is a separate field** (`final_answer_accuracy`, null) that needs an answerer and a judge; probe cells never carry it. `aggregate` refuses to score unless every planned question has a result. `question_pair_id` is not unique (only 8 distinct ids cover all 4,012 questions at the pin, the most reused 806 times, in both settings; `(record, setting, id)` has no duplicate), so plans and results are matched on `(record_id, setting, question_pair_id)`; a duplicate result or a result without that identity is an error, never an overwrite, and cells are keyed by setting so adjacent and long-context never merge.
 
 ## Cold vs matured
 
@@ -88,7 +88,7 @@ Per [maturation.md](maturation.md), `cold` (ingest, then recall) and `matured` (
 
 ## Scaffold and verification
 
-`runners/memops/adapter.py` is stdlib only and offline: it validates records, builds ingest and recall plans, classifies and aggregates results, and emits a `not_scored` report. The CLI (`python3 runners/memops/adapter.py [--memops-dir DIR]`) has no recall transport. `runners/test_memops.py` has 20 tests; `MEMOPS_DIR=<pinned checkout>` enables the test that validates all 403 records and locates evidence in all 403 injected files.
+`runners/memops/adapter.py` is stdlib only and offline: it validates records, builds ingest and recall plans, classifies and aggregates results, and emits a `not_scored` report. The CLI (`python3 runners/memops/adapter.py [--memops-dir DIR]`) has no recall transport. `runners/test_memops.py` has 25 tests; `MEMOPS_DIR=<pinned checkout>` enables the test that validates all 403 records and locates evidence in all 403 injected files.
 
 ## Gates and cost
 

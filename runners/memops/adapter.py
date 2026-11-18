@@ -211,8 +211,10 @@ def ingest_plan(evidence, *, setting, arm, run_tag, record_id, injected=None):
             current.pop(target, None)
         elif op["type"] == "reflect":
             ref = f"{op['operation_id']}r"
-            store(ref, op["new_value"], ts, _tags(run_tag, record_id, "memops:op:reflect", tag),
-                  memory_type="Insight")
+            store(ref, op["new_value"], ts,
+                  _tags(run_tag, record_id, "memops:op:reflect", f"memops:validity:{op['validity']}", tag),
+                  memory_type="Insight",
+                  confidence=TENTATIVE_CONFIDENCE if op["validity"] == "tentative" else 0.9)
             for span in op["evidence_spans"]:
                 src = ensure_turn(span["segment_index"], span["turn_index"], op, (tag,))
                 steps.append({"step": "associate", "from": ref, "to": src, "type": "DERIVED_FROM",
@@ -245,6 +247,9 @@ def recall_plan(evidence, *, setting, run_tag, record_id, limit=10):
             continue
         rubric, checks = q["judge_rubric"], q["diagnostic_checks"]
         plan.append({
+            # question_pair_id repeats across records and settings (8 distinct ids over
+            # 4,012 questions at the pin), so the composite identity travels with the plan.
+            "record_id": record_id, "setting": setting,
             "question_pair_id": q["question_pair_id"], "probe": q["evaluation_type"],
             "operation_type": evidence["operation_type"],
             "params": {"query": q["question"], "tags": _tags(run_tag, record_id)[1:],
@@ -270,17 +275,39 @@ def classify_recall(labels, recalled_texts):
     }
 
 
+def _question_key(item):
+    """Composite identity of one question: ids repeat across records and settings."""
+    try:
+        return (item["record_id"], item["setting"], item["question_pair_id"])
+    except KeyError as exc:
+        raise ValueError(f"missing {exc.args[0]} on {sorted(item)}") from None
+
+
+def _index_by_question(items, what):
+    by_key = {}
+    for item in items:
+        key = _question_key(item)
+        if key in by_key:  # a silent overwrite would let one record cover another
+            raise ValueError(f"duplicate {what} for {key}")
+        by_key[key] = item
+    return by_key
+
+
 def aggregate(plans, results):
-    """Per-(operation, probe) recall diagnostics; refuses incomplete coverage."""
-    by_id = {r["question_pair_id"]: r for r in results}
-    missing = [p["question_pair_id"] for p in plans if p["question_pair_id"] not in by_id]
+    """Per-(operation, probe, setting) recall diagnostics; refuses incomplete coverage.
+
+    Plans and results are matched on (record_id, setting, question_pair_id).
+    """
+    planned = _index_by_question(plans, "planned question")
+    by_key = _index_by_question(results, "result")
+    missing = [key for key in planned if key not in by_key]
     if missing:
         raise CoverageError(f"{len(missing)} planned questions have no result")
     cells = defaultdict(lambda: {"n": 0, "support_labeled": 0, "support_hits": 0,
                                  "leak_labeled": 0, "leaks": 0})
-    for plan in plans:
-        verdict = classify_recall(plan["labels"], by_id[plan["question_pair_id"]]["recalled"])
-        cell = cells[(plan["operation_type"], plan["probe"])]
+    for key, plan in planned.items():
+        verdict = classify_recall(plan["labels"], by_key[key]["recalled"])
+        cell = cells[(plan["operation_type"], plan["probe"], plan["setting"])]
         cell["n"] += 1
         if verdict["support"] is not None:
             cell["support_labeled"] += 1
@@ -289,8 +316,8 @@ def aggregate(plans, results):
             cell["leak_labeled"] += 1
             cell["leaks"] += verdict["leak"]
     out = []
-    for (op, probe), c in sorted(cells.items()):
-        out.append({"operation_type": op, "probe": probe, **c,
+    for (op, probe, setting), c in sorted(cells.items()):
+        out.append({"operation_type": op, "probe": probe, "setting": setting, **c,
                     "support_rate": c["support_hits"] / c["support_labeled"] if c["support_labeled"] else None,
                     "leak_rate": c["leaks"] / c["leak_labeled"] if c["leak_labeled"] else None})
     return out

@@ -25,6 +25,12 @@ def kinds(p, name):
     return [s for s in p["steps"] if s["step"] == name]
 
 
+def result(planned, recalled):
+    """A recall result carrying the planned question's composite identity."""
+    return {"record_id": planned["record_id"], "setting": planned["setting"],
+            "question_pair_id": planned["question_pair_id"], "recalled": recalled}
+
+
 class ValidationTests(unittest.TestCase):
     def test_fixture_is_valid_and_defects_fail_closed(self):
         self.assertTrue(m.validate_record(m.fixture()))
@@ -105,6 +111,17 @@ class WriteArmTests(unittest.TestCase):
         derived = {(a["from"], a["to"]) for a in kinds(p, "associate") if a["type"] == "DERIVED_FROM"}
         self.assertEqual(derived, {("op6r", "c1t1"), ("op6r", "c2t1")})
 
+    def test_tentative_reflection_keeps_its_uncertainty(self):
+        record = m.fixture()
+        record["operations"][5]["validity"] = "tentative"
+        for arm in m.ARMS[1:]:
+            reflection = next(s for s in kinds(plan(arm, record=record), "store") if s["ref"] == "op6r")
+            self.assertEqual(reflection["body"]["confidence"], m.TENTATIVE_CONFIDENCE, arm)
+            self.assertIn("memops:validity:tentative", reflection["body"]["tags"], arm)
+        confirmed = next(s for s in kinds(plan("oracle_lifecycle_soft"), "store") if s["ref"] == "op6r")
+        self.assertEqual(confirmed["body"]["confidence"], 0.9)
+        self.assertIn("memops:validity:confirmed", confirmed["body"]["tags"])
+
     def test_retracted_operation_is_skipped_not_applied(self):
         record = m.fixture()
         record["operations"][4]["validity"] = "retracted"
@@ -152,11 +169,40 @@ class ProbeReportTests(unittest.TestCase):
 
     def test_aggregate_refuses_incomplete_coverage(self):
         with self.assertRaises(m.CoverageError):
-            m.aggregate(self.plans, [{"question_pair_id": self.plans[0]["question_pair_id"], "recalled": []}])
+            m.aggregate(self.plans, [result(self.plans[0], [])])
+
+    def test_aggregate_does_not_let_one_record_cover_another(self):
+        # question_pair_id repeats across records and settings at the pin, so a result for
+        # record B must not satisfy record A's identical id.
+        other = m.recall_plan(m.fixture(), setting="adjacent_operation", run_tag="t", record_id="other")
+        self.assertEqual([p["question_pair_id"] for p in other],
+                         [p["question_pair_id"] for p in self.plans])
+        with self.assertRaises(m.CoverageError):
+            m.aggregate(self.plans + other, [result(p, ["Porto"]) for p in other])
+
+    def test_aggregate_does_not_let_one_setting_cover_another(self):
+        long_plans = m.recall_plan(m.fixture(), setting="longitudinal_operation", run_tag="t", record_id="fx")
+        with self.assertRaises(m.CoverageError):
+            m.aggregate(self.plans + long_plans, [result(p, ["Porto"]) for p in long_plans])
+
+    def test_aggregate_rejects_duplicate_and_unidentified_results(self):
+        results = [result(p, []) for p in self.plans]
+        with self.assertRaisesRegex(ValueError, "duplicate result"):
+            m.aggregate(self.plans, results + [results[0]])
+        with self.assertRaisesRegex(ValueError, "missing record_id"):
+            m.aggregate(self.plans, [{"question_pair_id": p["question_pair_id"], "setting": p["setting"],
+                                      "recalled": []} for p in self.plans])
+
+    def test_aggregate_keeps_settings_in_separate_cells(self):
+        long_plans = m.recall_plan(m.fixture(), setting="longitudinal_operation", run_tag="t", record_id="fx")
+        results = ([result(p, ["I moved to Porto"]) for p in self.plans]
+                   + [result(p, ["Lisbon only"]) for p in long_plans])
+        cells = {(c["probe"], c["setting"]): c for c in m.aggregate(self.plans + long_plans, results)}
+        self.assertEqual(cells[("StateTransition", "adjacent_operation")]["support_rate"], 1.0)
+        self.assertEqual(cells[("StateTransition", "longitudinal_operation")]["support_rate"], 0.0)
 
     def test_aggregate_reports_per_probe_cells_without_answer_accuracy(self):
-        results = [{"question_pair_id": p["question_pair_id"],
-                    "recalled": ["I moved to Porto", "I used to live in Lisbon"]} for p in self.plans]
+        results = [result(p, ["I moved to Porto", "I used to live in Lisbon"]) for p in self.plans]
         cells = {c["probe"]: c for c in m.aggregate(self.plans, results)}
         self.assertEqual(cells["StateTransition"]["support_rate"], 1.0)
         self.assertEqual(cells["StateTransition"]["leak_rate"], 1.0)  # stale Lisbon surfaced
