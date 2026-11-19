@@ -1,0 +1,75 @@
+{
+  "status": "provisional_degraded_full_run_not_official_locomo",
+  "protocol": {
+    "judge": false,
+    "answer_embedding_similarity": false,
+    "provider_cost_usd": 0,
+    "enrichment": false,
+    "auto_summarization": false,
+    "network": "internal",
+    "scorer_limitation": "The deterministic scorer can add gold evidence from scoped tag-only search to nonempty recalled context, masking retrieval misses.",
+    "dataset_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+    "driver_sha256": "52215237b6529ac0d4e2e2039c21c0019e45538cbd34650df0291df9adaf8ba3",
+    "model": "fastembed:BAAI/bge-base-en-v1.5",
+    "model_revision": "199291fdd1aa89faf9c20b722dc72ad5e17aa0d0",
+    "model_sha256": "4e556722bc4f65716c544c8a931f1e90fb3f866e5741fd93a96f051d673339c7",
+    "image_ids": {"automem-flask-api:latest": "sha256:668fccdfd77afba9be262df8b1ef944da072b72834da098bdd5fc87c7feb722d", "falkordb/falkordb:latest": "sha256:30c530c193ac48cb6ea8c6cae745f793d2c098a0a138f7b3e46c1d90848845ba", "qdrant/qdrant:v1.11.3": "sha256:da426bb8aa0ba0a3032b3110e71d0d1516d51a686aa17b39bde4e090ce3b8e7c"}
+  },
+  "full": {
+    "baseline_sha": "1a7ba1a6afe69835f62ad7f6013e33301d1ab83e",
+    "candidate_sha": "b3beabc993e67c92d77f68d8ddc7a1c232e5ca60",
+    "counts": {"baseline_correct": 1206, "candidate_correct": 1207, "losses": 0, "questions": 1986, "scored": 1542, "skipped": 444, "ties": 1541, "wins": 1},
+    "categories": {
+      "2": {"baseline_correct": 280, "candidate_correct": 280, "losses": 0, "scored": 321, "skipped": 0, "ties": 321, "total": 321, "wins": 0},
+      "3": {"baseline_correct": 30, "candidate_correct": 31, "losses": 0, "scored": 96, "skipped": 0, "ties": 95, "total": 96, "wins": 1},
+      "1": {"baseline_correct": 123, "candidate_correct": 123, "losses": 0, "scored": 282, "skipped": 0, "ties": 282, "total": 282, "wins": 0},
+      "4": {"baseline_correct": 771, "candidate_correct": 771, "losses": 0, "scored": 841, "skipped": 0, "ties": 841, "total": 841, "wins": 0},
+      "5": {"baseline_correct": 2, "candidate_correct": 2, "losses": 0, "scored": 2, "skipped": 444, "ties": 2, "total": 446, "wins": 0}
+    },
+    "corpus": {"corpus_sha256": "76bd754555e536df75392a92ba7aca692ec367b72b39280e2b25e3415ddf54d4", "count_per_arm": 5882, "identical_vectors": 5882, "index_config_sha256": "08068677ce7d261ecb0d9362fa5733002845697bbeb4ed4da20991d1f7000563", "matched": true, "memory_relations": 0, "relations_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", "timestamp_fingerprints_match": false},
+    "baseline_log_audit": {"clean": true, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 1, "expected_collection_404": 1, "http_5xx": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0},
+    "candidate_log_audit": {"clean": false, "error_log_lines": 2, "exceptions": 2, "expected_capability_400": 1, "expected_collection_404": 1, "http_5xx": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0},
+    "replacement_query_timeouts": 2,
+    "candidate_degraded": "FalkorDB replacement queries timed out; handler returned empty maps and HTTP requests continued. Fresh matched full rerun required.",
+    "elapsed_seconds": {"baseline": 1710.7596294879913, "candidate": 2927.2827763557434},
+    "latency_by_request_shape_ms": {
+      "results/full-baseline.api.log": {
+        "multi-vector": {"count": 409, "p50_ms": 1247.39, "p95_ms": 2425.98},
+        "single-no-vector": {"count": 1953, "p50_ms": 200.68, "p95_ms": 468.64},
+        "single-vector": {"count": 1133, "p50_ms": 337.32, "p95_ms": 732.76}
+      },
+      "results/full-optimized.api.log": {
+        "multi-vector": {"count": 409, "p50_ms": 3171.42, "p95_ms": 7025.82},
+        "single-no-vector": {"count": 1953, "p50_ms": 172.29, "p95_ms": 459.59},
+        "single-vector": {"count": 1133, "p50_ms": 698.67, "p95_ms": 1335.97}
+      }
+    },
+    "timing_caveat": "Runs had unequal concurrency; the final mini overlapped the candidate full run. Do not infer performance."
+  },
+  "mini": {
+    "baseline_sha": "1a7ba1a6afe69835f62ad7f6013e33301d1ab83e",
+    "candidate_sha": "45a2f1d53c507fb69a4a9d215fe8883754db3539",
+    "counts": {"baseline_correct": 197, "candidate_correct": 197, "losses": 0, "questions": 304, "scored": 235, "skipped": 69, "ties": 235, "wins": 0},
+    "categories": {
+      "2": {"baseline_correct": 59, "candidate_correct": 59, "losses": 0, "scored": 63, "skipped": 0, "ties": 63, "total": 63, "wins": 0},
+      "3": {"baseline_correct": 4, "candidate_correct": 4, "losses": 0, "scored": 13, "skipped": 0, "ties": 13, "total": 13, "wins": 0},
+      "1": {"baseline_correct": 27, "candidate_correct": 27, "losses": 0, "scored": 43, "skipped": 0, "ties": 43, "total": 43, "wins": 0},
+      "4": {"baseline_correct": 105, "candidate_correct": 105, "losses": 0, "scored": 114, "skipped": 0, "ties": 114, "total": 114, "wins": 0},
+      "5": {"baseline_correct": 2, "candidate_correct": 2, "losses": 0, "scored": 2, "skipped": 69, "ties": 2, "total": 71, "wins": 0}
+    },
+    "corpus": {"corpus_sha256": "e0511145e30ce7ac96feff9f07669d6e33916b6313ea6acc15b069c40a72b6c5", "count_per_arm": 788, "identical_vectors": 788, "index_config_sha256": "1fe89d61e7930029f38ad2be576aa78d1d7f0c2b6942032c1c3cb1dd0e728dfc", "matched": true, "memory_relations": 0, "relations_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", "timestamp_fingerprints_match": false},
+    "baseline_log_audit": {"clean": true, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 1, "expected_collection_404": 1, "http_5xx": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0},
+    "candidate_log_audit": {"clean": true, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 1, "expected_collection_404": 1, "http_5xx": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0},
+    "elapsed_seconds": {"baseline": 107.42842602729797, "candidate": 138.87569665908813},
+    "candidate_latency_by_request_shape_ms": {
+      "results/final-mini.api.log": {
+        "multi-vector": {"count": 53, "p50_ms": 1161.59, "p95_ms": 2192.86},
+        "single-no-vector": {"count": 287, "p50_ms": 52.36, "p95_ms": 82.46},
+        "single-vector": {"count": 182, "p50_ms": 268.04, "p95_ms": 365.42}
+      }
+    },
+    "timing_caveat": "Final mini overlapped the candidate full run; timings are not controlled."
+  },
+  "receipt_sha256": {"baseline-errors.json": "a575a9be42008e12f73a66eeef98874fddd685a4d29da64fbbfa34e9f86bd13c", "baseline.api.log": "dd11e8df8868a8b8c3ee1c7926f0f72c16139b84dc7e91706f7b11f055658619", "baseline.json": "0a5da6cd2ee18b2b59b912ec3ebadb26e07874e711a3a49057d278ba89978f2c", "final-mini-comparison.json": "f383e33ddbd99cf97fd7bcf25f3aee10631f12d15d77ac618ffad7467b27e935", "final-mini-corpus-comparison.json": "fd0c42bd4d839ba71057ef64cb5be42ee385403af638145ee4414290c7b91100", "final-mini-errors.json": "a575a9be42008e12f73a66eeef98874fddd685a4d29da64fbbfa34e9f86bd13c", "final-mini-latency.json": "fcfc9386732b2dc3c131a0b07f059548ceec1430474702c1e5208d0c5dfa7578", "final-mini.api.log": "eedd48909f29edff838315abb6ad959910815aa34df78b09d876ed6d5ccc4297", "final-mini.json": "4da9dbb8902370c524861490d01397361edb4b2283e373395909caa9bed1b965", "full-baseline-errors.json": "a575a9be42008e12f73a66eeef98874fddd685a4d29da64fbbfa34e9f86bd13c", "full-baseline.api.log": "fc5fd8c85b51f840962ad4bdd5af8f4bdcf603482b1d42456f9a3a7ca93a09d3", "full-baseline.json": "7e95613859ea5805188f7fdbe492afd0226ff35939f71491f36b60a2f157c863", "full-comparison.json": "24b4218af1e78a059c2702f8c94f27ff0324d5cce9b5596a17f2f73016aea562", "full-corpus-comparison.json": "723459f3ba8d0af45b2ca650eba0232ec67ed56cebcd92b56f4c250623590fc4", "full-latency.json": "9515d784c111e55c0d5a773f92706c2762081f94920c0f97cd4371b9a9564648", "full-optimized-errors.json": "35d610151bb16a3ae2e86c4f1ba16e7b0bd4aaefb2ecbb0d0c45dd7a3d0f90ec", "full-optimized.api.log": "92a619bcf73ce2ccd1ff759db6c06a3aad04ca2e44edc72dcd8708e101bd16c2", "full-optimized.json": "00c51428658bd83ac8db25b8b85a09852f0f031d4d152ad197e23b01e4514e79"},
+  "raw_receipts": "Local-only temporary run artifacts; raw questions and logs are not published."
+}

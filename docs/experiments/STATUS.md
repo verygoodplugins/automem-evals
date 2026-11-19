@@ -2,7 +2,7 @@
 
 Historical AMB snapshot: LoCoMo, PersonaMem, BEAM-100K values retained from the index generated 2026-06-22T20:26:29+00:00 because the raw archives are unavailable. These are historical values, not fresh AMB results. Source: origin/main@35fa73d, docs/experiments/index.json; full source commit/hash recorded per retained row in index.json.
 
-Generated: `2026-11-10T14:37:09+00:00`
+Generated: `2026-11-11T02:26:08+00:00`
 
 Refresh with `python3 data/results/postmerge-20261022/refresh_dashboard.py`.
 Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
@@ -16,6 +16,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 - `EXP-MATURATION` **Memory maturation evaluation concept** - `parked`; Recall quality may improve through maturation or consolidation processes beyond immediate ingestion. Decision: Parked until a concrete maturation runner is prioritized. Artifacts: 1. Updated: `2026-06-17`.
 - `EXP-EVOMEMBENCH` **EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan** - `in-progress`; A tag-isolated AutoMem recall/store backend can be wired into the EvoMemBench CrossEp-Know driver without editing the unlicensed upstream tree; supersession (t_invalid, INVALIDATED_BY) can only be credited on the separate InEp-Know FactConsolidation suite. Decision: Track in issue #90 at medium-low priority: runners/evomembench/ adapter plus a 17-episode CrossEp-Know wiring smoke on a local AutoMem endpoint after an owner-approved cap and a spend-guard path. No vendoring of upstream code or data. InEp-Know FactConsolidation adapter is a separate follow-up. Artifacts: 1. Updated: `2026-11-10`.
 - `EXP-MEME` **MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan** - `in-progress`; Typed AutoMem edges plus t_invalid supersession may deliver the change event or a propagated value in a single retrieval, closing Cascade/Absence/Deletion without Opus-class write-time cost. Decision: Track adapter work in the MEME issue (pending filing); no paid run until the spend guard supports the paper's models or a non-comparable column is chosen, and the owner approves a cap. Publish per-task accuracy with answerer/judge/cost disclosure only after actual AutoMem runs. Artifacts: 1. Updated: `2026-11-04`.
+- `EXP-ORIGINAL-TEXT-20261111` **Original-text index versus chunk retrieval diagnostic** - `completed`; A separate native original-text index can recover facts lost during summarization without crossing scope or lifecycle boundaries; chunk vectors may improve evidence coverage. Decision: Use explicit legacy trust only in disposable tests; do not infer agent success or production latency. Investigate calibrated abstention and a matched server chunk arm. Artifacts: 1. Updated: `2026-11-11`.
 - `EXP-PRECISION-CONTEXT-20261026` **Paired support-label context pruning diagnostic** - `completed`; Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support. Decision: Next: blinded evidence-anchored calibration of all 60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked. Artifacts: 6. Updated: `2026-11-02`.
 - `EXP-INLINE-OBSOLETE-20261026` **Suppress obsolete payloads in inline recall relations** - `completed`; Current-state recall must apply lifecycle suppression to inline relation payloads as well as top-level results, while retaining edge provenance and explicit history access. Decision: Focused fix and evidence merged in automem#273 / evals#78. Precision diagnostic reconciled in EXP-PRECISION-CONTEXT-20261026; calibrate scoring before a retrieval change. Keep #270 and broader #31 work parked. Artifacts: 4. Updated: `2026-10-26`.
 - `EXP-POSTMERGE-20261022` **Combined post-merge baseline and lifecycle follow-up** - `completed`; Merged embedding, lifecycle, enrichment and tag fixes improve write correctness without introducing retrieval regressions; answer-quality impact requires fresh ingestion. Decision: Baseline complete; inline fix/evidence merged. Precision diagnostic retrospectively reviewed; next calibrate preference scoring. Keep graph comparison, #270, AMB/BEAM refresh, new adapters and architecture parked. Artifacts: 5. Updated: `2026-10-26`.
@@ -34,6 +35,7 @@ Edit `docs/experiments/registry.json` instead of hand-editing this dashboard.
 
 ```mermaid
 flowchart LR
+  EXP_ORIGINAL_TEXT_20261111["EXP-ORIGINAL-TEXT-20261111: Original-text index versus chunk retrieval diagnostic"]
   EXP_EVOMEMBENCH["EXP-EVOMEMBENCH: EvoMemBench self-evolving memory: adapter feasibility and CrossEp-Know smoke plan"]
   EXP_MEME["EXP-MEME: MEME multi-entity and evolving memory: Cascade/Absence/Deletion adapter plan"]
   EXP_PRECISION_CONTEXT_20261026["EXP-PRECISION-CONTEXT-20261026: Paired support-label context pruning diagnostic"]
@@ -54,6 +56,8 @@ flowchart LR
   EXP_WRIT["EXP-WRIT: WRIT adapter diagnostics"]
   EXP_MATURATION["EXP-MATURATION: Memory maturation evaluation concept"]
   EXP_ORPHAN_FAMA_MEMORA_RELCHAIN["EXP-ORPHAN-FAMA-MEMORA-RELCHAIN: Undocumented FAMA, Memora, and relation-chain result clusters"]
+  EXP_ORIGINAL_TEXT_20261111 --> EXP_NEG_CONTROL
+  EXP_ORIGINAL_TEXT_20261111 --> EXP_CURRENT_STATE
   EXP_EVOMEMBENCH --> EXP_MEME
   EXP_MEME --> EXP_CURRENT_STATE
   EXP_MEME --> EXP_MATURATION

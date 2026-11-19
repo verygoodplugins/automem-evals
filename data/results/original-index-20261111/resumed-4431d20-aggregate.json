@@ -1,0 +1,49 @@
+{
+  "audit_provenance": {
+    "driver_sha256": "52215237b6529ac0d4e2e2039c21c0019e45538cbd34650df0291df9adaf8ba3",
+    "raw_receipts": "Retained locally only; raw questions and API logs are not published.",
+    "strict_log_auditor_sha256": "266291dcbb8b6dbae755d56f96d3da59b43bf7fcbb314f4358a4fe83220ddb12",
+    "targeted_runner_sha256": "48fad9265f133f8b5f0b3d9deb1ceecea23ea96df7714d79e9f90b78e8ae5dbd"
+  },
+  "baseline_sha": "1a7ba1a6afe69835f62ad7f6013e33301d1ab83e",
+  "candidate_sha": "4431d20e93ee194ed0749d91934af0219fad7b4f",
+  "dataset_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+  "mini": {
+    "api_and_driver_audits": {"baseline_api": {"clean": true, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 1, "expected_collection_404": 1, "http_5xx": 0, "query_timeouts": 0, "replacement_failures": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0}, "baseline_driver": {"clean": true, "counts": {"ERROR:": 0, "Traceback (most recent call last)": 0, "WARNING:": 0, "⚠️  Evidence fetch error:": 0, "⚠️  Graph traversal error:": 0, "⚠️  Recall error:": 0}}, "candidate_api": {"clean": true, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 1, "expected_collection_404": 1, "http_5xx": 0, "query_timeouts": 0, "replacement_failures": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0}, "candidate_driver": {"clean": true, "counts": {"ERROR:": 0, "Traceback (most recent call last)": 0, "WARNING:": 0, "⚠️  Evidence fetch error:": 0, "⚠️  Graph traversal error:": 0, "⚠️  Recall error:": 0}}},
+    "baseline_correct": 197,
+    "candidate_correct": 197,
+    "categories": {"1": {"baseline_correct": 27, "candidate_correct": 27, "losses": 0, "scored": 43, "skipped": 0, "ties": 43, "total": 43, "wins": 0}, "2": {"baseline_correct": 59, "candidate_correct": 59, "losses": 0, "scored": 63, "skipped": 0, "ties": 63, "total": 63, "wins": 0}, "3": {"baseline_correct": 4, "candidate_correct": 4, "losses": 0, "scored": 13, "skipped": 0, "ties": 13, "total": 13, "wins": 0}, "4": {"baseline_correct": 105, "candidate_correct": 105, "losses": 0, "scored": 114, "skipped": 0, "ties": 114, "total": 114, "wins": 0}, "5": {"baseline_correct": 2, "candidate_correct": 2, "losses": 0, "scored": 2, "skipped": 69, "ties": 2, "total": 71, "wins": 0}},
+    "corpus": {"corpus_sha256": "e0511145e30ce7ac96feff9f07669d6e33916b6313ea6acc15b069c40a72b6c5", "count_per_arm": 788, "identical_vectors": 788, "index_config_sha256": "1fe89d61e7930029f38ad2be576aa78d1d7f0c2b6942032c1c3cb1dd0e728dfc", "matched": true, "memory_relations": 0, "mismatches": [], "relations_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945", "timestamp_fingerprints_match": false, "timestamp_ranges": {"baseline": ["2026-11-11T15:50:37.905969+00:00", "2026-11-11T15:51:13.862593+00:00"], "candidate": ["2026-11-11T15:53:01.731492+00:00", "2026-11-11T15:53:25.863994+00:00"]}},
+    "limitations": ["Native deterministic scorer augments nonempty recall with gold-labelled evidence and can mask retrieval misses.", "Judge and answer-embedding scoring disabled; zero memory-to-memory relations; no ingest-time summarization.", "Targeted and mini runs overlapped, so timings are not controlled."],
+    "paired_losses": 0,
+    "paired_ties": 235,
+    "paired_wins": 0,
+    "questions": 304,
+    "receipt_sha256": {"baseline": "84d27c1320f00ac9d3f457be0eb5aa5c66cdfe7c174fc537d94c71cd8068564e", "candidate": "f44c65d0bceb6344e23621251072629a3afc1f559a79873854b71ded73cb5c2e", "comparison": "50e1c1ce48c63a911ffd3c4141975e7f0de0ca1eb5b373584a2deb1031aa10da", "corpus_comparison": "74b226806cd8d4bc87c4dd67592bc208c2972f17e554733dd6da0f788a7e04cf", "manifest": "290dd16c9f63691aec257180bab52fce555f08629956a240b74e9f9f66ee3f68"},
+    "scored": 235,
+    "skipped": 69
+  },
+  "model": "BAAI/bge-base-en-v1.5",
+  "model_revision": "199291fdd1aa89faf9c20b722dc72ad5e17aa0d0",
+  "model_sha256": "4e556722bc4f65716c544c8a931f1e90fb3f866e5741fd93a96f051d673339c7",
+  "network": "internal",
+  "product_head_test_only_delta": {
+    "changed_paths": ["tests/test_metadata_recall_search.py"],
+    "sha": "8fb56211ba7d7e3d146ae067e575bcafa98eeec0"
+  },
+  "provider_calls": 0,
+  "status": "exploratory; mini judge disabled; no official benchmark claim",
+  "targeted": {
+    "api_audits": {"baseline": {"clean": true, "docker_logs_exit": 0, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 0, "expected_collection_404": 1, "http_5xx": 0, "query_timeouts": 0, "replacement_failures": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0}, "candidate": {"clean": true, "docker_logs_exit": 0, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 0, "expected_collection_404": 0, "http_5xx": 0, "query_timeouts": 0, "replacement_failures": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0}, "candidate_seed": {"clean": true, "docker_logs_exit": 0, "error_log_lines": 0, "exceptions": 0, "expected_capability_400": 0, "expected_collection_404": 1, "http_5xx": 0, "query_timeouts": 0, "replacement_failures": 0, "unexpected_http_4xx": 0, "unexpected_upstream_4xx": 0, "upstream_5xx": 0}},
+    "backfill_applied": {"conservative": 548, "repeat_trusted": 0, "trusted": 542},
+    "backfill_conflicts": 0,
+    "denominators": {"history": 4, "identifier": 16, "locomo": 136, "negative": 16, "paraphrase": 16, "wrong_scope": 4},
+    "fixture_sha256": "d89af992a8e71bc2aafde8ba54fdb441e93b6b716de63bc9cc1a57b0b64559f6",
+    "index_mutation": "old token removed on PATCH, new token added, removed on DELETE; old query still returned updated memory via vector similarity",
+    "metrics_at_floor_0": {"baseline": {"all_locomo_evidence_at_10": 69, "all_locomo_evidence_at_5": 58, "history_at_5": 4, "identifier_at_5": 10, "inactive_leaks": 0, "negative_nonempty": 16, "paraphrase_at_5": 14, "scope_leaks": 0, "wrong_scope_nonempty": 4}, "candidate": {"all_locomo_evidence_at_10": 75, "all_locomo_evidence_at_5": 62, "history_at_5": 4, "identifier_at_5": 16, "inactive_leaks": 0, "negative_nonempty": 16, "paraphrase_at_5": 14, "scope_leaks": 0, "wrong_scope_nonempty": 4}},
+    "query_floor_pairs": 257,
+    "receipt_sha256": {"baseline": "7147e2bce849b3aa598374c1514cfc829fdd8018fd10f01a9d0d4c0bcb596ed5", "candidate": "c272bc3760fe3967f18919f68ea4ab6eee8bc58f8281f32a9aa446a1fdd18de5", "comparison": "ea0231e0329908d1b2deaac9bcc3daa2198d521f9608c8c3b18c2c0e595cec98", "manifest": "9558980dc520a90b295a99fd0812246c5866536020ca2b87f1983f51e4d716aa"},
+    "records": 548,
+    "scope": "positive, negative, scope, temporal/history, mutation; relation expansion disabled"
+  }
+}
