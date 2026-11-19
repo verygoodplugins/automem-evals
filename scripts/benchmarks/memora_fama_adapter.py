@@ -274,6 +274,20 @@ class AutoMemFamaSystem(_MemoraBaseMemorySystem):
         if not content:
             return {"status": "skipped", "reason": "no share_memory turn", "fact_key": fact_key}
 
+        previous_key = fact_key
+        old_item = (conversation_data.get("operation_details") or {}).get("old_item")
+        if operation == "update" and isinstance(old_item, str):
+            old_key = _safe_tag(old_item)
+            if old_key and fact_key and old_key != fact_key:
+                if previous_id:
+                    return {
+                        "status": "skipped",
+                        "reason": "renamed update destination already active",
+                        "fact_key": fact_key,
+                    }
+                previous_key = old_key
+                previous_id = self._current_by_fact.get(previous_key)
+
         payload: dict[str, Any] = {
             "content": content,
             "type": "Context",
@@ -298,6 +312,8 @@ class AutoMemFamaSystem(_MemoraBaseMemorySystem):
                 }
             )
         memory_id = self.client.store_memory(**payload)
+        if operation == "update" and previous_id and previous_key != fact_key:
+            del self._current_by_fact[previous_key]
         self._current_by_fact[fact_key] = memory_id
         return {
             "status": "stored",

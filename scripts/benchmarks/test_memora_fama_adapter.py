@@ -122,6 +122,56 @@ class AutoMemFamaSystemTest(unittest.TestCase):
             transport.calls,
         )
 
+    def test_renamed_update_uses_explicit_predecessor_and_retires_old_key(self) -> None:
+        transport = RecordingAutoMem()
+        subject = AutoMemFamaSystem("persona", request_json=transport.request)
+        subject.add_conversation_to_memory(conversation("add", "2025-06-01", "Old editor"))
+        update = conversation("update", "2025-06-02", "New editor")
+        update["operation_details"] = {"item": "preferred code editor", "old_item": "favorite editor"}
+
+        result = subject.add_conversation_to_memory(update)
+        self.assertEqual(result["superseded"], "memory-1")
+        self.assertNotIn("favorite-editor", subject._current_by_fact)
+        self.assertEqual(subject._current_by_fact["preferred-code-editor"], "memory-2")
+        calls_after_rename = list(transport.calls)
+
+        self.assertEqual(subject.add_conversation_to_memory(update)["status"], "skipped")
+        old_delete = conversation("delete", "2025-06-03", "Delete the retired item")
+        self.assertEqual(subject.add_conversation_to_memory(old_delete)["status"], "skipped")
+        self.assertEqual(transport.calls, calls_after_rename)
+
+    def test_renamed_update_does_not_replace_an_unrelated_active_destination(self) -> None:
+        transport = RecordingAutoMem()
+        subject = AutoMemFamaSystem("persona", request_json=transport.request)
+        subject.add_conversation_to_memory(conversation("add", "2025-06-01", "Old editor"))
+        other = conversation("add", "2025-06-01", "Unrelated active destination")
+        other["operation_details"] = {"item": "preferred code editor"}
+        subject.add_conversation_to_memory(other)
+        calls = list(transport.calls)
+        active = dict(subject._current_by_fact)
+
+        update = conversation("update", "2025-06-02", "Renamed editor")
+        update["operation_details"] = {"item": "preferred code editor", "old_item": "favorite editor"}
+        self.assertEqual(subject.add_conversation_to_memory(update)["status"], "skipped")
+        self.assertEqual(transport.calls, calls)
+        self.assertEqual(subject._current_by_fact, active)
+
+    def test_failed_renamed_update_does_not_retire_the_bookkeeping_key(self) -> None:
+        transport = RecordingAutoMem()
+
+        def fail_association(*args: Any, **kwargs: Any) -> dict[str, Any]:
+            if args[2:4] == ("POST", "/associate"):
+                raise RuntimeError("fixture association failure")
+            return transport.request(*args, **kwargs)
+
+        subject = AutoMemFamaSystem("persona", request_json=fail_association)
+        subject.add_conversation_to_memory(conversation("add", "2025-06-01", "Old editor"))
+        update = conversation("update", "2025-06-02", "New editor")
+        update["operation_details"] = {"item": "preferred code editor", "old_item": "favorite editor"}
+        with self.assertRaisesRegex(RuntimeError, "fixture association failure"):
+            subject.add_conversation_to_memory(update)
+        self.assertEqual(subject._current_by_fact, {"favorite-editor": "memory-1"})
+
 
 if __name__ == "__main__":
     unittest.main()
