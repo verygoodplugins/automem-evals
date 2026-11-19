@@ -1,0 +1,33 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+  qdrant:
+    image: qdrant/qdrant:v1.11.3
+  api:
+    image: automem-flask-api:latest
+    command: ["python", "/experiment/server.py"]
+    depends_on: [falkordb, qdrant]
+    volumes:
+      - ${AUTOMEM_SOURCE}:/app:ro
+      - ${SCENARIO_FILE}:/experiment/scenario.py:ro
+      - ${SERVER_FILE}:/experiment/server.py:ro
+      - ${MODEL_CACHE}:/experiment/models:ro
+    environment:
+      PORT: "8001"
+      FALKORDB_HOST: falkordb
+      FALKORDB_PORT: "6379"
+      QDRANT_URL: http://qdrant:6333
+      AUTOMEM_API_TOKEN: graph-value-fixture-token
+      ADMIN_API_TOKEN: graph-value-fixture-admin
+      OPENAI_API_KEY: ""
+      VOYAGE_API_KEY: ""
+      EMBEDDING_PROVIDER: local
+      VECTOR_SIZE: "768"
+      AUTOMEM_MODELS_DIR: /experiment/models
+      HF_HUB_OFFLINE: "1"
+      MEMORY_AUTO_SUMMARIZE: "false"
+      JIT_ENRICHMENT_ENABLED: "false"
+      RECALL_ADAPTIVE_FLOOR: "false"
+networks:
+  default:
+    internal: true

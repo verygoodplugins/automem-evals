@@ -1,5 +1,30 @@
 [
   {
+    "id": "EXP-GRAPH-VALUE-20261111",
+    "title": "Controlled graph expansion and scope diagnostic",
+    "status": "in-progress",
+    "hypothesis": "Graph expansion can improve linked-fact retrieval within a fixed context budget without returning foreign, stale, or excessive evidence.",
+    "result": "Six synthetic queries across 48 variants: final combined scope and limit heads removed observed tag-respecting inline foreign content (4/24 to 0/24) and limit overflow (4/48 to 0/48); evidence unchanged and all 8 negative variants returned results.",
+    "decision": "Complete isolated no-judge mini/full benchmarks and record comparisons; independently review scope and limit PRs. Do not infer agent success or general graph value from the combined synthetic replay.",
+    "started": "2026-11-11",
+    "updated": "2026-11-13",
+    "artifacts": [
+      "data/results/graph-value-probe-20261111/README.md",
+      "data/results/graph-value-probe-20261111/aggregate.json",
+      "data/results/graph-value-probe-20261111/paired-fix-aggregate.json",
+      "data/results/graph-value-probe-20261111/final-replay-aggregate.json"
+    ],
+    "branch": "test/graph-value-probe",
+    "worktree": "../automem-evals.worktrees/graph-value-probe",
+    "pr": 99,
+    "related": [
+      "EXP-ORIGINAL-TEXT-20261111",
+      "EXP-NEG-CONTROL",
+      "EXP-CURRENT-STATE"
+    ],
+    "notes": "Product fixes: https://github.com/verygoodplugins/automem/pull/287 and https://github.com/verygoodplugins/automem/pull/288. Live paired replay used combined integration 3f9a424 with the exact final PR heads, not either head in isolation. No paid provider calls."
+  },
+  {
     "id": "EXP-ORIGINAL-TEXT-20261111",
     "title": "Original-text index versus chunk retrieval diagnostic",
     "status": "completed",
