@@ -1,0 +1,11 @@
+# Synthetic scorer probe — 2026-11-11
+
+**Result: keep the scorer out of benchmark policy.** One local Qwen scorer matched the manually assigned verdicts on all eight development cases. On the eight held-out cases, seven responses passed structural validation and matched the labels; the eighth was rejected because its overall `pass` contradicted its own `unmet` required criterion. That rejected result was a raw false pass on a compound-requirement case. The prompt was not revised after development, and the held-out split was run once.
+
+All cases were manually authored fictional examples, not copied questions or real user traces. Both splits include conjunctions, missing clauses, paraphrases, optional details, contradictions and abstention. The scorer labeled an abstention as `contradicted` rather than `unmet` in each split; both overall fail verdicts were correct. Literal-quote checks and internal consistency checks catch some mechanical defects, but they do not prove semantic correctness or detect every missing requirement.
+
+The [sanitized aggregate](AGGREGATE.json) records the local model digest, frozen prompt/schema/fixture/runner hashes, per-category counts, and hashes of locally retained raw receipts. The runner and frozen fixture are documented in the [probe README](../../../experiments/preference_scorer_probe/README.md); raw model responses were retained only in local `/tmp` directories. The local Ollama process used no remote model or paid provider calls.
+
+The aggregate binds the runner as executed at commit `e4ff926`. Later changes reject HTTP redirects and preserve malformed model output in private receipts; they change the runner hash and do not alter or replace this run's evidence.
+
+This is eight held-out synthetic cases with one local model, not human gold, a representative sample, or an official benchmark score. The held-out fixture is visible to a researcher; the freeze protocol is procedural rather than a cryptographic blind. The earlier saved-answer scorer candidate failed two of four held-out cases, and this separate small probe does not erase that failure or validate a benchmark scoring policy. Any revised scorer needs a new disjoint holdout, not a rerun on these now-observed cases.

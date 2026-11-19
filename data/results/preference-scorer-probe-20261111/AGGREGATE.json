@@ -1,0 +1,151 @@
+{
+  "claim": "Small manually labelled synthetic scorer diagnostic; not a validated judge or benchmark score.",
+  "config": {
+    "fixture_sha256": "4ee52be4599911c1e0a9d36954d699818d8467cd51ee5a1b6d08350a89530bbf",
+    "heldout_sha256": "28e130cdf90f0704141667476463345f4a348ff1fc1f495a52a9d0d15b5dab76",
+    "model": "qwen3.6:35b-a3b",
+    "model_digest": "599a7133f2e36499a5dcac65d686a90e151011ada575a6bb08269fcfbfe138c2",
+    "options": {
+      "num_predict": 768,
+      "seed": 42,
+      "temperature": 0
+    },
+    "runner_sha256": "04aba4b1ac98f277e5e95291ef45d700c2240be2df52c8ef208f47e447726965",
+    "schema_sha256": "a5baf373627605ac2a99df860f27f03f4658913db70238e1396338d91aaba64b",
+    "system_sha256": "ee790147a616eb8ad736eaa1e737493fc655d885d402a2bfc098a9574963cede",
+    "think": false
+  },
+  "development": {
+    "ambiguous": 0,
+    "by_kind": {
+      "abstention": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "conjunction-pass": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "contradiction": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "irrelevant-distraction": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "missing-clause": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "optional-inclusion": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "optional-omission": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "paraphrase": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      }
+    },
+    "cases": 8,
+    "correct": 8,
+    "false_fails": 0,
+    "false_passes": 0,
+    "finished_at_utc": "2026-11-11T17:23:40.154804+00:00",
+    "invalid": 0,
+    "receipt_sha256": "533d908d22dbbfe64f2623764c496ea100ebcb86e4a669e794e9415ae96b6e18",
+    "summary_sha256": "0963aef330b6fd5460ed00c2ef5baf9422413fc897c4d3212c74cdb0be6fdf43",
+    "valid": 8
+  },
+  "fixture": "experiments/preference_scorer_probe/fixture.json",
+  "fixture_provenance": "16 manually authored fictional cases; no real user traces or benchmark questions.",
+  "heldout": {
+    "ambiguous": 0,
+    "by_kind": {
+      "abstention": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "conjunction-pass": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "contradiction": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "irrelevant-distraction": {
+        "cases": 1,
+        "correct": 0,
+        "valid": 0
+      },
+      "missing-clause": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "optional-inclusion": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "optional-omission": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      },
+      "paraphrase": {
+        "cases": 1,
+        "correct": 1,
+        "valid": 1
+      }
+    },
+    "cases": 8,
+    "correct": 7,
+    "false_fails": 0,
+    "false_passes": 0,
+    "finished_at_utc": "2026-11-11T17:24:17.229384+00:00",
+    "invalid": 1,
+    "receipt_sha256": "7dde80d625e173c9e7077bbd6f934cf7a1c7fec63ed73fb0589e60862cd67684",
+    "summary_sha256": "9239a2c9dc41b9d3ecbc7020b1ca5cb5fba7d29ecbd5b4fdff95a998568b7b4d",
+    "valid": 7
+  },
+  "paid_provider_calls": 0,
+  "protocol": {
+    "development_cases": 8,
+    "endpoint": "HTTP loopback Ollama, no proxy, remote references rejected",
+    "heldout_cases": 8,
+    "heldout_runs": 1,
+    "limitations": [
+      "Literal evidence validation does not establish semantic support.",
+      "Heldout is visible in the committed fixture; discipline is procedural, not cryptographic blinding.",
+      "One local model and eight held-out cases cannot establish scorer reliability.",
+      "Synthetic tasks do not replace the failed real-answer heldout or official evaluation."
+    ],
+    "prompt_revision_after_development": false,
+    "validator": "Every criterion evaluated once; quoted evidence literal; overall verdict consistent with statuses."
+  },
+  "raw_evidence": "Retained locally outside the repository; only aggregate counts and hashes are committed.",
+  "review": {
+    "abstention_status_nuance": "The development and held-out abstentions were labeled contradicted instead of unmet; both overall verdicts were fail.",
+    "description": "A held-out response marked one required criterion unmet but returned an overall pass; validation rejected it.",
+    "raw_false_pass_among_rejected": 1,
+    "rejected_inconsistent_heldout_responses": 1
+  },
+  "status": "complete_synthetic_diagnostic"
+}
