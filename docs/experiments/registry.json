@@ -42,14 +42,16 @@
     "title": "Paired support-label context pruning diagnostic",
     "status": "completed",
     "hypothesis": "Removing off-label retrieved context may improve preference answer correctness while preserving all retrieved labeled support.",
-    "result": "All 34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences 15/30 full vs 18/30 pruned (4 wins/1 loss); miss controls 0/5 both. Scoring inconsistencies prevent a product efficacy claim.",
-    "decision": "Next: blinded evidence-anchored calibration of all 60 saved preference answers; no retrieval change or paid rerun. Graph comparison and broader work remain parked.",
+    "result": "All 34 paired cases retrospectively validated for content analysis; original automated receipts remain incomplete. Original judge: preferences 15/30 full vs 18/30 pruned (4 wins/1 loss); miss controls 0/5 both. Scoring inconsistencies prevent a product efficacy claim. Offline blinded calibration: full 23 pass/6 fail/1 ambiguous vs support-only 22/6/2; all five original discordances became both-pass ties.",
+    "decision": "Keep retrieval unchanged; validate the scorer with privacy-reviewed synthetic regressions and a fresh holdout before the next matched preference-to-answer experiment.",
     "started": "2026-10-26",
-    "updated": "2026-11-02",
+    "updated": "2026-11-11",
     "artifacts": [
       "data/results/precision-context-20261026/*",
       "data/sweep_runs/precision-context-20261026/**",
-      "docs/session_20261026_precision_context.md"
+      "docs/session_20261026_precision_context.md",
+      "data/results/preference-scoring-20261105/REPORT.md",
+      "data/results/preference-scoring-20261105/AGGREGATE.json"
     ],
     "branch": "test/precision-context-ablation",
     "worktree": "../automem-evals.worktrees/precision-context-ablation",
@@ -58,7 +60,7 @@
       "EXP-POSTMERGE-20261022",
       "EXP-INLINE-OBSOLETE-20261026"
     ],
-    "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted $10.727503350/$20 including retained prior liability; remaining $9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged."
+    "notes": "AutoMem#273 merged fe0d5c3; evidence#78 merged cead9f4 after clean refreshed review. Reconciliation used zero provider calls. Total accounted $10.727503350/$20 including retained prior liability; remaining $9.272496650. See RECONCILIATION.md and AUDITED_RESULTS.json; original grades unchanged. Blinded local calibration used no new paid calls; one compound-criterion false positive remains. See the aggregate-only calibration report."
   },
   {
     "id": "EXP-INLINE-OBSOLETE-20261026",
