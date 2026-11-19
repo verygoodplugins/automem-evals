@@ -1,0 +1,57 @@
+# Isolated stack for issue #83. Never shares ports/volumes with a developer's own AutoMem stack.
+#   AUTOMEM_SRC=/path/to/automem MEILI_ARM=baseline|keyword_swap|vector_swap \
+#     docker compose -p meilibench-$MEILI_ARM -f configs/meilisearch/docker-compose.yml up -d
+# One arm at a time, fresh volumes per arm (`down -v` between arms). Reuses the dependency image
+# automem-flask-api:latest and mounts the pinned AutoMem checkout at /app, as upstream compose does.
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    ports: ["16379:6379"]
+    healthcheck: { test: ["CMD-SHELL", "redis-cli ping"], interval: 5s, timeout: 3s, retries: 20 }
+  qdrant:
+    image: qdrant/qdrant:v1.11.3
+    ports: ["16333:6333"]
+  meilisearch:
+    image: getmeili/meilisearch:v1.56.1 # pinned; keep in sync with meili_backend.PINNED_VERSION
+    ports: ["17700:7700"]
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-bench-master-key}
+    volumes: ["meili_data:/meili_data"]
+  flask-api:
+    image: automem-flask-api:latest
+    working_dir: /app
+    command: ["python", "/bench/meili_launch.py"]
+    ports: ["18001:8001"]
+    depends_on: { falkordb: { condition: service_healthy }, qdrant: { condition: service_started }, meilisearch: { condition: service_started } }
+    volumes:
+      - ${AUTOMEM_SRC:?set AUTOMEM_SRC to the automem checkout}:/app:ro
+      - ../../scripts/benchmarks:/bench:ro
+      - fastembed_models:/root/.config/automem/models
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PORT: "8001"
+      FALKORDB_HOST: falkordb
+      FALKORDB_PORT: "6379"
+      QDRANT_URL: http://qdrant:6333
+      AUTOMEM_API_TOKEN: test-token
+      ADMIN_API_TOKEN: test-admin-token
+      MEILI_ARM: ${MEILI_ARM:-baseline}
+      MEILI_URL: http://meilisearch:7700
+      MEILI_KEYWORD_ONLY: ${MEILI_KEYWORD_ONLY:-}
+      MEILI_MATCHING_STRATEGY: ${MEILI_MATCHING_STRATEGY:-}
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-bench-master-key}
+      # Identical, free, local embeddings across all arms (no provider keys are forwarded).
+      EMBEDDING_PROVIDER: local
+      VECTOR_SIZE: "384"
+      VECTOR_SIZE_AUTODETECT: "true"
+      AUTOMEM_MODELS_DIR: /root/.config/automem/models
+      MEMORY_AUTO_SUMMARIZE: "false"
+      # AutoMem loads the mounted checkout's .env itself; empty values stop it reaching paid providers
+      # (the memory-type classifier otherwise calls OpenAI once per stored memory, outside any budget ledger).
+      OPENAI_API_KEY: ""
+      VOYAGE_API_KEY: ""
+volumes:
+  meili_data:
+  fastembed_models:
