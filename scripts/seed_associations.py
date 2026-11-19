@@ -17,6 +17,9 @@ traversal surfaces relevant-but-untagged memories.
 
 Usage:
   python3 scripts/seed_associations.py [--endpoint http://localhost:8001] [--token test-token]
+  python3 scripts/seed_associations.py \
+      --endpoint http://localhost:8011 \
+      --manifest corpus_v1-8011.manifest.json
 """
 
 import argparse
@@ -27,7 +30,8 @@ import urllib.error
 import urllib.request
 
 HERE = pathlib.Path(__file__).resolve().parent.parent
-MANIFEST = HERE / "data" / "seed_memories" / "corpus_v1.manifest.json"
+SEED_DIR = HERE / "data" / "seed_memories"
+MANIFEST = SEED_DIR / "corpus_v1.manifest.json"
 
 
 def request(method: str, url: str, token: str, payload: dict | None = None) -> dict:
@@ -40,6 +44,16 @@ def request(method: str, url: str, token: str, payload: dict | None = None) -> d
     )
     with urllib.request.urlopen(req, timeout=20) as r:
         return json.loads(r.read())
+
+
+def resolve_manifest(value: str | None) -> pathlib.Path:
+    """Bare filenames live under data/seed_memories/; paths are used as given."""
+    if not value:
+        return MANIFEST
+    path = pathlib.Path(value)
+    if path.is_absolute() or path.parent != pathlib.Path("."):
+        return path
+    return SEED_DIR / path
 
 
 # Edges to create, expressed in scenario-id terms. Each entry: (from_scenario,
@@ -85,9 +99,17 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--endpoint", default="http://localhost:8001")
     ap.add_argument("--token", default="test-token")
+    ap.add_argument(
+        "--manifest",
+        default=None,
+        help=(
+            "Manifest written by the seed script for this stack. Bare filenames "
+            "are read from data/seed_memories/. Defaults to corpus_v1.manifest.json."
+        ),
+    )
     args = ap.parse_args()
 
-    manifest = json.loads(MANIFEST.read_text())
+    manifest = json.loads(resolve_manifest(args.manifest).read_text())
     scen_to_mids: dict[str, list[str]] = manifest["scenario_to_memories"]
 
     created = 0

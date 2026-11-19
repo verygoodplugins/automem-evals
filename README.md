@@ -63,7 +63,8 @@ docker compose up -d
 # 2. Come back here
 cd ../automem-evals
 
-# 3. Seed a snapshotted corpus (v1 ships with this repo — zero API cost)
+# 3. Seed a snapshotted corpus (v1 ships with this repo — zero API cost).
+#    Timestamps are shifted so the corpus is "recent" today; --no-rebase disables.
 python3 scripts/seed_from_snapshot.py
 python3 scripts/seed_associations.py
 

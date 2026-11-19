@@ -1,0 +1,80 @@
+{
+  "ambiguous_binary_bounds_pruned_minus_full": [
+    -2,
+    1
+  ],
+  "answers": 60,
+  "arms": {
+    "full": {
+      "ambiguous": 1,
+      "fail": 6,
+      "old_fail_new_pass": 9,
+      "old_pass_new_fail": 0,
+      "original_correct": 15,
+      "pass": 23
+    },
+    "support_pruned": {
+      "ambiguous": 2,
+      "fail": 6,
+      "old_fail_new_pass": 5,
+      "old_pass_new_fail": 0,
+      "original_correct": 18,
+      "pass": 22
+    }
+  },
+  "calibrated_paired": {
+    "ambiguous_pairs": 3,
+    "exploratory_paired_sign_p": 1.0,
+    "pruned_losses": 2,
+    "pruned_wins": 2,
+    "ties": 23
+  },
+  "calibration_paid_provider_calls": 0,
+  "calibrator_model": "qwen3.6:35b-a3b",
+  "calibrator_model_digest": "599a7133f2e36499a5dcac65d686a90e151011ada575a6bb08269fcfbfe138c2",
+  "criterion_checks": 86,
+  "decisive_judgments_agree_with_original": 43,
+  "experiment": "EXP-PREFERENCE-CAL-20261105",
+  "harness_revision": "3eaa1f5d4a622db8d85fa9e5f45519fbb67f8876",
+  "limitations": [
+    "One local model is not human gold or a validated benchmark judge.",
+    "One compound-criterion false positive was identified after unmasking; sealed verdicts were not revised.",
+    "The sample is small and no agent task success is established.",
+    "Calibration made no new paid provider calls; original answer generation was part of an earlier paid experiment."
+  ],
+  "local_attempts": 86,
+  "local_source_commit": "0f17792b8898f816dfae4a31ff7d15cd35826ffb",
+  "official_score_eligible": false,
+  "original_audited_results_sha256": "d3c58cca9948b97819822a158b499ea9295163545fa9404c289945a944bda5b5",
+  "original_discordances_that_became_both_pass": 5,
+  "original_fails_now_pass": 14,
+  "original_paired": {
+    "ambiguous_pairs": 0,
+    "exploratory_paired_sign_p": 0.375,
+    "pruned_losses": 1,
+    "pruned_wins": 4,
+    "ties": 25
+  },
+  "pairs": 30,
+  "published_content": "aggregate only; raw questions, answers, rubrics, and case-level judgments are excluded",
+  "recovered_quote_flags": 17,
+  "server_revision": "fe0d5c374f1da65d30aaa9311e24647284d22793",
+  "source_evidence_sha256": {
+    "anchors.json": "e8da72380c072d23cca5cc3bf1451c207c8912a9bdc9910d5d2b5985d14ae83f",
+    "blind-quote-review.json": "ee37812dc825cfb5d6cbfb4e12554d27abe1f4653d2b38377f4e6233fe550e67",
+    "blind-receipt.json": "0e148fbd91cabb519cd236fde7b27bebfb6a303c0c5c3499fdcd25d6f2e099ea",
+    "blind-results.json": "2d224007a68afc2b7ac2193265b7445d839a340aae85111dc4b6ae19e3e59a37",
+    "compare_after_seal.py": "272a371799af1b94ee887f15aa3b6dc12bb833db56c06cd78752a43b9784f110",
+    "comparison.json": "097622ef08a34bffbb0ca3e1525cfd0ccacd5d72fd3eec8026811ae9d2a8f448",
+    "contract.json": "85a49b8fedbacc8125284e68d21a7c8146740d22be92ed4ddadd220eea0416b0",
+    "format-correction.json": "a1d37cf839dc2fac907218eca93deb8558dffab615478445efaac556761c64e2",
+    "rubric-correction.json": "476f2639879447418b172ac8c82082c539b2532747d996d76706ea5af9805648",
+    "score_blind.py": "356c762fc1b558bff99adfe19406882ad49541a2666de68740b7259f74ef3056",
+    "verify_quotes_blind.py": "de5863243c73b130fb03dade4499e9d09aac65785c95d923f573236c376ca28a"
+  },
+  "source_experiment": "EXP-PRECISION-CONTEXT-20261026",
+  "source_pr": 82,
+  "source_record_sha256": "ce650d14ae6b19b971c666719c32f158ba2f191bdb876f767008c254c302bd63",
+  "status": "complete_diagnostic",
+  "unresolved_evidence_answers": 3
+}
