@@ -225,6 +225,8 @@ class ClientRequestTests(unittest.TestCase):
         self.assertEqual(created, 2)
         self.assertEqual(calls[1]["memory1_id"], "m1")
         self.assertEqual(calls[2]["memory2_id"], "m3")
+        self.assertEqual(client.association_request_calls, 3)
+        self.assertEqual(client.association_write_failures, 1)
 
     def test_cleanup_deletes_recalled_run_tag_ids(self):
         deleted = []
